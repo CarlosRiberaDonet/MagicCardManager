@@ -20,6 +20,10 @@ import java.net.URL;
 public class CardDetailBuilder {
 
     private Card card;
+    // Configuración de botones
+    JButton linkButton;
+    JButton addCardButton;
+    JButton removeCardButton;
 
     public CardDetailBuilder(Card card) {
         this.card = card;
@@ -29,7 +33,7 @@ public class CardDetailBuilder {
     public JPanel createImagePanel() {
         JPanel imagePanel = new JPanel(new BorderLayout());
         JLabel imageLabel = new JLabel();
-
+        
         // Cargar la imagen desde la URL proporcionada por la carta
         String imageUrl = card.getImageUrl();
         if (imageUrl != null) {
@@ -52,6 +56,9 @@ public class CardDetailBuilder {
     // Método para crear el panel con los detalles de la carta
     public JPanel createRightPanel() {
         JPanel rightPanel = new JPanel(new GridBagLayout());
+        addCardButton = new JButton("Añadir a mi lista");
+        removeCardButton = new JButton("Quitar carta de mi lista");
+        linkButton = new JButton("Link");
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.anchor = GridBagConstraints.WEST;
@@ -68,10 +75,7 @@ public class CardDetailBuilder {
         addLabelPair(rightPanel, gbc, "Valor FOIL:", CardController.getFoilPrice(card), 6, boldFont);
         addLabelPair(rightPanel, gbc, "Disponible FOIL:", card.isFoil() ? "Sí" : "No", 7, boldFont);
 
-        // Configuración de botones
-        JButton linkButton = new JButton("Abrir enlace");
-        JButton addCardButton = new JButton("Añadir a mi lista");
-        JButton removeCardButton = new JButton("Quitar de mi lista");
+        
 
         // Botón "Abrir enlace" alineado a la derecha
         gbc.gridx = 1;
@@ -90,27 +94,32 @@ public class CardDetailBuilder {
         rightPanel.add(removeCardButton, gbc);
 
         // Lógica de visibilidad de los botones
-        if (isCardInUserList(card)) {
-            removeCardButton.addActionListener(e -> {
-                UserController.removeCardFromMap(card);
-                removeCardButton.setVisible(false);
-                addCardButton.setVisible(true);   
-            });
-            removeCardButton.setVisible(true);
-            addCardButton.setVisible(false);
-        } else {
-            addCardButton.addActionListener(e -> {
-                UserController.addCardToMap(card);
-                addCardButton.setVisible(false);
-                removeCardButton.setVisible(true);
-            });
-            addCardButton.setVisible(true);
-            removeCardButton.setVisible(false);
-        }
-
+        updateButtons();
+        
+        addCardButton.addActionListener(e ->{
+           UserController.addCardToMap(card);
+           updateButtons();
+        });
+        
+        removeCardButton.addActionListener (e -> {
+            UserController.removeCardFromMap(card);
+            updateButtons();
+        
+        });
+        
         linkButton.addActionListener(e -> MisMetodos.abrirURL(card.getNewUrl()));
 
         return rightPanel;
+    }
+    
+    private void updateButtons(){
+        if(isCardInUserList(card)){
+            removeCardButton.setVisible(true);
+            addCardButton.setVisible(false);            
+        } else{
+            removeCardButton.setVisible(false);
+            addCardButton.setVisible(true);          
+        }
     }
 
     // Método auxiliar para agregar pares de etiquetas y valores
