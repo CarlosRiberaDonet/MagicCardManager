@@ -55,12 +55,6 @@ public class Card {
     @Column(name = "type_line")
     private String typeLine;
 
-    @Column(name = "mana_cost")
-    private String manaCost;
-
-    @Column(name = "cmc", precision = 5, scale = 1)
-    private BigDecimal cmc;
-
     @Column(name = "border_color", length = 20)
     private String borderColor;
 
@@ -69,4 +63,7 @@ public class Card {
 
     @Column(name = "is_reprint")
     private boolean isReprint;
+
+    @Column(name="cardmarket_url")
+    private String cardmarketURL;
 }
