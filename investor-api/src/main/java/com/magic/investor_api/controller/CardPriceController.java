@@ -1,7 +1,7 @@
 package com.magic.investor_api.controller;
 
 import com.magic.investor_api.downloader.CardmarketDownloader;
-import com.magic.investor_api.service.CardmarketService;
+import com.magic.investor_api.service.CardmarketImportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class CardPriceController {
 
     private final CardmarketDownloader cardmarketDownloader;
-    private final CardmarketService cardmarketService;
+    private final CardmarketImportService cardmarketService;
 
     @PostMapping("/import-guide-prices")
     public ResponseEntity<String> startImportGuidePrices(){
@@ -43,7 +43,7 @@ public class CardPriceController {
 
         } catch (Exception e) {
             System.err.println("Error en el proceso: " + e.getMessage());
-            System.out.println("Erro en ScryfallOtchestator startFullImport:");
+            System.out.println("Erro en CardPriceController startFullImport:");
             e.printStackTrace();
         }
         return ResponseEntity.ok("Base de datos actualizada.");

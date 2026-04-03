@@ -1,6 +1,5 @@
 package com.magic.investor_api.downloader;
 
-import com.magic.investor_api.client.ScryfallApi;
 import com.magic.investor_api.service.ScryfallImportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,17 +13,13 @@ import java.net.URL;
 @RequiredArgsConstructor
 public class ScryfallDownloader {
 
-    private final ScryfallApi scryfallApi;
     private final ScryfallImportService importService;
     private static final String URL_SCRYFALL = "https://data.scryfall.io/all-cards/all-cards-20260401092717.json";
     private static final String PATH_LOCAL = "D:/Proyectos/MagicCardManager/cards.json";
 
     public void startFullImport() {
 
-        System.out.println("Iniciando descarga desde Scryfall...");
-
         try {
-            System.out.println("Iniciando descarga desde Cardmarket S3...");
 
             URL url = new URL(URL_SCRYFALL);
             try (InputStream in = url.openStream();

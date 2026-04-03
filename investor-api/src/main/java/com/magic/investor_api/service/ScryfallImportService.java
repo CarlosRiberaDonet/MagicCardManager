@@ -8,13 +8,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.magic.investor_api.model.Card;
 import com.magic.investor_api.repository.CardRepository;
-import com.magic.investor_api.repository.CardPriceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -26,7 +24,6 @@ import java.util.Map;
 public class ScryfallImportService {
 
     private final CardRepository cardRepository;
-    private final CardPriceRepository cardPriceRepository;
     private ObjectMapper objectMapper = new ObjectMapper(); // Spring ya lo tiene configurado
 
     private static final Map<String, String> LANGUAGE_MAP = Map.ofEntries(
@@ -62,7 +59,7 @@ public class ScryfallImportService {
                 batch.add(card);
                 totalProcessed++;
 
-                // Cada 1000 cartas, volcamos y vaciamos la memoria RAM
+                // Cada 1000 cartas, vuelco a la BD
                 if (totalProcessed % 1000 == 0) {
                     cardRepository.saveAll(batch);
                     batch.clear();
@@ -172,44 +169,4 @@ public class ScryfallImportService {
 
         return url;
     }
-
-    /*public void importCardsFromJson(String filePath) throws IOException {
-        JsonFactory factory = new JsonFactory();
-        try (JsonParser parser = factory.createParser(new File(filePath))) {
-
-            // Verificamos que el JSON empiece con un array [
-            if (parser.nextToken() != JsonToken.START_ARRAY) {
-                throw new IOException("El archivo no es un array JSON válido");
-            }
-
-            List<Card> cardBatch = new ArrayList<>();
-            int count = 0;
-
-            // Leemos el "río" de datos elemento por elemento
-            while (parser.nextToken() == JsonToken.START_OBJECT) {
-                // Leemos el nodo actual (una carta)
-                JsonNode node = objectMapper.readTree(parser);
-
-                // Mapeamos el JSON a nuestro objeto Card
-                Card card = mapNodeToCard(node);
-                cardBatch.add(card);
-
-                count++;
-
-                // Guardamos en bloques de 1000 para no saturar MySQL
-                if (count % 1000 == 0) {
-                    cardRepository.saveAll(cardBatch);
-                    cardBatch.clear();
-                    System.out.println("Procesadas: " + count + " cartas...");
-                }
-            }
-
-            // Guardamos el resto
-            if (!cardBatch.isEmpty()) {
-                cardRepository.saveAll(cardBatch);
-            }
-
-            System.out.println("¡Importación finalizada! Total: " + count);
-        }
-    }*/
 }
