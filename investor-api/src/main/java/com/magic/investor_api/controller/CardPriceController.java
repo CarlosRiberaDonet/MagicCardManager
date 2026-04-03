@@ -18,10 +18,11 @@ public class CardPriceController {
     private final CardmarketDownloader cardmarketDownloader;
     private final CardmarketImportService cardmarketService;
 
+    // Descargar el price guide de cardmarket
     @PostMapping("/import-guide-prices")
     public ResponseEntity<String> startImportGuidePrices(){
         try {
-            // El controlador delega TODA la responsabilidad al orquestador
+
             cardmarketDownloader.downloadGuidePrice();
 
             return ResponseEntity.ok("Proceso iniciado. Revisa la consola de IntelliJ para ver el progreso.");
@@ -43,7 +44,7 @@ public class CardPriceController {
 
         } catch (Exception e) {
             System.err.println("Error en el proceso: " + e.getMessage());
-            System.out.println("Erro en CardPriceController startFullImport:");
+            System.out.println("Erro en CardPriceController /prices-updater:");
             e.printStackTrace();
         }
         return ResponseEntity.ok("Base de datos actualizada.");

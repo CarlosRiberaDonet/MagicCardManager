@@ -1,27 +1,38 @@
 package com.magic.investor_api.dao;
 
+import com.magic.investor_api.model.Card;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.util.Map;
-import java.util.stream.Collectors;
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 @Repository
 public class CardDAO {
 
     @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private DataSource dataSource;
 
-    public Map<String, Long> getCardMapIds() {
-        String sql = "SELECT id, cardmarket_id FROM card WHERE cardmarket_id IS NOT NULL";
+    public Card getCardByCardmarketId(Long cardmarketId) {
+        String GET_CARD_BT_ID = "SELECT id, cardmarket_id FROM card WHERE cardmarket_id = ?";
 
-        return jdbcTemplate.query(sql, (rs, rowNum) -> {
-            return new Object[]{ rs.getString("id"), rs.getLong("cardmarket_id") };
-        }).stream().collect(Collectors.toMap(
-                data -> (String) data[0], // UUID Scryfall como clave
-                data -> (Long) data[1],   // cardmarket_id como valor
-                (existing, replacement) -> existing // Si hay duplicados, conservar el primero
-        ));
+        try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(GET_CARD_BT_ID)){
+
+            stmt.setLong(1, cardmarketId);
+            try(ResultSet rs = stmt.executeQuery()){
+                if(rs.next()){
+                    Card card = new Card();
+                    card.setId(rs.getString("id"));
+                    card.setCardmarketId(rs.getLong("cardmarket_id"));
+                    return card;
+                }
+            }
+        } catch (SQLException e){
+            System.out.println("Error al recuperar la carta desde CardDAO getCardByCardmarketId");
+        }
+        return null;
     }
 }
