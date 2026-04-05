@@ -1,6 +1,7 @@
 package com.magic.investor_api.controller;
 
 import com.magic.investor_api.dto.CardDTO;
+import com.magic.investor_api.dto.CardPageDTO;
 import com.magic.investor_api.service.CardService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,7 +22,7 @@ public class CardController {
     }
 
     @GetMapping("/search")
-    public List<CardDTO> searchCardByName(@RequestParam String name, @RequestParam int page, @RequestParam int size){
+    public CardPageDTO searchCardByName(@RequestParam String name, @RequestParam int page, @RequestParam int size){
 
         return cardService.getCardByName(name, page, size);
     }

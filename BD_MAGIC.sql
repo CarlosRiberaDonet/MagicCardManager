@@ -5,8 +5,8 @@ USE magic;
 CREATE TABLE card (
     id VARCHAR(36) NOT NULL PRIMARY KEY,           -- UUID de Scryfall
     oracle_id VARCHAR(36) NOT NULL,                -- Para agrupar versiones
-    cardmarket_id BIGINT NULL,                     -- ID europeo
-    tcgplayer_id VARCHAR(36) NULL,                      -- ID americano
+    cardmarket_id BIGINT,                    	   -- ID europeo
+    tcgplayer_id VARCHAR(36),                      -- ID americano
     name VARCHAR(255) NOT NULL,                    -- Nombre en inglés
     lang CHAR(3) NOT NULL,                         -- 'en', 'es', etc.
     image_url VARCHAR(255),                        -- URL de la imagen normal
@@ -16,11 +16,10 @@ CREATE TABLE card (
     set_name VARCHAR(150),                         -- ej: 'Bloomburrow'
     collector_number VARCHAR(20),                  -- ej: '280'
     type_line VARCHAR(255),                        -- ej: 'Basic Land — Forest'
-    mana_cost VARCHAR(100),                        -- ej: '{2}{G}'
-    cmc DECIMAL(5,1) DEFAULT 0.0,                  -- Coste convertido
     border_color VARCHAR(20),                      -- black, white, etc.
     is_foil TINYINT(1) DEFAULT 0,                  -- 1 si existe versión foil
     is_reprint TINYINT(1) DEFAULT 0,               -- 1 si es reedición
+    cardmarket_url VARCHAR(255),
     
     -- Índices para que tu buscador vuele
     INDEX idx_name (name),
@@ -30,19 +29,38 @@ CREATE TABLE card (
 );
 
 CREATE TABLE card_price (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    card_id VARCHAR(36) NOT NULL,                  -- FK hacia CARD.id
-    price_eur DECIMAL(10,2) NULL,                  -- Precio normal
-    price_eur_foil DECIMAL(10,2) NULL,             -- Precio brillante
+	id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    card_id VARCHAR(36), -- UUID de Scryfall 
+    cardmarket_id BIGINT,  -- FK hacia card.id
+    -- Precio normal
+    avg DECIMAL(10,2),
+    low DECIMAL(10,2),                  
+    trend DECIMAL(10,2),
+    avg1 DECIMAL (10,2),
+    avg7 DECIMAL (10,2),
+    avg30 DECIMAL (10,2),
+    -- Precio brillante
+	avg_foil DECIMAL(10,2),
+    low_foil DECIMAL(10,2),                  
+    trend_foil DECIMAL(10,2),
+    avg1_foil DECIMAL (10,2),
+    avg7_foil DECIMAL (10,2),
+    avg30_foil DECIMAL (10,2),
+
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Fecha del registro
     
     -- Relación e integridad
-    CONSTRAINT fk_price_card FOREIGN KEY (card_id) 
-        REFERENCES CARD(id) ON DELETE CASCADE,
+    CONSTRAINT fk_price_card FOREIGN KEY (card_id) REFERENCES card(id) ON DELETE CASCADE,
     
     -- Índice para buscar precios de una carta rápidamente
-    INDEX idx_card_price (card_id, updated_at)
-);
+    INDEX idx_card_price (card_id, updated_at),
+    INDEX idx_card_price_recent (card_id, updated_at DESC)
+  
+)  ENGINE=InnoDB
+    DEFAULT CHARACTER SET utf8mb4 
+	COLLATE utf8mb4_unicode_ci;
+    
+    DROP TABLE card_price;
 
 CREATE TABLE user_inventory (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -67,4 +85,23 @@ ALTER TABLE user_inventory CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unic
 -- 4. Volvemos a activar la seguridad
 SET FOREIGN_KEY_CHECKS = 1;
 
-SELECT * FROM card where name ='Black Lotus' AND set_code = '2ed';
+SELECT * FROM card;
+
+SELECT COUNT(*) AS total_cartas
+FROM card;
+
+SELECT * FROM card WHERE name = "Altar's Light";
+
+SELECT * FROM card WHERE id = 'dd037f62-7cef-4737-b575-942c5959f1ea';
+
+SELECT * FROM card_price;
+
+SELECT * FROM card_price WHERE cardmarket_id = 1;
+
+SELECT COUNT(*) AS total_cartas
+FROM card_price;
+
+SELECT c.id, c.name, p.avg, p.low, p.trend, p.avg1, p.avg7, p.avg30 
+FROM card c
+JOIN card_price p ON c.id = p.card_id
+WHERE c.name = "Altar's Light";
