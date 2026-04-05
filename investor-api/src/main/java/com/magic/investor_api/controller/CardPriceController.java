@@ -49,5 +49,4 @@ public class CardPriceController {
         }
         return ResponseEntity.ok("Base de datos actualizada.");
     }
-
 }
