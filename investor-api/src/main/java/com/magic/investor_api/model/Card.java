@@ -19,17 +19,14 @@ public class Card {
     @Column(name = "id", length = 36)
     private String id; // El UUID de Scryfall
 
-    @Column(name = "oracle_id", length = 36, nullable = false)
-    private String oracleId;
-
     @Column(name = "cardmarket_id")
     private Long cardmarketId;
 
-    @Column(name = "tcgplayer_id")
-    private String tcgplayerId;
-
     @Column(name = "name", nullable = false)
     private String name;
+
+    @Column(name="printed_name")
+    private String printedName;
 
     @Column(name = "lang", length = 3, nullable = false)
     private String lang;
@@ -43,11 +40,11 @@ public class Card {
     @Column(name = "released_at")
     private LocalDate releasedAt;
 
-    @Column(name = "set_code", length = 10, nullable = false)
-    private String setCode;
-
     @Column(name = "set_name", length = 150)
     private String setName;
+
+    @Column(name = "set_code")
+    private String setCode;
 
     @Column(name = "collector_number", length = 20)
     private String collectorNumber;
@@ -57,6 +54,9 @@ public class Card {
 
     @Column(name = "border_color", length = 20)
     private String borderColor;
+
+    @Column(name="frame_effects")
+    private String frameEffects;
 
     @Column(name = "is_foil")
     private boolean isFoil;

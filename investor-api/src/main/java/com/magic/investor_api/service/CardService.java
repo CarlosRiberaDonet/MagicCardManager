@@ -26,4 +26,9 @@ public class CardService {
         CardPageDTO cardPageDTO = new CardPageDTO(totalCards, page, size, cardListDTO);
         return cardPageDTO;
     }
+
+    /*public CardDTO getCardById(String id){
+
+        return CardDTO cardDTO = CardDAO.
+    }*/
 }

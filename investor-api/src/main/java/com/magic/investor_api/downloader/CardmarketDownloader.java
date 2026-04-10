@@ -10,7 +10,7 @@ import java.net.URL;
 public class CardmarketDownloader {
 
     private static final String URL_S3 = "https://downloads.s3.cardmarket.com/productCatalog/priceGuide/price_guide_1.json";
-    private static final String PATH_LOCAL = "D:/Proyectos/MagicCardManager/guide-prices.json";
+    private static final String PATH_LOCAL = "C:/Proyectos/MagicCardManager/guide-prices.json";
 
     public void downloadGuidePrice() {
         try {

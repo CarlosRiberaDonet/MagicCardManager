@@ -54,7 +54,7 @@ public class ScryfallImportService {
             while (parser.nextToken() == JsonToken.START_OBJECT) {
                 JsonNode node = objectMapper.readTree(parser);
 
-                // Usamos tu lógica de mapeo que ya está limpia
+                // Lógica de mapeo
                 Card card = mapNodeToCard(node);
                 batch.add(card);
                 totalProcessed++;
@@ -63,11 +63,11 @@ public class ScryfallImportService {
                 if (totalProcessed % 1000 == 0) {
                     cardRepository.saveAll(batch);
                     batch.clear();
-                    System.out.println("📦 Cartas en BD: " + totalProcessed);
+                    System.out.println("Cartas en BD: " + totalProcessed);
                 }
             }
 
-            // No olvides las últimas que queden en el tintero
+            // Volcar las cartas que queden
             if (!batch.isEmpty()) {
                 cardRepository.saveAll(batch);
             }
@@ -79,19 +79,23 @@ public class ScryfallImportService {
 
         // Campos de identidad
         card.setId(node.path("id").asText(""));
-        card.setOracleId(node.path("oracle_id").asText(""));
         card.setCardmarketId(node.path("cardmarket_id").asLong(0L));
-        card.setTcgplayerId(node.path("tcgplayer_id").asText("")); // Corregido el nombre del campo
+
+        if(!node.path("printed_name").asText().isEmpty()){ // Si la carta tiene valor printed_name
+            card.setName(node.path("printed_name").asText());
+        }
+
         card.setName(node.path("name").asText("Unknown"));
+
         card.setLang(node.path("lang").asText("en"));
 
-        // Métodos externos (Asegúrate de que usen .path interiormente)
+        // Métodos para extraer la url de la carta
         card.setImageUrl(extractImageUrl(node));
         card.setCardmarketURL(buildCardmarketUrl(node));
 
         card.setRarity(node.path("rarity").asText("common"));
 
-        // Fecha con validación robusta
+        // Fecha de lanzamiento
         String releasedAtStr = node.path("released_at").asText("");
         if (!releasedAtStr.isEmpty()) {
             try {
@@ -100,15 +104,13 @@ public class ScryfallImportService {
                 card.setReleasedAt(null);
             }
         }
-
         // Campos de edición
-        card.setSetCode(node.path("set").asText(""));
         card.setSetName(node.path("set_name").asText(""));
+        card.setSetCode(node.path("set_code").asText(""));
         card.setCollectorNumber(node.path("collector_number").asText(""));
         card.setTypeLine(node.path("type_line").asText(""));
         card.setBorderColor(node.path("border_color").asText(""));
-
-        // CORRECCIÓN CRÍTICA: Scryfall usa "foil" y "reprint", no "is_foil"
+        card.setFrameEffects(node.path("frame_effects").asText());
         card.setFoil(node.path("foil").asBoolean(false));
         card.setReprint(node.path("reprint").asBoolean(false));
 
@@ -122,43 +124,42 @@ public class ScryfallImportService {
 
         // Si no está en la raíz, buscar en el array de card_faces del JSON
         if (imageUris.isMissingNode() && node.has("card_faces")) {
-            // Accedemos de forma segura a la primera cara y sus uris
+            // Acceder de forma segura a la primera cara y sus uris
             imageUris = node.path("card_faces").path(0).path("image_uris");
         }
 
-        // Devolvemos la versión 'normal', o null si el archivo está corrupto/vacío
         // return imageUris.path("normal").asText(null);
         return imageUris.path("normal").isMissingNode() ? null : imageUris.path("normal").asText();
     }
 
     public String buildCardmarketUrl(JsonNode node) {
-        // 1. Acceso ultra-seguro al nodo de la URL
+        // Acceso seguro al nodo de la URL
         JsonNode cmNode = node.path("purchase_uris").path("cardmarket");
 
-        // Si no existe, devolvemos null real para la BD (no el String "null")
+        // Si no existe, devuelve null
         if (cmNode.isMissingNode() || cmNode.isNull()) {
             return null;
         }
 
         String url = cmNode.asText();
 
-        // 2. Extraemos metadatos con fallback para evitar errores en los replace
+        // Extraer metadatos con fallback para evitar errores en los replace
         String name = node.path("name").asText("");
         String lang = node.path("lang").asText("");
         String edition = node.path("set_name").asText("");
 
-        // 3. Reconstrucción de la URL de búsqueda a URL de Single
-        // Usamos .toLowerCase() porque Cardmarket es sensible a esto en sus slugs
+        // Reconstrucción de la URL de búsqueda a URL de Single
+        // toLowerCase() porque Cardmarket es sensible a esto en sus slugs
         if (url.contains("Search?searchString=")) {
-            // Limpiamos caracteres que rompen URLs (comas, puntos, apóstrofes)
+            // Limpiar caracteres que rompen URLs (comas, puntos, apóstrofes)
             String formattedEdition = edition.replace(" ", "-").replaceAll("[^a-zA-Z0-9-]", "");
             String formattedName = name.replace(" ", "-").replaceAll("[^a-zA-Z0-9-]", "");
 
             url = url.replace("Search?searchString=", "/Singles/" + formattedEdition + "/" + formattedName);
         }
 
-        // 4. Filtro de lenguaje y limpieza de tracking
-        // Validamos que LANGUAGE_MAP esté inicializado para que no pete aquí
+        // Filtro de lenguaje y limpieza de tracking
+        // Valido que LANGUAGE_MAP esté inicializado para que no pete aquí
         if (LANGUAGE_MAP != null && !lang.isEmpty()) {
             String languageParam = LANGUAGE_MAP.get(lang);
             if (languageParam != null) {
