@@ -15,7 +15,7 @@ public class ScryfallDownloader {
 
     private final ScryfallImportService importService;
     private static final String URL_SCRYFALL = "https://data.scryfall.io/all-cards/all-cards-20260401092717.json";
-    private static final String PATH_LOCAL = "D:/Proyectos/MagicCardManager/cards.json";
+    private static final String PATH_LOCAL = "C:/Proyectos/MagicCardManager/cards.json";
 
     public void startFullImport() {
 

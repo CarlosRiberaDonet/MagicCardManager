@@ -52,6 +52,7 @@ public class CardDTO {
     private String collectorNumber;
     private String typeLine;
     private String borderColor;
+    private String frameEffects;
     private boolean isFoil;
     private boolean isReprint;
     private String cardmarketURL;
@@ -88,6 +89,7 @@ public class CardDTO {
         this.collectorNumber = card.getCollectorNumber();
         this.typeLine = card.getTypeLine();
         this.borderColor = card.getBorderColor();
+        this.frameEffects = card.getFrameEffects();
         this.isFoil = card.isFoil();
         this.isReprint = card.isReprint();
         this.cardmarketURL = card.getCardmarketURL();
@@ -210,6 +212,14 @@ public class CardDTO {
 
     public void setBorderColor(String borderColor) {
         this.borderColor = borderColor;
+    }
+
+    public String getFrameEffects() {
+        return frameEffects;
+    }
+
+    public void setFrameEffects(String frameEffects) {
+        this.frameEffects = frameEffects;
     }
 
     public boolean isFoil() {

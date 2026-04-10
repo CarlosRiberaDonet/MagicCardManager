@@ -19,10 +19,11 @@ public class ScryfallController {
     private final ScryfallDownloader scryfallDownloader;
     private final ScryfallImportService scryfallImportService;
 
+    // Descargar JSON de scryfall
     @PostMapping("/import-all")
     public ResponseEntity<String> startImport() {
         try {
-            // El controlador delega TODA la responsabilidad al orquestador
+
             scryfallDownloader.startFullImport();
 
             return ResponseEntity.ok("Proceso iniciado. Revisa la consola de IntelliJ para ver el progreso.");
@@ -32,19 +33,20 @@ public class ScryfallController {
         }
     }
 
+    // Volcar JSON a BD
     @PostMapping("/sync")
     public ResponseEntity<String> importJsonToDB(){
         try {
             System.out.println("Iniciando procesado de JSON a BD...");
 
-            String SCRYFALL_JSON_PATH = "D:/Proyectos/MagicCardManager/cards.json";
+            String SCRYFALL_JSON_PATH = "C:/Proyectos/MagicCardManager/cards.json";
             scryfallImportService.importToDatabase(SCRYFALL_JSON_PATH);
 
             System.out.println("¡Proceso total finalizado con éxito!");
 
         } catch (Exception e) {
             System.err.println("Error en el proceso: " + e.getMessage());
-            System.out.println("Erro en ScryfallOtchestator startFullImport:");
+            System.out.println("Erro en ScryfallController importJsonToDB:");
             e.printStackTrace();
         }
         return ResponseEntity.ok("Base de datos actualizada.");

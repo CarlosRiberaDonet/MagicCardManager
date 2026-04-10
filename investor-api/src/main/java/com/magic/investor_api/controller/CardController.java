@@ -21,9 +21,20 @@ public class CardController {
         this.cardService = cardService;
     }
 
+    // Buscar carta por nombre
     @GetMapping("/search")
     public CardPageDTO searchCardByName(@RequestParam String name, @RequestParam int page, @RequestParam int size){
 
         return cardService.getCardByName(name, page, size);
     }
+
+    // Buscar carta por UUID scryfall
+    @GetMapping("id")
+    public CardDTO searchCardById(@RequestParam String s){
+
+        return null;
+        // return cardService.getCardById(id);
+    }
+
+
 }

@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +30,9 @@ public class CardmarketImportService {
     private ObjectMapper objectMapper = new ObjectMapper();
 
     public void importToDatabase(String filePath) throws IOException {
+
+        // Llenar Mapa <CardmarketID, ScryfallUUID>
+        Map<Long, String> cardMap = cardDAO.getAllCardsIds();
 
         List<CardPrice> batch = new ArrayList<>();
         String fechaCreacion = "";
@@ -63,21 +67,22 @@ public class CardmarketImportService {
                     // Recorro cada elemento dentro del array
                     for (JsonNode guide : priceGuidesArray) {
 
-                        // Filtro los idCategory = 1
+                        // Filtro los idCategory = 1 (cartas sueltas)
                         if (guide.path("idCategory").asInt() == 1) {
 
                             // Extraigo el identificador que conecta con la BD
                             Long idProduct = guide.path("idProduct").asLong();
 
-                            // Buscas la carta en BD usando ese id
-                            Card card = cardDAO.getCardByCardmarketId(idProduct);
+                            // Busca el cardmarketId en el diccionario
+                            String scryfallUUID = cardMap.get(idProduct);
 
                             // Si no existe en BD
-                            if(card == null) {
+                            if(scryfallUUID == null) {
                                 System.out.println("No se encontró cardmarketId: " + idProduct);
                                 continue;
                             }
-                            CardPrice newCardPrice = mapNodeToCardPrice(guide, card);
+
+                            CardPrice newCardPrice = mapNodeToCardPrice(guide, scryfallUUID);
                             batch.add(newCardPrice);
                         }
                         // Guardamos cada 1000 elementos
@@ -91,51 +96,48 @@ public class CardmarketImportService {
                             parser.skipChildren();
                         }
                     }
-                }
-                if (!batch.isEmpty()) {
-                    cardPriceRepository.saveAll(batch);
+                    // Guardamos los últimos elementos que queden en batch
+                    if (!batch.isEmpty()) {
+                        cardPriceRepository.saveAll(batch);
+                        System.out.println("📦 Cartas en BD (resto final)");
+                    }
                 }
             }
-
-            // Guardamos los últimos elementos que queden en batch
-            if (!batch.isEmpty()) {
-                cardPriceRepository.saveAll(batch);
-                System.out.println("📦 Cartas en BD (resto final)");
-            }
+        }
+        if (!batch.isEmpty()) {
+            cardPriceRepository.saveAll(batch);
         }
     }
 
-    private CardPrice mapNodeToCardPrice(JsonNode node, Card card){
+    private CardPrice mapNodeToCardPrice(JsonNode node, String scryfallUUID) {
+        // 1. Creamos la entidad de precio
+        CardPrice cardPrice = new CardPrice();
 
-        // Extraigo el idProduct del json de cardmarket
-        Long idProduct = node.path("idProduct").asLong();
+        // 2. Creamos un objeto Card "fantasma" (Proxy)
+        // Solo le seteamos el ID para que Hibernate sepa a qué carta enlazar el precio
+        Card cardProxy = new Card();
+        cardProxy.setId(scryfallUUID);
 
+        // 3. Seteamos la relación y los datos
+        cardPrice.setCard(cardProxy);
+        cardPrice.setCardmarketId(node.path("idProduct").asLong());
 
-        System.out.println("idProduct del node: " + idProduct);
-        System.out.println("Carta obtenida: " + card);
+        // Usamos decimalValue() para asegurar precisión financiera
+        cardPrice.setAvg(node.path("avg").decimalValue());
+        cardPrice.setLow(node.path("low").decimalValue());
+        cardPrice.setTrend(node.path("trend").decimalValue());
+        cardPrice.setAvg1(node.path("avg1").decimalValue());
+        cardPrice.setAvg7(node.path("avg7").decimalValue());
+        cardPrice.setAvg30(node.path("avg30").decimalValue());
 
-        if(card == null){
-            System.out.println("No se encontró cardmarketId");
-        } else{
-            CardPrice cardPrice = new CardPrice();
+        // OJO con los nombres de los campos en el JSON de Cardmarket (suelen llevar guion)
+        cardPrice.setAvgFoil(node.path("avg-foil").decimalValue());
+        cardPrice.setLowFoil(node.path("low-foil").decimalValue());
+        cardPrice.setTrendFoil(node.path("trend-foil").decimalValue());
+        cardPrice.setAvg1Foil(node.path("avg1-foil").decimalValue());
+        cardPrice.setAvg7Foil(node.path("avg7-foil").decimalValue());
+        cardPrice.setAvg30Foil(node.path("avg30-foil").decimalValue());
 
-            cardPrice.setCard(card);
-            cardPrice.setCardmarketId(card.getCardmarketId());
-            cardPrice.setAvg(node.path("avg").decimalValue());
-            cardPrice.setLow(node.path("low").decimalValue());
-            cardPrice.setTrend(node.path("trend").decimalValue());
-            cardPrice.setAvg1(node.path("avg1").decimalValue());
-            cardPrice.setAvg7(node.path("avg7").decimalValue());
-            cardPrice.setAvg30(node.path("avg30").decimalValue());
-
-            cardPrice.setAvgFoil(node.path("avg-foil").decimalValue());
-            cardPrice.setLowFoil(node.path("low-foil").decimalValue());
-            cardPrice.setTrendFoil(node.path("trend-foil").decimalValue());
-            cardPrice.setAvg1Foil(node.path("avg1-foil").decimalValue());
-            cardPrice.setAvg7Foil(node.path("avg7-foil").decimalValue());
-            cardPrice.setAvg30Foil(node.path("avg30-foil").decimalValue());
-            return cardPrice;
-        }
-        return null;
+        return cardPrice;
     }
 }
