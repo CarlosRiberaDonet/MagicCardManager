@@ -2,6 +2,7 @@ package com.magic.investor_api.controller;
 
 import com.magic.investor_api.API.CardTraderAPI;
 import com.magic.investor_api.model.Expansion;
+import com.magic.investor_api.service.CardVariantService;
 import com.magic.investor_api.service.ExpansionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,10 +15,12 @@ public class CardTraderController {
 
     private final CardTraderAPI cardTraderApi;
     private final ExpansionService expansionService;
+    private final CardVariantService cardVariantService;
 
-    public CardTraderController(CardTraderAPI cardTraderApi, ExpansionService expansionService) {
+    public CardTraderController(CardTraderAPI cardTraderApi, ExpansionService expansionService, CardVariantService cardVariantService) {
         this.cardTraderApi = cardTraderApi;
         this.expansionService = expansionService;
+        this.cardVariantService = cardVariantService;
     }
 
     // Método para descargar ediciones desde CardTrader
@@ -29,9 +32,12 @@ public class CardTraderController {
         return ResponseEntity.ok(expansions);
     }
 
-    @GetMapping("/blueprints/{id}")
-    public ResponseEntity<String> getBlueprints(@PathVariable Long id) {
-        return ResponseEntity.ok(cardTraderApi.fetchBlueprints(id));
+    // Obtener todas las cartas de cada edicion
+    @GetMapping("/download/cards")
+    public ResponseEntity<String> getBlueprints() {
+        cardVariantService.getCardVariantList();
+
+        return ResponseEntity.ok();
     }
 
     // Prueba directa: devuelve el JSON tal cual viene de CardTrader
