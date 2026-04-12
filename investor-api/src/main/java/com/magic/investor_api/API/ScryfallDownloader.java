@@ -1,4 +1,4 @@
-package com.magic.investor_api.downloader;
+package com.magic.investor_api.API;
 
 import com.magic.investor_api.service.ScryfallImportService;
 import lombok.RequiredArgsConstructor;

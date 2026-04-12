@@ -25,22 +25,15 @@ import java.time.LocalDateTime;
         "cardmarketURL",
         "avg",
         "low",
-        "trend",
-        "avg1",
-        "avg7",
-        "avg30",
         "avgFoil",
         "lowFoil",
-        "trendFoil",
-        "avg1Foil",
-        "avg7Foil",
-        "avg30Foil",
         "updatedAt"
 })
 
 public class CardDTO {
 
-    private String id; // El UUID de Scryfall
+    private Long id;
+    private String scryfallId;
     private Long cardmarketId;
     private String name;
     private String lang;
@@ -60,24 +53,14 @@ public class CardDTO {
     // Precios
     private BigDecimal avg;
     private BigDecimal low;
-    private BigDecimal trend;
-    private BigDecimal avg1;
-    private BigDecimal avg7;
-    private BigDecimal avg30;
-
-    // Precios FOIL
     private BigDecimal avgFoil;
     private BigDecimal lowFoil;
-    private BigDecimal trendFoil;
-    private BigDecimal avg1Foil;
-    private BigDecimal avg7Foil;
-    private BigDecimal avg30Foil;
-    private LocalDateTime updatedAt;
 
     // CONSTRUCTOR
     public CardDTO(Card card, CardPrice cardPrice){
         // Campos de la carta
         this.id = card.getId();
+        this.scryfallId = card.getScryfallId();
         this.cardmarketId = card.getCardmarketId();
         this.name = card.getName();
         this.lang = card.getLang();
@@ -98,17 +81,8 @@ public class CardDTO {
         if (cardPrice != null) {
             this.avg = cardPrice.getAvg();
             this.low = cardPrice.getLow();
-            this.trend = cardPrice.getTrend();
-            this.avg1 = cardPrice.getAvg1();
-            this.avg7 = cardPrice.getAvg7();
-            this.avg30 = cardPrice.getAvg30();
-            this.updatedAt = cardPrice.getUpdatedAt();
             this.avgFoil = cardPrice.getAvgFoil();
             this.lowFoil = cardPrice.getLowFoil();
-            this.trendFoil = cardPrice.getTrendFoil();
-            this.avg1Foil = cardPrice.getAvg1Foil();
-            this.avg7Foil = cardPrice.getAvg7Foil();
-            this.avg30Foil = cardPrice.getAvg30Foil();
         }
     }
 
@@ -118,12 +92,20 @@ public class CardDTO {
 
     // GETTERS Y SETTERS
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getScryfallId() {
+        return scryfallId;
+    }
+
+    public void setScryfallId(String scryfallId) {
+        this.scryfallId = scryfallId;
     }
 
     public Long getCardmarketId() {
@@ -262,38 +244,6 @@ public class CardDTO {
         this.low = low;
     }
 
-    public BigDecimal getTrend() {
-        return trend;
-    }
-
-    public void setTrend(BigDecimal trend) {
-        this.trend = trend;
-    }
-
-    public BigDecimal getAvg1() {
-        return avg1;
-    }
-
-    public void setAvg1(BigDecimal avg1) {
-        this.avg1 = avg1;
-    }
-
-    public BigDecimal getAvg7() {
-        return avg7;
-    }
-
-    public void setAvg7(BigDecimal avg7) {
-        this.avg7 = avg7;
-    }
-
-    public BigDecimal getAvg30() {
-        return avg30;
-    }
-
-    public void setAvg30(BigDecimal avg30) {
-        this.avg30 = avg30;
-    }
-
     public BigDecimal getAvgFoil() {
         return avgFoil;
     }
@@ -308,45 +258,5 @@ public class CardDTO {
 
     public void setLowFoil(BigDecimal lowFoil) {
         this.lowFoil = lowFoil;
-    }
-
-    public BigDecimal getTrendFoil() {
-        return trendFoil;
-    }
-
-    public void setTrendFoil(BigDecimal trendFoil) {
-        this.trendFoil = trendFoil;
-    }
-
-    public BigDecimal getAvg1Foil() {
-        return avg1Foil;
-    }
-
-    public void setAvg1Foil(BigDecimal avg1Foil) {
-        this.avg1Foil = avg1Foil;
-    }
-
-    public BigDecimal getAvg7Foil() {
-        return avg7Foil;
-    }
-
-    public void setAvg7Foil(BigDecimal avg7Foil) {
-        this.avg7Foil = avg7Foil;
-    }
-
-    public BigDecimal getAvg30Foil() {
-        return avg30Foil;
-    }
-
-    public void setAvg30Foil(BigDecimal avg30Foil) {
-        this.avg30Foil = avg30Foil;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
     }
 }

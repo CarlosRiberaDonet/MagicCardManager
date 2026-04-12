@@ -1,6 +1,6 @@
 package com.magic.investor_api.controller;
 
-import com.magic.investor_api.downloader.CardmarketDownloader;
+import com.magic.investor_api.API.CardmarketDownloader;
 import com.magic.investor_api.service.CardmarketImportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

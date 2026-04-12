@@ -1,7 +1,7 @@
 package com.magic.investor_api.controller;
 
 
-import com.magic.investor_api.downloader.ScryfallDownloader;
+import com.magic.investor_api.API.ScryfallDownloader;
 import com.magic.investor_api.service.ScryfallImportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

@@ -16,8 +16,12 @@ import java.time.LocalDate;
 public class Card {
 
     @Id
-    @Column(name = "id", length = 36)
-    private String id; // El UUID de Scryfall
+    @Column(name="id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "scryfall_id", length = 36)
+    private String scryfallId; // UUID de Scryfall
 
     @Column(name = "cardmarket_id")
     private Long cardmarketId;

@@ -22,9 +22,9 @@ public class CardDAO {
     private DataSource dataSource;
 
     // Obtener todas las cartas de la tabla card
-    public Map<Long, String> getAllCardsIds(){
+    public Map<Long, Long> getAllCardsIds(){
         String SELECT_IDS = "SELECT id, cardmarket_id FROM card WHERE cardmarket_id IS NOT NULL AND cardmarket_id > 0";
-        Map<Long, String> cardMap = new HashMap<>(600000);
+        Map<Long, Long> cardMap = new HashMap<>(600000);
 
         try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(SELECT_IDS)){
 
@@ -33,9 +33,9 @@ public class CardDAO {
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     // Suponiendo que tu ID de Scryfall es String o Long
-                    String scryfallUUID = rs.getString("id");
+                    Long cardId = rs.getLong("id");
                     Long cardmarketId = rs.getLong("cardmarket_id");
-                    cardMap.put(cardmarketId, scryfallUUID);
+                    cardMap.put(cardmarketId, cardId);
                 }
             }
         }catch(SQLException e){
@@ -56,7 +56,7 @@ public class CardDAO {
             try(ResultSet rs = stmt.executeQuery()){
                 if(rs.next()){
                     Card card = new Card();
-                    card.setId(rs.getString("id"));
+                    card.setId(rs.getLong("id"));
                     card.setCardmarketId(rs.getLong("cardmarket_id"));
                     return card;
                 }
@@ -90,7 +90,7 @@ public class CardDAO {
 
             while(rs.next()){
                 CardDTO cardDTO = new CardDTO();
-                cardDTO.setId(rs.getString("id"));
+                cardDTO.setId(rs.getLong("id"));
                 cardDTO.setName(rs.getString("name"));
                 cardDTO.setLang(rs.getString("lang"));
                 cardDTO.setImageUrl(rs.getString("image_url"));

@@ -16,16 +16,17 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class CardPrice {
 
-    @Id //
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    // Referencia el campo cardmarket_id (clave foránea)
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "card_id", nullable = false) // Esta es la FK de SQL
-    private Card card;
 
-    @Column(name = "cardmarket_id")
-    private Long cardmarketId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "card_variant_id", nullable = false)
+    private CardVariant cardVariant;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "source", nullable = false)
+    private Source source;
 
     @Column(name = "avg", precision = 10, scale = 2)
     private BigDecimal avg;
@@ -33,38 +34,17 @@ public class CardPrice {
     @Column(name = "low", precision = 10, scale = 2)
     private BigDecimal low;
 
-    @Column(name = "trend", precision = 10, scale = 2)
-    private BigDecimal trend;
-
-    @Column(name = "avg1", precision = 10, scale = 2)
-    private BigDecimal avg1;
-
-    @Column(name = "avg7", precision = 10, scale = 2)
-    private BigDecimal avg7;
-
-    @Column(name = "avg30", precision = 10, scale = 2)
-    private BigDecimal avg30;
-
     @Column(name = "avg_foil", precision = 10, scale = 2)
     private BigDecimal avgFoil;
 
     @Column(name = "low_foil", precision = 10, scale = 2)
     private BigDecimal lowFoil;
 
-    @Column(name = "trend_foil", precision = 10, scale = 2)
-    private BigDecimal trendFoil;
-
-    @Column(name = "avg1_foil", precision = 10, scale = 2)
-    private BigDecimal avg1Foil;
-
-    @Column(name = "avg7_foil", precision = 10, scale = 2)
-    private BigDecimal avg7Foil;
-
-    @Column(name = "avg30_foil", precision = 10, scale = 2)
-    private BigDecimal avg30Foil;
-
-    @CreationTimestamp // Esto rellena automáticamente la fecha al insertar
-    @Column(name = "updated_at", nullable = false, updatable = false)
+    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+    public enum Source {
+        CARDMARKET,
+        CARDTRADER
+    }
 }
