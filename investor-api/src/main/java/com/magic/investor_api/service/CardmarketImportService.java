@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.magic.investor_api.dao.CardDAO;
 import com.magic.investor_api.model.Card;
 import com.magic.investor_api.model.CardPrice;
+import com.magic.investor_api.model.CardVariant;
 import com.magic.investor_api.repository.CardPriceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,7 @@ public class CardmarketImportService {
     public void importToDatabase(String filePath) throws IOException {
 
         // Llenar Mapa <CardmarketID, ScryfallUUID>
-        Map<Long, String> cardMap = cardDAO.getAllCardsIds();
+        Map<Long, Long> cardMap = cardDAO.getAllCardsIds();
 
         List<CardPrice> batch = new ArrayList<>();
         String fechaCreacion = "";
@@ -74,15 +75,15 @@ public class CardmarketImportService {
                             Long idProduct = guide.path("idProduct").asLong();
 
                             // Busca el cardmarketId en el diccionario
-                            String scryfallUUID = cardMap.get(idProduct);
+                            Long cardId = cardMap.get(idProduct);
 
                             // Si no existe en BD
-                            if(scryfallUUID == null) {
+                            if(cardId == null) {
                                 System.out.println("No se encontró cardmarketId: " + idProduct);
                                 continue;
                             }
 
-                            CardPrice newCardPrice = mapNodeToCardPrice(guide, scryfallUUID);
+                            CardPrice newCardPrice = mapNodeToCardPrice(guide, cardId);
                             batch.add(newCardPrice);
                         }
                         // Guardamos cada 1000 elementos
@@ -109,34 +110,26 @@ public class CardmarketImportService {
         }
     }
 
-    private CardPrice mapNodeToCardPrice(JsonNode node, String scryfallUUID) {
-        // 1. Creamos la entidad de precio
+    private CardPrice mapNodeToCardPrice(JsonNode node, Long cardId) {
+        // 1. Creo la entidad de precio
         CardPrice cardPrice = new CardPrice();
 
-        // 2. Creamos un objeto Card "fantasma" (Proxy)
+        // 2. Creo un objeto Card "fantasma" (Proxy)
         // Solo le seteamos el ID para que Hibernate sepa a qué carta enlazar el precio
-        Card cardProxy = new Card();
-        cardProxy.setId(scryfallUUID);
+        CardVariant cardProxy = new CardVariant();
+        cardProxy.setId(cardId);
 
-        // 3. Seteamos la relación y los datos
-        cardPrice.setCard(cardProxy);
-        cardPrice.setCardmarketId(node.path("idProduct").asLong());
+        // 3. Setteo la relación y los datos
+        cardPrice.setCardVariant(cardProxy);
+        //cardPrice.setCardmarketId(node.path("idProduct").asLong());
 
         // Usamos decimalValue() para asegurar precisión financiera
         cardPrice.setAvg(node.path("avg").decimalValue());
         cardPrice.setLow(node.path("low").decimalValue());
-        cardPrice.setTrend(node.path("trend").decimalValue());
-        cardPrice.setAvg1(node.path("avg1").decimalValue());
-        cardPrice.setAvg7(node.path("avg7").decimalValue());
-        cardPrice.setAvg30(node.path("avg30").decimalValue());
 
         // OJO con los nombres de los campos en el JSON de Cardmarket (suelen llevar guion)
         cardPrice.setAvgFoil(node.path("avg-foil").decimalValue());
         cardPrice.setLowFoil(node.path("low-foil").decimalValue());
-        cardPrice.setTrendFoil(node.path("trend-foil").decimalValue());
-        cardPrice.setAvg1Foil(node.path("avg1-foil").decimalValue());
-        cardPrice.setAvg7Foil(node.path("avg7-foil").decimalValue());
-        cardPrice.setAvg30Foil(node.path("avg30-foil").decimalValue());
 
         return cardPrice;
     }

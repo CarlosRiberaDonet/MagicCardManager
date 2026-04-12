@@ -1,9 +1,14 @@
-package com.magic.investor_api.dao;
+package com.magic.investor_api.API;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.magic.investor_api.model.Expansion;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import java.util.List;
 
 
 @Service
@@ -23,13 +28,59 @@ public class CardTraderAPI {
             "9YTYDZiM1zaWkVHlQzmVFOOC_YW2R5LMUDxSPiTjRz24pLmgJYeWtiSK32AAikuXFzbXWimNFfkeI6UJN46Zk0T2XNPWuPYbrMXJkxHj3x6i" +
             "Uu51Wc-ku3TePnhGJ2u1_qcS5R2Rw-NKxWdtS9lTELhxxEVxkfe85Zji5VFiWISTZlNcWIIOPU-Wqdh8nS4q8mAdJzN6wKzTy2jVtbVw";
 
-    /**
-     * Llama a la API de CardTrader y devuelve el JSON como String.
-     *
-     * @param blueprintId Id de la carta en CardTrader
-     //* @param page Página de resultados
-     * @return JSON de la API
-     */
+    // Obtener lista de expansiones de CardTrader
+    public List<Expansion> fetchExpansions() {
+
+        String url = "https://api.cardtrader.com/api/v2/expansions";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(apiToken);
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                entity,
+                String.class
+        );
+
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+
+            return mapper.readValue(
+                    response.getBody(),
+                    new TypeReference<List<Expansion>>() {}
+            );
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    // Obtener cartas mediante su expansion
+    public String fetchBlueprints(Long expansionId) {
+
+        String url = "https://api.cardtrader.com/api/v2/blueprints/export"
+                + "?expansion_id=" + expansionId;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(apiToken);
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                entity,
+                String.class
+        );
+
+        return response.getBody();
+    }
+
     public String fetchCardProducts(String blueprintId) {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(MediaType.parseMediaTypes("application/json"));

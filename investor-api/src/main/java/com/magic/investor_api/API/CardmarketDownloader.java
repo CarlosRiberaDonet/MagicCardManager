@@ -1,4 +1,4 @@
-package com.magic.investor_api.downloader;
+package com.magic.investor_api.API;
 
 import org.springframework.stereotype.Component;
 import java.io.FileOutputStream;

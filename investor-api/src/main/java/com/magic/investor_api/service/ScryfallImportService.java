@@ -78,11 +78,11 @@ public class ScryfallImportService {
         Card card = new Card();
 
         // Campos de identidad
-        card.setId(node.path("id").asText(""));
+        card.setScryfallId(node.path("id").asText(""));
         card.setCardmarketId(node.path("cardmarket_id").asLong(0L));
 
-        if(!node.path("printed_name").asText().isEmpty()){ // Si la carta tiene valor printed_name
-            card.setName(node.path("printed_name").asText());
+        if(node.path("printed_name").asText() != null){ // Si la carta tiene valor printed_name
+            card.setPrintedName(node.path("printed_name").asText());
         }
 
         card.setName(node.path("name").asText("Unknown"));
