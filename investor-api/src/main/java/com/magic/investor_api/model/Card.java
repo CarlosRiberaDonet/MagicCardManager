@@ -59,8 +59,8 @@ public class Card {
     @Column(name = "border_color", length = 20)
     private String borderColor;
 
-    @Column(name="frame_effects")
-    private String frameEffects;
+    @Column(name="frame")
+    private String frame;
 
     @Column(name = "is_foil")
     private boolean isFoil;

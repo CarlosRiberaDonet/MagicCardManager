@@ -6,7 +6,6 @@ import com.magic.investor_api.model.CardPrice;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 @JsonPropertyOrder({
         "id",
         "cardmarketId",
@@ -72,7 +71,6 @@ public class CardDTO {
         this.collectorNumber = card.getCollectorNumber();
         this.typeLine = card.getTypeLine();
         this.borderColor = card.getBorderColor();
-        this.frameEffects = card.getFrameEffects();
         this.isFoil = card.isFoil();
         this.isReprint = card.isReprint();
         this.cardmarketURL = card.getCardmarketURL();

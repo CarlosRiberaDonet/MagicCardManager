@@ -39,7 +39,7 @@ public class ScryfallController {
         try {
             System.out.println("Iniciando procesado de JSON a BD...");
 
-            String SCRYFALL_JSON_PATH = "C:/Proyectos/MagicCardManager/cards.json";
+            String SCRYFALL_JSON_PATH = "D:/Proyectos/MagicCardManager/cards.json";
             scryfallImportService.importToDatabase(SCRYFALL_JSON_PATH);
 
             System.out.println("¡Proceso total finalizado con éxito!");

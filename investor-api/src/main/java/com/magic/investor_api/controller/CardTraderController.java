@@ -1,6 +1,7 @@
 package com.magic.investor_api.controller;
 
 import com.magic.investor_api.API.CardTraderAPI;
+import com.magic.investor_api.dto.CardVariantDTO;
 import com.magic.investor_api.model.Expansion;
 import com.magic.investor_api.service.CardVariantService;
 import com.magic.investor_api.service.ExpansionService;
@@ -33,11 +34,9 @@ public class CardTraderController {
     }
 
     // Obtener todas las cartas de cada edicion
-    @GetMapping("/download/cards")
-    public ResponseEntity<String> getBlueprints() {
-        cardVariantService.getCardVariantList();
-
-        return ResponseEntity.ok();
+    @GetMapping("/cards")
+    public List<Long> getBlueprints() {
+        return cardVariantService.getCardVariantList();
     }
 
     // Prueba directa: devuelve el JSON tal cual viene de CardTrader
