@@ -1,7 +1,11 @@
 package com.magic.investor_api.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class CardVariantDTO {
 
     private Long id; // CardTrader blueprint id
@@ -10,18 +14,23 @@ public class CardVariantDTO {
 
     private String version;
 
+    @JsonProperty("expansion_id")
     private Long expansionId;
 
+    @JsonProperty("scryfall_id")
     private String scryfallId;
 
+    @JsonProperty("card_market_ids")
     private List<Long> cardMarketIds;
 
+    @JsonProperty("fixed_properties")
     private FixedProperties fixedProperties;
 
     // --- INNER CLASS ---
     public static class FixedProperties {
+
+        @JsonProperty("collector_number")
         private String collectorNumber;
-        private String mtgRarity;
 
         public String getCollectorNumber() {
             return collectorNumber;
@@ -29,14 +38,6 @@ public class CardVariantDTO {
 
         public void setCollectorNumber(String collectorNumber) {
             this.collectorNumber = collectorNumber;
-        }
-
-        public String getMtgRarity() {
-            return mtgRarity;
-        }
-
-        public void setMtgRarity(String mtgRarity) {
-            this.mtgRarity = mtgRarity;
         }
     }
 

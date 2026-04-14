@@ -37,7 +37,7 @@ public class CardPriceController {
         try {
             System.out.println("Actualizando lista de precios...");
 
-            String GUIDE_PRICES_JSON_PATH = "C:/Proyectos/MagicCardManager/guide-prices.json";
+            String GUIDE_PRICES_JSON_PATH = "D:/Proyectos/MagicCardManager/guide-prices.json";
             cardmarketService.importToDatabase(GUIDE_PRICES_JSON_PATH);
 
             System.out.println("¡Proceso total finalizado con éxito!");

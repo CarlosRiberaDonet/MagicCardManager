@@ -78,14 +78,11 @@ public class ScryfallImportService {
         Card card = new Card();
 
         // Campos de identidad
-        card.setScryfallId(node.path("id").asText(""));
+        card.setScryfallId(node.path("id").asText("")); // scryfall UUID
         card.setCardmarketId(node.path("cardmarket_id").asLong(0L));
 
-        if(node.path("printed_name").asText() != null){ // Si la carta tiene valor printed_name
-            card.setPrintedName(node.path("printed_name").asText());
-        }
-
-        card.setName(node.path("name").asText("Unknown"));
+        card.setName(node.path("name").asText(""));
+        card.setPrintedName(node.path("printed_name").asText(""));
 
         card.setLang(node.path("lang").asText("en"));
 
@@ -94,23 +91,15 @@ public class ScryfallImportService {
         card.setCardmarketURL(buildCardmarketUrl(node));
 
         card.setRarity(node.path("rarity").asText("common"));
-
-        // Fecha de lanzamiento
         String releasedAtStr = node.path("released_at").asText("");
-        if (!releasedAtStr.isEmpty()) {
-            try {
-                card.setReleasedAt(LocalDate.parse(releasedAtStr));
-            } catch (DateTimeParseException e) {
-                card.setReleasedAt(null);
-            }
-        }
+        card.setReleasedAt(LocalDate.parse(releasedAtStr));
+
         // Campos de edición
         card.setSetName(node.path("set_name").asText(""));
-        card.setSetCode(node.path("set_code").asText(""));
+        card.setSetCode(node.path("set").asText(""));
         card.setCollectorNumber(node.path("collector_number").asText(""));
         card.setTypeLine(node.path("type_line").asText(""));
         card.setBorderColor(node.path("border_color").asText(""));
-        card.setFrameEffects(node.path("frame_effects").asText());
         card.setFoil(node.path("foil").asBoolean(false));
         card.setReprint(node.path("reprint").asBoolean(false));
 
