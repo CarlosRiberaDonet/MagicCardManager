@@ -22,7 +22,7 @@ public class CardVariant {
     @JoinColumn(name = "card_id", nullable = false)
     private Card card;
 
-    @Column(name = "cardtrader_id", nullable = false, unique = true)
+    @Column(name = "cardtrader_id", unique = true)
     private Long cardtraderId;
 
     @Column(name = "cardmarket_id")
@@ -36,4 +36,7 @@ public class CardVariant {
 
     @Column(name = "version")
     private String version;
+
+    @Column(name = "collector_number")
+    private String collectorNumber;
 }
