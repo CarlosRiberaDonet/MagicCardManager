@@ -8,7 +8,8 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CardVariantDTO {
 
-    private Long id; // CardTrader blueprint id
+    @JsonProperty("id")
+    private Long cardTraderId; // CardTrader blueprint id
 
     private String name;
 
@@ -27,6 +28,7 @@ public class CardVariantDTO {
     private FixedProperties fixedProperties;
 
     // --- INNER CLASS ---
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class FixedProperties {
 
         @JsonProperty("collector_number")
@@ -43,12 +45,12 @@ public class CardVariantDTO {
 
     // --- GETTERS & SETTERS ---
 
-    public Long getId() {
-        return id;
+    public Long getCardTraderId() {
+        return cardTraderId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setCardTraderId(Long cardTraderId) {
+        this.cardTraderId = cardTraderId;
     }
 
     public String getName() {

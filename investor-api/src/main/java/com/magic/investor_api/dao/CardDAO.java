@@ -137,9 +137,51 @@ public class CardDAO {
         return cardListDTO;
     }
 
-   /* public CardDTO selectCardById(String id){
+   // Obtener cardmarketId y id de la tabla card
+   public Map<Long, Long> getCardmarketId(){
+        Map<Long, Long> cardMap = new HashMap<>();
+        String query = "SELECT id, cardmarket_id FROM card";
 
-    }*/
+        try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)){
+
+            ResultSet rs = stmt.executeQuery();
+            while(rs.next()){
+                Long cardmarketId = rs.getLong("cardmarket_id");
+                if(!rs.wasNull()){
+                    Long id = rs.getLong("id");
+                    cardMap.put(cardmarketId, id);
+                }
+
+            }
+        } catch(SQLException e){
+            throw new RuntimeException(e);
+        }
+
+        return cardMap;
+   }
+
+    // Obtener scryfallId y id de la tabla card
+    public Map<String, Long> getScryfallId(){
+        Map<String, Long> cardMap = new HashMap<>();
+        String query = "SELECT id, scryfall_id FROM card";
+
+        try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)){
+
+            ResultSet rs = stmt.executeQuery();
+            while(rs.next()){
+                String scryfallId = rs.getString("scryfall_id");
+                if(scryfallId != null && !scryfallId.trim().isEmpty()){
+                    Long id = rs.getLong("id");
+                    cardMap.put(scryfallId, id);
+                }
+
+            }
+        } catch(SQLException e){
+            throw new RuntimeException(e);
+        }
+
+        return cardMap;
+    }
 
     // Contar total de cartas mediante su nombre
     public int countCardsByName(String name){

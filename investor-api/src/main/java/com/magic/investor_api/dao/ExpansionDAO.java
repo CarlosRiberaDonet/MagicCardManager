@@ -59,4 +59,47 @@ public class ExpansionDAO {
 
         return expansionList;
     }
+
+    // Obtener progreso de la tabla sync_progress
+    // La utilizo como checkpoint para saber la última expansión de la que estoy descargando
+    // las cartas de cardtrader
+    public Long getLastExpansionId() {
+
+        String sql = "SELECT last_expansion_id FROM sync_progress WHERE process_name = ?";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, "card_variant_sync");
+
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                return rs.getLong("last_expansion_id");
+            }
+
+            return 0L;
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    // Actualiza el checkpoint de la tabla sync_progress
+    public void updateLastExpansionId(Long id) {
+
+        String sql = "UPDATE sync_progress SET last_expansion_id = ? WHERE process_name = ?";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setLong(1, id);
+            stmt.setString(2, "card_variant_sync");
+
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

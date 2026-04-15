@@ -35,8 +35,11 @@ public class CardTraderController {
 
     // Obtener todas las cartas de cada edicion
     @GetMapping("/cards")
-    public List<Long> getBlueprints() {
-        return cardVariantService.getCardVariantList();
+    public void getBlueprints() {
+
+        // return cardVariantService.testSingleExpansionRaw();
+        // cardVariantService.testSingleExpansion();
+        cardVariantService.getCardVariantList();
     }
 
     // Prueba directa: devuelve el JSON tal cual viene de CardTrader

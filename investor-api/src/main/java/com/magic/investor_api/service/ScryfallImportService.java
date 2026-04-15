@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -40,9 +41,9 @@ public class ScryfallImportService {
             Map.entry("zht", "language=11")
     );
 
-    public void importToDatabase(String filePath) throws IOException {
+    public void importToDatabase(InputStream input) throws IOException {
         JsonFactory factory = new JsonFactory();
-        try (JsonParser parser = factory.createParser(new File(filePath))) {
+        try (JsonParser parser = factory.createParser(input)) {
 
             if (parser.nextToken() != JsonToken.START_ARRAY) {
                 throw new IOException("Formato JSON inválido");
