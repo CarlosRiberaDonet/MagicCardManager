@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +38,7 @@ public class CardmarketImportService {
         Map<Long, Long> cardMap = cardDAO.getAllCardsIds();
 
         List<CardPrice> batch = new ArrayList<>();
-        String fechaCreacion = "";
+
 
         // Factoría de Jackson para parseo en streaming (no carga todo el JSON en memoria)
         JsonFactory factory = new JsonFactory();
@@ -58,7 +60,8 @@ public class CardmarketImportService {
 
                 // Nombre del campo actual (ej: "createdAt", "priceGuides")
                 if ("createdAt".equals(nombreCampo)) {
-                    fechaCreacion = parser.getText();
+                    //OffsetDateTime odt = OffsetDateTime.parse(parser.getText());
+                    //LocalDateTime fechaCreacion = odt.toLocalDateTime();
 
                 } else if ("priceGuides".equals(nombreCampo)) {
 

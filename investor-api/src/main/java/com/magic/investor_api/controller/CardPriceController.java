@@ -17,6 +17,7 @@ public class CardPriceController {
 
     private final CardmarketDownloader cardmarketDownloader;
     private final CardmarketImportService cardmarketService;
+    private final String basePath = System.getProperty("user.dir");
 
     // Descargar el price guide de cardmarket
     @PostMapping("/import-guide-prices")
@@ -37,14 +38,13 @@ public class CardPriceController {
         try {
             System.out.println("Actualizando lista de precios...");
 
-            String GUIDE_PRICES_JSON_PATH = "D:/Proyectos/MagicCardManager/guide-prices.json";
+            String GUIDE_PRICES_JSON_PATH = basePath + "/src/main/resources/guide-prices.json";
             cardmarketService.importToDatabase(GUIDE_PRICES_JSON_PATH);
 
             System.out.println("¡Proceso total finalizado con éxito!");
 
         } catch (Exception e) {
             System.err.println("Error en el proceso: " + e.getMessage());
-            System.out.println("Erro en CardPriceController /prices-updater:");
             e.printStackTrace();
         }
         return ResponseEntity.ok("Base de datos actualizada.");

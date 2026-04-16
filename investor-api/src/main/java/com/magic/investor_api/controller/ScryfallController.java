@@ -21,6 +21,7 @@ public class ScryfallController {
     private final ScryfallDownloader scryfallDownloader;
     private final ScryfallImportService scryfallImportService;
 
+
     // Descargar JSON de scryfall
     @PostMapping("/import-all")
     public ResponseEntity<String> startImport() {
