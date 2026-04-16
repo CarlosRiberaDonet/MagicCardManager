@@ -99,9 +99,9 @@ public class CardDAO {
 
         String SELECT_CARD_BY_NAME = "SELECT c.id, c.name, c.lang, c.image_url, c.rarity, " +
                 "c.set_name, c.collector_number, c.cardmarket_url, " +
-                "p.low, p.trend " +
+                "p.low, p.avg " +
                 "FROM card c " +
-                "LEFT JOIN card_price p ON c.id = p.card_id " +
+                "LEFT JOIN card_price p ON c.id = p.card_variant_id " +
                 "WHERE c.name LIKE ? " +
                 "LIMIT ? OFFSET ?";
 

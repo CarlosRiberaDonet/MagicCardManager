@@ -25,7 +25,7 @@ public class CardPrice {
     private CardVariant cardVariant;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "source", nullable = false)
+    //@Column(name = "source", nullable = false)
     private Source source;
 
     @Column(name = "avg", precision = 10, scale = 2)
@@ -40,7 +40,7 @@ public class CardPrice {
     @Column(name = "low_foil", precision = 10, scale = 2)
     private BigDecimal lowFoil;
 
-    @Column(name = "updated_at", nullable = false)
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
     public enum Source {
