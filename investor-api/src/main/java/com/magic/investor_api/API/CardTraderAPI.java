@@ -81,7 +81,8 @@ public class CardTraderAPI {
         return response.getBody();
     }
 
-    public String fetchCardProducts(String blueprintId) {
+    // Obtener cartas mediante id de cardtrader (blueprint)
+    public String fetchCardProducts(String blueprintId, int page) {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(MediaType.parseMediaTypes("application/json"));
         headers.setBearerAuth(apiToken);
@@ -91,7 +92,7 @@ public class CardTraderAPI {
         // Construye la URL con parámetros
         String url = UriComponentsBuilder.fromUriString(BASE_URL)
                 .queryParam("blueprint_id", blueprintId)
-                .queryParam("page")
+                .queryParam("page", page)
                 .toUriString();
 
         ResponseEntity<String> response = restTemplate.exchange(

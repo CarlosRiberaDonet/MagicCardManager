@@ -34,6 +34,7 @@ public class CardVariantService {
 
     public List<Long> getCardVariantList() {
 
+        int count = 0;
         Map<Long, Long> cardmarketMap = cardDAO.getCardmarketId();
         Map<String, Long> scryfallMap = cardDAO.getScryfallId();
 
@@ -43,17 +44,16 @@ public class CardVariantService {
 
         // ORDEN CRÍTICO (para checkpoint fiable)
         Collections.sort(expansionList);
-
+        // Obtengo la última expansión procesada
         Long lastProcessed = expansionDAO.getLastExpansionId();
 
         for (Long id : expansionList) {
 
-            if (id <= lastProcessed) {
-                continue;
-            }
+            if (id <= lastProcessed) continue;
+            if(count >= 500)break;
+            System.out.println("Procesando expansión: " + id);
 
             try {
-
                 String jsonCards = cardTraderAPI.fetchBlueprints(id);
 
                 List<CardVariantDTO> cardVariantList = objectMapper.readValue(
@@ -111,6 +111,8 @@ public class CardVariantService {
 
                 // CHECKPOINT SOLO SI TODO OK
                 expansionDAO.updateLastExpansionId(id);
+                count++;
+                System.out.println("Vuelta: " + count);
 
             } catch (Exception e) {
                 throw new RuntimeException(e);

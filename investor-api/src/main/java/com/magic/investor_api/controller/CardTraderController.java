@@ -42,12 +42,11 @@ public class CardTraderController {
         cardVariantService.getCardVariantList();
     }
 
-    // Prueba directa: devuelve el JSON tal cual viene de CardTrader
     @GetMapping("/card")
     public String getProducts(
             @RequestParam String blueprintId,
             @RequestParam(defaultValue = "1") int page
     ) {
-        return cardTraderApi.fetchCardProducts(blueprintId);
+        return cardTraderApi.fetchCardProducts(blueprintId, page);
     }
 }

@@ -79,8 +79,6 @@ public class CardDTO {
         if (cardPrice != null) {
             this.avg = cardPrice.getAvg();
             this.low = cardPrice.getLow();
-            this.avgFoil = cardPrice.getAvgFoil();
-            this.lowFoil = cardPrice.getLowFoil();
         }
     }
 

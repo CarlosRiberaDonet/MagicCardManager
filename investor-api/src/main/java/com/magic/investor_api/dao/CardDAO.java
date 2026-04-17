@@ -23,7 +23,7 @@ public class CardDAO {
 
     // Obtener los campos id y cardmarket_id de la tabla card
     public Map<Long, Long> getAllCardsIds(){
-        String SELECT_IDS = "SELECT id, cardmarket_id FROM card WHERE cardmarket_id IS NOT NULL AND cardmarket_id > 0";
+        String SELECT_IDS = "SELECT id, cardmarket_id FROM card_variant";
         Map<Long, Long> cardMap = new HashMap<>(600000);
 
         try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(SELECT_IDS)){
@@ -101,7 +101,8 @@ public class CardDAO {
                 "c.set_name, c.collector_number, c.cardmarket_url, " +
                 "p.low, p.avg " +
                 "FROM card c " +
-                "LEFT JOIN card_price p ON c.id = p.card_variant_id " +
+                "JOIN card_variant v ON c.id = v.card_id " +
+                "JOIN card_price p ON v.id = p.card_variant_id " +
                 "WHERE c.name LIKE ? " +
                 "LIMIT ? OFFSET ?";
 
