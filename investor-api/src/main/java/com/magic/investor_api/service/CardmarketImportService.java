@@ -58,12 +58,7 @@ public class CardmarketImportService {
                 // Avanzo al valor del campo
                 parser.nextToken();
 
-                // Nombre del campo actual (ej: "createdAt", "priceGuides")
-                if ("createdAt".equals(nombreCampo)) {
-                    //OffsetDateTime odt = OffsetDateTime.parse(parser.getText());
-                    //LocalDateTime fechaCreacion = odt.toLocalDateTime();
-
-                } else if ("priceGuides".equals(nombreCampo)) {
+                if ("priceGuides".equals(nombreCampo)) {
 
                     // Convierto todo el array en memoria
                     JsonNode priceGuidesArray = objectMapper.readTree(parser);
@@ -129,10 +124,6 @@ public class CardmarketImportService {
         // Usamos decimalValue() para asegurar precisión financiera
         cardPrice.setAvg(node.path("avg").decimalValue());
         cardPrice.setLow(node.path("low").decimalValue());
-
-        // OJO con los nombres de los campos en el JSON de Cardmarket (suelen llevar guion)
-        cardPrice.setAvgFoil(node.path("avg-foil").decimalValue());
-        cardPrice.setLowFoil(node.path("low-foil").decimalValue());
 
         return cardPrice;
     }

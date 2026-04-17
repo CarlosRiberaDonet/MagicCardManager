@@ -34,12 +34,6 @@ public class CardPrice {
     @Column(name = "low", precision = 10, scale = 2)
     private BigDecimal low;
 
-    @Column(name = "avg_foil", precision = 10, scale = 2)
-    private BigDecimal avgFoil;
-
-    @Column(name = "low_foil", precision = 10, scale = 2)
-    private BigDecimal lowFoil;
-
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
