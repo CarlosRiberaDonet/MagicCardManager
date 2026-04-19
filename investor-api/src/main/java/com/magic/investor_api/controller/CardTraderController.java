@@ -37,9 +37,8 @@ public class CardTraderController {
     @GetMapping("/cards")
     public void getBlueprints() {
 
-        // return cardVariantService.testSingleExpansionRaw();
-        // cardVariantService.testSingleExpansion();
-        cardVariantService.getCardVariantList();
+         // return cardVariantService.testSingleExpansionRaw();
+         cardVariantService.getCardVariantList();
     }
 
     @GetMapping("/card")

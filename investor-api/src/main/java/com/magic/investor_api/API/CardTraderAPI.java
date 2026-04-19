@@ -104,26 +104,4 @@ public class CardTraderAPI {
 
         return response.getBody();
     }
-
-    /*public String fetchBlueprints(int page) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(MediaType.parseMediaTypes("application/json"));
-        headers.setBearerAuth(apiToken);
-
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-
-        String url = UriComponentsBuilder.fromUriString(BLUEPRINTS_URL)
-                .queryParam("page", page)
-                .toUriString();
-
-        ResponseEntity<String> response = restTemplate.exchange(
-                url,
-                HttpMethod.GET,
-                entity,
-                String.class
-        );
-
-        return response.getBody();
-    }*/
-
 }

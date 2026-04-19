@@ -10,21 +10,21 @@ import java.net.URL;
 public class CardmarketDownloader {
 
     private static final String URL_S3 = "https://downloads.s3.cardmarket.com/productCatalog/priceGuide/price_guide_1.json";
-    private static final String PATH_LOCAL = "D:/Proyectos/MagicCardManager/guide-prices.json";
-
+    private final String basePath = System.getProperty("user.dir");
+    String CARDS_PRICES_JSON_PATH = basePath + "/src/main/resources/guide-prices.json";
     public void downloadGuidePrice() {
         try {
             System.out.println("Iniciando descarga desde Cardmarket S3...");
 
             URL url = new URL(URL_S3);
             try (InputStream in = url.openStream();
-                 FileOutputStream out = new FileOutputStream(PATH_LOCAL)) {
+                 FileOutputStream out = new FileOutputStream(CARDS_PRICES_JSON_PATH)) {
 
                 // Copia el contenido del stream de internet al archivo en D:/
                 in.transferTo(out);
             }
 
-            System.out.println("Archivo guardado con éxito en: " + PATH_LOCAL);
+            System.out.println("Archivo guardado con éxito en: " + CARDS_PRICES_JSON_PATH);
 
         } catch (IOException e) {
             System.err.println("Error al descargar el JSON de precios: " + e.getMessage());
