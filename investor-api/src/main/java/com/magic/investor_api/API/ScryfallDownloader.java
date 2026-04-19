@@ -16,7 +16,7 @@ public class ScryfallDownloader {
     private final ScryfallImportService importService;
     private static final String URL_SCRYFALL = "https://data.scryfall.io/all-cards/all-cards-20260401092717.json";
     private final String basePath = System.getProperty("user.dir");
-    String CARDS_PRICES_JSON_PATH = basePath + "/src/main/resources/guide-prices.json";
+    String CARDS = basePath + "/src/main/resources/cards.json";
 
     public void startFullImport() {
 
@@ -24,13 +24,14 @@ public class ScryfallDownloader {
 
             URL url = new URL(URL_SCRYFALL);
             try (InputStream in = url.openStream();
-                 FileOutputStream out = new FileOutputStream(CARDS_PRICES_JSON_PATH)) {
+                 FileOutputStream out = new FileOutputStream(CARDS)) {
 
-                // Copia el contenido del stream de internet al archivo en D:/
+                System.out.println("Iniciando descarga de cartas desde scryfall...");
+                // Copia el contenido del stream de internet al directorio CARDS
                 in.transferTo(out);
             }
 
-            System.out.println("Archivo guardado con éxito en: " + CARDS_PRICES_JSON_PATH);
+            System.out.println("Archivo guardado con éxito en: " + CARDS);
 
         } catch (IOException e) {
             System.err.println("Error al descargar el JSON de precios: " + e.getMessage());

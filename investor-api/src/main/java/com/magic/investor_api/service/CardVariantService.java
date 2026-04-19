@@ -32,6 +32,7 @@ public class CardVariantService {
         this.cardDAO = cardDAO;
     }
 
+    // Obtener cartas por expansión
     public List<Long> getCardVariantList() {
 
         int count = 0;
@@ -40,6 +41,7 @@ public class CardVariantService {
 
         ObjectMapper objectMapper = new ObjectMapper();
 
+        // Obtengo los id de la lista de expansiones
         List<Long> expansionList = expansionDAO.getExpansionList();
 
         // ORDEN CRÍTICO (para checkpoint fiable)
@@ -51,7 +53,6 @@ public class CardVariantService {
 
             if (id <= lastProcessed) continue;
             if(count >= 500)break;
-            System.out.println("Procesando expansión: " + id);
 
             try {
                 String jsonCards = cardTraderAPI.fetchBlueprints(id);
@@ -112,7 +113,7 @@ public class CardVariantService {
                 // CHECKPOINT SOLO SI TODO OK
                 expansionDAO.updateLastExpansionId(id);
                 count++;
-                System.out.println("Vuelta: " + count);
+                System.out.println("Expansion: " + lastProcessed + "/" + expansionList.size());
 
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -122,86 +123,10 @@ public class CardVariantService {
         return null;
     }
 
-    public void testSingleExpansion() {
-
-        Long expansionId = 69L;
-
-        Map<Long, Long> cardmarketMap = cardDAO.getCardmarketId();
-        Map<String, Long> scryfallMap = cardDAO.getScryfallId();
-
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        String jsonCards = cardTraderAPI.fetchBlueprints(expansionId);
-
-        try {
-
-            JsonNode root = objectMapper.readTree(jsonCards);
-
-            // CardTrader puede devolver array directo o wrapper
-            JsonNode arrayNode = root.isArray() ? root : root.get("data");
-
-            List<CardVariantDTO> cardVariantList = objectMapper.readValue(
-                    arrayNode.toString(),
-                    new TypeReference<List<CardVariantDTO>>() {}
-            );
-
-            List<CardVariant> cardVariants = new ArrayList<>();
-
-            for (CardVariantDTO dto : cardVariantList) {
-
-                Long cardId = null;
-
-                Long cardmarketId = null;
-                String scryfallId = null;
-
-                if (dto.getCardMarketIds() != null && !dto.getCardMarketIds().isEmpty()) {
-                    cardmarketId = dto.getCardMarketIds().get(0);
-                }
-
-                if (dto.getScryfallId() != null && !dto.getScryfallId().trim().isEmpty()) {
-                    scryfallId = dto.getScryfallId();
-                }
-
-                if (cardmarketId != null) {
-                    cardId = cardmarketMap.get(cardmarketId);
-                }
-
-                if (cardId == null && scryfallId != null) {
-                    cardId = scryfallMap.get(scryfallId);
-                }
-
-                if (cardId == null) {
-                    continue;
-                }
-
-                CardVariant cardVariant = new CardVariant();
-
-                Card cardRef = new Card();
-                cardRef.setId(cardId);
-
-                cardVariant.setCard(cardRef);
-                cardVariant.setCardtraderId(dto.getCardTraderId());
-                cardVariant.setCardmarketId(cardmarketId);
-                cardVariant.setScryfallId(scryfallId);
-                cardVariant.setExpansionId(dto.getExpansionId());
-                cardVariant.setVersion(dto.getVersion());
-
-                cardVariants.add(cardVariant);
-            }
-
-            if (!cardVariants.isEmpty()) {
-                cardVariantDAO.insertCardVariant(cardVariants);
-            }
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     // Permite visualizar la estructura de la respuesta de la API para las cartas de una expansión
     public String testSingleExpansionRaw() {
 
-        Long expansionId = 1L;
+        Long expansionId = 69L;
 
         String jsonCards = cardTraderAPI.fetchBlueprints(expansionId);
 
