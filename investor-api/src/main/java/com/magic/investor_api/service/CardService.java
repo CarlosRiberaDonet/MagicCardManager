@@ -26,4 +26,9 @@ public class CardService {
         CardPageDTO cardPageDTO = new CardPageDTO(totalCards, page, size, cardListDTO);
         return cardPageDTO;
     }
+
+    // Actualizar cardmarket_id de la tabla card
+    public void updateCardMarketId(){
+        cardDAO.updateCardmarketId();
+    }
 }

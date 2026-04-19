@@ -52,7 +52,8 @@ public class CardVariantService {
         for (Long id : expansionList) {
 
             if (id <= lastProcessed) continue;
-            if(count >= 500)break;
+            // Contador para actualizar expansiones de 100 en 100
+            if(count >= 100)break;
 
             try {
                 String jsonCards = cardTraderAPI.fetchBlueprints(id);
@@ -113,7 +114,7 @@ public class CardVariantService {
                 // CHECKPOINT SOLO SI TODO OK
                 expansionDAO.updateLastExpansionId(id);
                 count++;
-                System.out.println("Expansion: " + lastProcessed + "/" + expansionList.size());
+                System.out.println("Expansiones descargadas: " + count);
 
             } catch (Exception e) {
                 throw new RuntimeException(e);
