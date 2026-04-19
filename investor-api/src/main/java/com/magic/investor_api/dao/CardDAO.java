@@ -138,7 +138,7 @@ public class CardDAO {
         return cardListDTO;
     }
 
-   // Obtener cardmarketId y id de la tabla card
+   // Obtener id y cardmarketId
    public Map<Long, Long> getCardmarketId(){
         Map<Long, Long> cardMap = new HashMap<>();
         String query = "SELECT id, cardmarket_id FROM card";
@@ -182,6 +182,25 @@ public class CardDAO {
         }
 
         return cardMap;
+    }
+
+    // Actualizar cardmarket id en tabla card mediante scryfallUUID de la tabla card_variant
+    public void updateCardmarketId(){
+        String UPDATE_CARDMARKET_ID = "UPDATE card c " +
+                "JOIN card_variant cv ON cv.scryfall_id = c.scryfall_id " +
+                "SET c.cardmarket_id = cv.cardmarket_id " +
+                "WHERE (c.cardmarket_id IS NULL OR c.cardmarket_id = 0) " +
+                "AND  cv.cardmarket_id IS NOT NULL AND cv.cardmarket_id > 0";
+
+        try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(UPDATE_CARDMARKET_ID)){
+
+            int filasAfectadas = stmt.executeUpdate();
+
+            System.out.println("Cartas actualizadas: " + filasAfectadas);
+
+        }catch(SQLException e){
+            e.printStackTrace();
+        }
     }
 
     // Contar total de cartas mediante su nombre

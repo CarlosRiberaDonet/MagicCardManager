@@ -3,10 +3,7 @@ package com.magic.investor_api.controller;
 import com.magic.investor_api.dto.CardDTO;
 import com.magic.investor_api.dto.CardPageDTO;
 import com.magic.investor_api.service.CardService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -35,6 +32,8 @@ public class CardController {
         return null;
         // return cardService.getCardById(id);
     }
-
-
+    @PutMapping("update")
+    public void updateCardmarketId() {
+        cardService.updateCardMarketId();
+    }
 }
