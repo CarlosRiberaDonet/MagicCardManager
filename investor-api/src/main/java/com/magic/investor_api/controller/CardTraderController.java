@@ -33,12 +33,12 @@ public class CardTraderController {
         return ResponseEntity.ok(expansions);
     }
 
-    // Obtener todas las cartas de cada edicion
+    // Obtener todas las cartas de cada expansión
     @GetMapping("/cards")
     public void getBlueprints() {
 
-         // return cardVariantService.testSingleExpansionRaw();
-         cardVariantService.getCardVariantList();
+        // cardVariantService.testSingleExpansionRaw();
+        cardVariantService.getCardVariantList();
     }
 
     @GetMapping("/card")

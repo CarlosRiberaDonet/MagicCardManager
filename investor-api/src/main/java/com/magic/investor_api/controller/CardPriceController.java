@@ -33,6 +33,7 @@ public class CardPriceController {
         }
     }
 
+    // Actualizar precios de card_price
     @PostMapping("/prices-updater")
     public ResponseEntity<String> updatePrices(){
         try {

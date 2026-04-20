@@ -29,6 +29,8 @@ public class CardService {
 
     // Actualizar cardmarket_id de la tabla card
     public void updateCardMarketId(){
+
         cardDAO.updateCardmarketId();
+        cardDAO.updateCardmarketIdUnmatched();
     }
 }

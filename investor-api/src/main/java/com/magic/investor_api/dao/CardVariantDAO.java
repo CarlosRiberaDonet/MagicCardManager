@@ -2,6 +2,7 @@ package com.magic.investor_api.dao;
 
 import com.magic.investor_api.model.Card;
 import com.magic.investor_api.model.CardVariant;
+import com.magic.investor_api.model.CardVariantUnmatched;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -16,19 +17,11 @@ public class CardVariantDAO {
 
     @Autowired
     private DataSource dataSource;
-    private final CardDAO cardDAO;
-
-    public CardVariantDAO(CardDAO cardDAO) {
-        this.cardDAO = cardDAO;
-    }
 
     // Insertar carta en la tabla card_variant
     public void insertCardVariant(List<CardVariant> cardVarians){
 
-        // Obtengo los id, cardmarket_id y scryfall_id de la tabla card
-        List<Card> cardList = cardDAO.getCardsIds();
-
-        String INSERT_CARD_VARIANT = "INSERT INTO card_variant(card_id, cardtrader_id, " +
+        String INSERT_CARD_VARIANT = "INSERT IGNORE INTO card_variant(card_id, cardtrader_id, " +
                 "cardmarket_id, scryfall_id, expansion_id, " +
                 "version, collector_number) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
@@ -48,6 +41,30 @@ public class CardVariantDAO {
 
             stmt.executeBatch();
         }catch (SQLException e){
+            e.printStackTrace();
+        }
+    }
+
+    // Insertar carta en la tabla card_variant_unmatched
+    public void insertCardVarianUnmatched(List<CardVariantUnmatched> cardVariansUnmatched) {
+
+        String INSERT_CARD_VARIANT_UNMATCHED = "INSERT IGNORE INTO card_variant_unmatched(name, expansion_id, collector_number, cardtrader_id, cardmarket_id, scryfall_id) " +
+                "VALUES(?, ?, ?, ?, ?, ?)";
+
+        try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(INSERT_CARD_VARIANT_UNMATCHED)){
+            for(CardVariantUnmatched c : cardVariansUnmatched){
+                stmt.setString(1, c.getName());
+                stmt.setLong(2, c.getExpansionId());
+                stmt.setString(3, c.getCollectorNumber());
+                stmt.setLong(4, c.getCardtraderId());
+                stmt.setObject(5, c.getCardmarketId()); // setObject por si es null
+                stmt.setString(6, c.getScryfallId());
+
+                stmt.addBatch();
+            }
+
+            stmt.executeBatch();
+        }catch(SQLException e){
             e.printStackTrace();
         }
     }
