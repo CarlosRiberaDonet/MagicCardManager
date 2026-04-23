@@ -6,7 +6,7 @@ import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.magic.investor_api.dao.CardDAO;
-import com.magic.investor_api.model.Card;
+import com.magic.investor_api.dao.CardPriceDAO;
 import com.magic.investor_api.model.CardPrice;
 import com.magic.investor_api.model.CardVariant;
 import com.magic.investor_api.repository.CardPriceRepository;
@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -30,20 +29,24 @@ public class CardmarketImportService {
     private final CardPriceRepository cardPriceRepository;
     @Autowired
     private CardDAO cardDAO;
+    @Autowired
+    private CardPriceDAO cardPriceDAO;
     private ObjectMapper objectMapper = new ObjectMapper();
 
     public void importToDatabase(String filePath) throws IOException {
+
+        // Limpiar precios anteriores antes de insertar los nuevos
+        cardPriceDAO.truncateCardPrice();
 
         // Llenar Mapa <CardmarketID, ScryfallUUID>
         Map<Long, Long> cardMap = cardDAO.getAllCardsIds();
 
         List<CardPrice> batch = new ArrayList<>();
 
-
         // Factoría de Jackson para parseo en streaming (no carga todo el JSON en memoria)
         JsonFactory factory = new JsonFactory();
 
-        // Abro el parser sobre el fichero (try-with-resources para cierre automático)
+        // Abro el parser sobre el fichero
         try (JsonParser parser = factory.createParser(new File(filePath))) {
 
             // Primer token del JSON: debe ser un objeto raíz {...}
@@ -66,24 +69,20 @@ public class CardmarketImportService {
                     // Recorro cada elemento dentro del array
                     for (JsonNode guide : priceGuidesArray) {
 
-                        // Filtro los idCategory = 1 (cartas sueltas)
-                        if (guide.path("idCategory").asInt() == 1) {
+                        // Extraigo el identificador que conecta con la BD
+                        Long idProduct = guide.path("idProduct").asLong();
 
-                            // Extraigo el identificador que conecta con la BD
-                            Long idProduct = guide.path("idProduct").asLong();
+                        // Busca el cardmarketId en el diccionario
+                        Long cardId = cardMap.get(idProduct);
 
-                            // Busca el cardmarketId en el diccionario
-                            Long cardId = cardMap.get(idProduct);
-
-                            // Si no existe en BD
-                            if(cardId == null) {
-                                System.out.println("No se encontró cardmarketId: " + idProduct);
-                                continue;
-                            }
-
-                            CardPrice newCardPrice = mapNodeToCardPrice(guide, cardId);
-                            batch.add(newCardPrice);
+                        // Si no existe en BD
+                        if(cardId == null) {
+                            System.out.println("No se encontró cardmarketId: " + idProduct);
+                            continue;
                         }
+
+                        List<CardPrice> newPrices = mapNodeToCardPrice(guide, cardId);
+                        batch.addAll(newPrices);
                         // Guardamos cada 1000 elementos
                         if (batch.size() >= 1000) {
                             cardPriceRepository.saveAll(batch);
@@ -108,23 +107,40 @@ public class CardmarketImportService {
         }
     }
 
-    private CardPrice mapNodeToCardPrice(JsonNode node, Long cardId) {
-        // 1. Creo la entidad de precio
-        CardPrice cardPrice = new CardPrice();
+    private List<CardPrice> mapNodeToCardPrice(JsonNode node, Long cardVariantId) {
+        List<CardPrice> prices = new ArrayList<>();
 
-        // 2. Creo un objeto Card "fantasma" (Proxy)
-        // Solo le seteamos el ID para que Hibernate sepa a qué carta enlazar el precio
         CardVariant cardProxy = new CardVariant();
-        cardProxy.setId(cardId);
+        cardProxy.setId(cardVariantId);
 
-        // 3. Setteo la relación y los datos
-        cardPrice.setCardVariant(cardProxy);
-        //cardPrice.setCardmarketId(node.path("idProduct").asLong());
+        // Precio normal
+        CardPrice normal = new CardPrice();
+        normal.setCardVariant(cardProxy);
+        normal.setSource(CardPrice.Source.CARDMARKET);
+        normal.setFoil(false);
+        normal.setAvg(node.path("avg").decimalValue());
+        normal.setLow(node.path("low").decimalValue());
+        normal.setAvg1(node.path("avg1").decimalValue());
+        normal.setAvg7(node.path("avg7").decimalValue());
+        normal.setAvg30(node.path("avg30").decimalValue());
+        normal.setUpdatedAt(LocalDateTime.now());
+        prices.add(normal);
 
-        // Usamos decimalValue() para asegurar precisión financiera
-        cardPrice.setAvg(node.path("avg").decimalValue());
-        cardPrice.setLow(node.path("low").decimalValue());
+        // Precio foil (solo si existe)
+        if (!node.path("avg-foil").isNull()) {
+            CardPrice foil = new CardPrice();
+            foil.setCardVariant(cardProxy);
+            foil.setSource(CardPrice.Source.CARDMARKET);
+            foil.setFoil(true);
+            foil.setAvg(node.path("avg-foil").decimalValue());
+            foil.setLow(node.path("low-foil").decimalValue());
+            foil.setAvg1(node.path("avg1-foil").decimalValue());
+            foil.setAvg7(node.path("avg7-foil").decimalValue());
+            foil.setAvg30(node.path("avg30-foil").decimalValue());
+            foil.setUpdatedAt(LocalDateTime.now());
+            prices.add(foil);
+        }
 
-        return cardPrice;
+        return prices;
     }
 }

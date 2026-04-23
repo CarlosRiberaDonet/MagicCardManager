@@ -12,18 +12,18 @@ public class CardService {
 
 
     private final CardDAO cardDAO;
-    //private final CardPageDTO cardPageDTO;
+    private CardPageDTO cardPageDTO;
 
     public CardService(CardDAO cardDAO){
         this.cardDAO = cardDAO;
     }
 
     // Obtiene lista de cartas mediante su nombre
-    public CardPageDTO getCardByName(String name, int page, int size){
+    public CardPageDTO getCardByName(String name, int page, int size, boolean foil) {
 
-        int totalCards = cardDAO.countCardsByName(name);
-        List<CardDTO> cardListDTO = cardDAO.selectCardByName(name, page, size);
-        CardPageDTO cardPageDTO = new CardPageDTO(totalCards, page, size, cardListDTO);
+        int totalCards = cardDAO.countCardsByName(name, foil);
+        List<CardDTO> cardListDTO = cardDAO.selectCardByName(name, page, size, foil);
+         cardPageDTO = new CardPageDTO(totalCards, page, size, cardListDTO);
         return cardPageDTO;
     }
 

@@ -10,10 +10,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Repository
 public class CardDAO {
@@ -32,8 +29,9 @@ public class CardDAO {
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    Long cardId = rs.getLong("id");
                     Long cardmarketId = rs.getLong("cardmarket_id");
+                    if (rs.wasNull()) continue; // ignorar filas sin cardmarket_id
+                    Long cardId = rs.getLong("id");
                     cardMap.put(cardmarketId, cardId);
                 }
             }
@@ -95,29 +93,35 @@ public class CardDAO {
     }
 
     // Obtener carta mediante su nombre
-    public List<CardDTO> selectCardByName(String name, int page, int size){
+    public List<CardDTO> selectCardByName(String name, int page, int size, boolean foil) {
 
-        String SELECT_CARD_BY_NAME = "SELECT c.id, c.name, c.lang, c.image_url, c.rarity, " +
-                "c.set_name, c.collector_number, c.cardmarket_url, " +
-                "p.low, p.avg " +
-                "FROM card c " +
-                "JOIN card_variant v ON c.id = v.card_id " +
-                "JOIN card_price p ON v.id = p.card_variant_id " +
-                "WHERE c.name LIKE ? " +
-                "LIMIT ? OFFSET ?";
+        String SELECT_CARD_BY_NAME =
+                "SELECT cv.id, ca.name, ca.lang, ca.image_url, ca.rarity, " +
+                        "ca.set_name, cv.collector_number, ca.cardmarket_url, " +
+                        "pn.avg as avg, pn.low as low, " +
+                        "pf.avg as avg_foil, pf.low as low_foil " +
+                        "FROM card ca " +
+                        "JOIN card_variant cv ON cv.card_id = ca.id " +
+                        "LEFT JOIN card_price pn ON pn.card_variant_id = cv.id AND pn.foil = 0 " +
+                        "LEFT JOIN card_price pf ON pf.card_variant_id = cv.id AND pf.foil = 1 " +
+                        "WHERE (ca.name LIKE ? " +
+                        "OR ca.printed_name LIKE ?) " +
+                        "LIMIT ? OFFSET ?";
 
         List<CardDTO> cardListDTO = new ArrayList<>();
 
-        try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(SELECT_CARD_BY_NAME)){
+        try(Connection conn = dataSource.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(SELECT_CARD_BY_NAME)){System.out.println("Buscando printed_name: [" + name + "%]");
+            System.out.println("Bytes: " + Arrays.toString(name.getBytes()));
 
-            stmt.setString(1, "%" + name.toLowerCase() + "%");
-            stmt.setInt(2, size);
-            stmt.setInt(3, (page-1) * size);
+            stmt.setString(1, name + "%");
+            stmt.setString(2, name + "%");
+            stmt.setInt(3, size);
+            stmt.setInt(4, (page - 1) * size);
             ResultSet rs = stmt.executeQuery();
 
             while(rs.next()){
                 CardDTO cardDTO = new CardDTO();
-                cardDTO.setId(rs.getLong("id"));
                 cardDTO.setName(rs.getString("name"));
                 cardDTO.setLang(rs.getString("lang"));
                 cardDTO.setImageUrl(rs.getString("image_url"));
@@ -125,9 +129,10 @@ public class CardDAO {
                 cardDTO.setSetName(rs.getString("set_name"));
                 cardDTO.setCollectorNumber(rs.getString("collector_number"));
                 cardDTO.setCardmarketURL(rs.getString("cardmarket_url"));
-
+                cardDTO.setAvg(rs.getBigDecimal("avg"));
                 cardDTO.setLow(rs.getBigDecimal("low"));
-
+                cardDTO.setAvgFoil(rs.getBigDecimal("avg_foil"));
+                cardDTO.setLowFoil(rs.getBigDecimal("low_foil"));
                 cardListDTO.add(cardDTO);
             }
 
@@ -230,13 +235,22 @@ public class CardDAO {
         return false;
     }
 
-    // Contar total de cartas mediante su nombre
-    public int countCardsByName(String name){
-        String COUNT_CARDS_BY_NAME = "SELECT COUNT(*) FROM card WHERE LOWER(name) LIKE LOWER(?)";
+    public int countCardsByName(String name, boolean foil) {
+        String COUNT_CARDS_BY_NAME =
+                "SELECT COUNT(*) " +
+                        "FROM card ca " +
+                        "JOIN card_variant cv ON cv.card_id = ca.id " +
+                        "JOIN card_price cp ON cp.card_variant_id = cv.id " +
+                        "WHERE (ca.name LIKE ? COLLATE utf8mb4_unicode_ci " +
+                        "OR ca.printed_name LIKE ? COLLATE utf8mb4_unicode_ci) " +
+                        "AND cp.foil = ?";
 
-        try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(COUNT_CARDS_BY_NAME)){
+        try(Connection conn = dataSource.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(COUNT_CARDS_BY_NAME)){
 
-            stmt.setString(1, "%" + name + "%");
+            stmt.setString(1, name + "%");
+            stmt.setString(2, name + "%");
+            stmt.setBoolean(3, foil);
             ResultSet rs = stmt.executeQuery();
             if(rs.next()){
                 return rs.getInt(1);

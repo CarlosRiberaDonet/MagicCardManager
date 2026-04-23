@@ -1,7 +1,6 @@
 package com.magic.investor_api.controller;
 
 import com.magic.investor_api.API.CardTraderAPI;
-import com.magic.investor_api.dto.CardVariantDTO;
 import com.magic.investor_api.model.Expansion;
 import com.magic.investor_api.service.CardVariantService;
 import com.magic.investor_api.service.ExpansionService;
@@ -37,8 +36,8 @@ public class CardTraderController {
     @GetMapping("/cards")
     public void getBlueprints() {
 
-        // cardVariantService.testSingleExpansionRaw();
-        cardVariantService.getCardVariantList();
+       // return cardVariantService.testSingleExpansionRaw();
+       cardVariantService.getCardVariantList();
     }
 
     @GetMapping("/card")
