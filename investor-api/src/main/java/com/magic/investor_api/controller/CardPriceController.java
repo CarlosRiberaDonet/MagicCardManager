@@ -9,9 +9,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
+
 
 @RestController
-@RequestMapping("/api/cardmarket-guide-prices")
+@RequestMapping("/prices")
 @RequiredArgsConstructor
 public class CardPriceController {
 
@@ -20,7 +22,7 @@ public class CardPriceController {
     private final String basePath = System.getProperty("user.dir");
 
     // Descargar el price guide de cardmarket
-    @PostMapping("/import-guide-prices")
+    @PostMapping("/import")
     public ResponseEntity<String> startImportGuidePrices(){
         try {
 
@@ -34,7 +36,7 @@ public class CardPriceController {
     }
 
     // Actualizar precios de card_price
-    @PostMapping("/prices-updater")
+    @PostMapping("/update")
     public ResponseEntity<String> updatePrices(){
         try {
             System.out.println("Actualizando lista de precios...");

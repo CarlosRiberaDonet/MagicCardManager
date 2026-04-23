@@ -20,9 +20,14 @@ public class CardController {
 
     // Buscar carta por nombre
     @GetMapping("/search")
-    public CardPageDTO searchCardByName(@RequestParam String name, @RequestParam int page, @RequestParam int size){
-
-        return cardService.getCardByName(name, page, size);
+    public CardPageDTO searchCardByName(
+            @RequestParam String name,
+            @RequestParam int page,
+            @RequestParam int size,
+            @RequestParam(defaultValue = "false") boolean foil) {
+        System.out.println("Búsqueda recibida: [" + name + "]");
+        System.out.println("Longitud: " + name.length());
+        return cardService.getCardByName(name, page, size, foil);
     }
 
     // Buscar carta por UUID scryfall
@@ -32,6 +37,7 @@ public class CardController {
         return null;
         // return cardService.getCardById(id);
     }
+
     @PutMapping("update")
     public void updateCardmarketId() {
         cardService.updateCardMarketId();
