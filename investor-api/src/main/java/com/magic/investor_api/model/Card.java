@@ -26,6 +26,9 @@ public class Card {
     @Column(name = "cardmarket_id")
     private Long cardmarketId;
 
+    @Column(name = "cardmarket_id")
+    private Long cardtraderId;
+
     @Column(name = "name", nullable = false)
     private String name;
 

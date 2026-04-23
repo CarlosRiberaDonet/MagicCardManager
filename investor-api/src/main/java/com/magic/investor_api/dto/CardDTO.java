@@ -34,6 +34,7 @@ public class CardDTO {
     private Long id;
     private String scryfallId;
     private Long cardmarketId;
+    private Long cardtraderId;
     private String name;
     private String lang;
     private String imageUrl;
@@ -61,6 +62,7 @@ public class CardDTO {
         this.id = card.getId();
         this.scryfallId = card.getScryfallId();
         this.cardmarketId = card.getCardmarketId();
+        this.cardtraderId = card.getCardtraderId();
         this.name = card.getName();
         this.lang = card.getLang();
         this.imageUrl = card.getImageUrl();
@@ -110,6 +112,14 @@ public class CardDTO {
 
     public void setCardmarketId(Long cardmarketId) {
         this.cardmarketId = cardmarketId;
+    }
+
+    public Long getCardtraderId() {
+        return cardtraderId;
+    }
+
+    public void setCardtraderId(Long cardtraderId) {
+        this.cardtraderId = cardtraderId;
     }
 
     public String getName() {
