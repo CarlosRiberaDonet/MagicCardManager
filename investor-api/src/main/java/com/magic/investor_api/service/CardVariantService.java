@@ -10,7 +10,6 @@ import com.magic.investor_api.dao.ExpansionDAO;
 import com.magic.investor_api.dto.CardVariantDTO;
 import com.magic.investor_api.model.Card;
 import com.magic.investor_api.model.CardVariant;
-import com.magic.investor_api.model.CardVariantUnmatched;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
@@ -47,6 +46,9 @@ public class CardVariantService {
     // Obtener cartas por expansión
     public List<Long> getCardVariantList() {
 
+        // Borro los datos de la tabla card_variant
+        //cardVariantDAO.truncateCardVariant();
+
         int count = 0;
         Map<Long, Long> cardmarketMap = cardDAO.getCardmarketId();
         Map<String, Long> scryfallMap = cardDAO.getScryfallId();
@@ -75,7 +77,6 @@ public class CardVariantService {
                 );
 
                 List<CardVariant> cardVariantsList = new ArrayList<>();
-                List<CardVariantUnmatched> cardVariantsUnmatchedList = new ArrayList<>();
 
                 // Itero sobre la lista obtenida de cartas
                 for (CardVariantDTO dto : cardVariantList) {
@@ -94,26 +95,13 @@ public class CardVariantService {
                         scryfallId = dto.getScryfallId(); // Le asigno el scryfallId obtenido
                     }
 
-                    // Si cardmarketId no es nulo busco en el mapa si existe
-                    if (cardmarketId != null) {
-                        cardId = cardmarketMap.get(cardmarketId);
-                    }
-
                     // Si scryfallId no es nulo busco en el mapa si existe
-                    if (cardId == null && scryfallId != null) {
+                    if (scryfallId != null) {
                         cardId = scryfallMap.get(scryfallId);
                     }
-
-                    if (cardId == null) {
-                        CardVariantUnmatched unmatched = new CardVariantUnmatched();
-                        unmatched.setName(dto.getName());
-                        unmatched.setExpansionId(dto.getExpansionId());
-                        unmatched.setCollectorNumber(dto.getFixedProperties().getCollectorNumber());
-                        unmatched.setCardtraderId(dto.getCardTraderId());
-                        unmatched.setCardmarketId(cardmarketId);
-                        unmatched.setScryfallId(scryfallId);
-                        cardVariantsUnmatchedList.add(unmatched);
-                        continue;
+                    // Si cardmarketId no es nulo busco en el mapa si existe
+                    if (cardId == null && cardmarketId != null) {
+                        cardId = cardmarketMap.get(cardmarketId);
                     }
 
                     CardVariant cardVariant = new CardVariant();
@@ -132,11 +120,9 @@ public class CardVariantService {
                     cardVariantsList.add(cardVariant);
                 }
 
+                // Inserto la lista en la tabla card_variant
                 if (!cardVariantsList.isEmpty()) {
                     cardVariantDAO.insertCardVariant(cardVariantsList);
-                }
-                if(!cardVariantsUnmatchedList.isEmpty()){
-                    cardVariantDAO.insertCardVarianUnmatched(cardVariantsUnmatchedList);
                 }
 
                 // CHECKPOINT SOLO SI TODO OK
@@ -161,7 +147,7 @@ public class CardVariantService {
     // Permite visualizar la estructura de la respuesta de la API para las cartas de una expansión
     public String testSingleExpansionRaw() {
 
-        Long expansionId = 69L;
+        Long expansionId = 3261L;
 
         String jsonCards = cardTraderAPI.fetchBlueprints(expansionId);
 

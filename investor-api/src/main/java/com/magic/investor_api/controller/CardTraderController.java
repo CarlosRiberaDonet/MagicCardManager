@@ -36,8 +36,14 @@ public class CardTraderController {
     @GetMapping("/cards")
     public void getBlueprints() {
 
-       // return cardVariantService.testSingleExpansionRaw();
        cardVariantService.getCardVariantList();
+    }
+
+    // Obtener todas las cartas de cada expansión
+    @GetMapping("/cardsJSON")
+    public String getBlueprintsJSON() {
+
+        return cardVariantService.testSingleExpansionRaw();
     }
 
     @GetMapping("/card")

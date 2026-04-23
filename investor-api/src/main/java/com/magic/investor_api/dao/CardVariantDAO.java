@@ -28,7 +28,7 @@ public class CardVariantDAO {
         try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(INSERT_CARD_VARIANT)){
 
             for(CardVariant c : cardVarians){
-                stmt.setLong(1, c.getCard().getId()); // cardId de la BD
+                stmt.setObject(1, c.getCard() != null ? c.getCard().getId() : null); // cardId de la BD
                 stmt.setObject(2, c.getCardtraderId()); // cardtraderId
                 stmt.setObject(3, c.getCardmarketId()); // carmaketId
                 stmt.setObject(4, c.getScryfallId()); // scryfall UUID
@@ -45,27 +45,16 @@ public class CardVariantDAO {
         }
     }
 
-    // Insertar carta en la tabla card_variant_unmatched
-    public void insertCardVarianUnmatched(List<CardVariantUnmatched> cardVariansUnmatched) {
-
-        String INSERT_CARD_VARIANT_UNMATCHED = "INSERT IGNORE INTO card_variant_unmatched(name, expansion_id, collector_number, cardtrader_id, cardmarket_id, scryfall_id) " +
-                "VALUES(?, ?, ?, ?, ?, ?)";
-
-        try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(INSERT_CARD_VARIANT_UNMATCHED)){
-            for(CardVariantUnmatched c : cardVariansUnmatched){
-                stmt.setString(1, c.getName());
-                stmt.setLong(2, c.getExpansionId());
-                stmt.setString(3, c.getCollectorNumber());
-                stmt.setLong(4, c.getCardtraderId());
-                stmt.setObject(5, c.getCardmarketId()); // setObject por si es null
-                stmt.setString(6, c.getScryfallId());
-
-                stmt.addBatch();
-            }
-
-            stmt.executeBatch();
-        }catch(SQLException e){
-            e.printStackTrace();
+    // En el DAO
+    public void truncateCardVariant() {
+        String sql = "TRUNCATE TABLE card_variant";
+        // Resetear checkpoint
+        String RESET_CHECKPOINT = "UPDATE sync_progress SET last_expansion_id = 0 WHERE process_name = 'card_variant_sync'";
+        try(Connection conn = dataSource.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)){
+            stmt.executeUpdate();
+        } catch(SQLException e){
+            throw new RuntimeException(e);
         }
     }
 }

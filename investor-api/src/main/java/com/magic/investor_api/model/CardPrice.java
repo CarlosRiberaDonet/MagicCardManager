@@ -34,6 +34,9 @@ public class CardPrice {
     @Column(name = "low", precision = 10, scale = 2)
     private BigDecimal low;
 
+    @Column(name = "trend", precision = 10, scale = 2)
+    private BigDecimal trend;
+
     @Column(name = "avg1", precision = 10, scale = 2)
     private BigDecimal avg1;
 

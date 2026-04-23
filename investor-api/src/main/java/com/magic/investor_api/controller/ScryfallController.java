@@ -14,7 +14,7 @@ import java.io.InputStream;
 
 
 @RestController
-@RequestMapping("/api/scryfall")
+@RequestMapping("/scryfall")
 @RequiredArgsConstructor
 public class ScryfallController {
 
@@ -23,13 +23,13 @@ public class ScryfallController {
 
 
     // Descargar JSON de scryfall
-    @PostMapping("/import-all")
+    @PostMapping("/import")
     public ResponseEntity<String> startImport() {
         try {
-
+            System.out.println("Proceso de descarga iniciado...");
             scryfallDownloader.startFullImport();
 
-            return ResponseEntity.ok("Proceso iniciado. Revisa la consola de IntelliJ para ver el progreso.");
+            return ResponseEntity.ok("Descarga completada.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error al conectar con Scryfall: " + e.getMessage());

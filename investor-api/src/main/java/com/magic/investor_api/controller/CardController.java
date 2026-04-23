@@ -40,6 +40,7 @@ public class CardController {
 
     @PutMapping("update")
     public void updateCardmarketId() {
+
         cardService.updateCardMarketId();
     }
 }

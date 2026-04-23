@@ -31,6 +31,5 @@ public class CardService {
     public void updateCardMarketId(){
 
         cardDAO.updateCardmarketId();
-        cardDAO.updateCardmarketIdUnmatched();
     }
 }

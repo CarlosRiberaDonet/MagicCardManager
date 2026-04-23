@@ -14,7 +14,7 @@ public class CardPriceDAO {
     @Autowired
     private DataSource dataSource;
 
-    // En el DAO
+    // Borrar datos de la tabla card_price
     public void truncateCardPrice() {
         String sql = "TRUNCATE TABLE card_price";
         try(Connection conn = dataSource.getConnection();
