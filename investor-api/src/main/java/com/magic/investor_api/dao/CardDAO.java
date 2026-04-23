@@ -18,7 +18,7 @@ public class CardDAO {
     @Autowired
     private DataSource dataSource;
 
-    // Obtener los campos id y cardmarket_id de la tabla card
+    // Obtener los campos id y cardmarket_id de la tabla card_variant
     public Map<Long, Long> getAllCardsIds(){
         String SELECT_IDS = "SELECT id, cardmarket_id FROM card_variant";
         Map<Long, Long> cardMap = new HashMap<>(600000);
@@ -192,7 +192,7 @@ public class CardDAO {
     // Actualizar cardmarket id en tabla card mediante scryfallUUID de la tabla card_variant
     public boolean updateCardmarketId(){
         String UPDATE_CARDMARKET_ID = "UPDATE card c " +
-                "JOIN card_variant cv ON cv.cardmarket_id = c.cardmarket_id " +
+                "JOIN card_variant cv ON cv.scryfall_id = c.scryfall_id " +
                 "SET c.cardmarket_id = cv.cardmarket_id " +
                 "WHERE (c.cardmarket_id IS NULL OR c.cardmarket_id = 0) " +
                 "AND cv.cardmarket_id IS NOT NULL AND cv.cardmarket_id > 0";
@@ -203,29 +203,6 @@ public class CardDAO {
 
             if(filasAfectadas > 0){
                 System.out.println("Cartas actualizadas en tabla card_variant: " + filasAfectadas);
-                return true;
-            }
-
-        }catch(SQLException e){
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    // Actualizar cardmarket id en tabla card mediante scryfallUUID de la tabla card_variant
-    public boolean updateCardmarketIdUnmatched(){
-        String UPDATE_CARDMARKET_ID_UNMATCHED = "UPDATE card c " +
-                "JOIN card_variant_unmatched cvu ON cvu.scryfall_id = c.scryfall_id " +
-                "SET c.cardmarket_id = cvu.cardmarket_id " +
-                "WHERE (c.cardmarket_id IS NULL OR c.cardmarket_id = 0) " +
-                "AND cvu.cardmarket_id IS NOT NULL AND cvu.cardmarket_id > 0";
-
-        try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(UPDATE_CARDMARKET_ID_UNMATCHED)){
-
-            int filasAfectadas = stmt.executeUpdate();
-
-            if(filasAfectadas > 0){
-                System.out.println("Cartas actualizadas en tabla card_variant_unmatched: " + filasAfectadas);
                 return true;
             }
 

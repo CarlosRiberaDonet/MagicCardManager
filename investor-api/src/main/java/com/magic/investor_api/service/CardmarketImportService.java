@@ -120,6 +120,7 @@ public class CardmarketImportService {
         normal.setFoil(false);
         normal.setAvg(node.path("avg").decimalValue());
         normal.setLow(node.path("low").decimalValue());
+        normal.setTrend(node.path("trend").decimalValue());
         normal.setAvg1(node.path("avg1").decimalValue());
         normal.setAvg7(node.path("avg7").decimalValue());
         normal.setAvg30(node.path("avg30").decimalValue());
@@ -134,6 +135,7 @@ public class CardmarketImportService {
             foil.setFoil(true);
             foil.setAvg(node.path("avg-foil").decimalValue());
             foil.setLow(node.path("low-foil").decimalValue());
+            foil.setTrend(node.path("trend-foil").decimalValue());
             foil.setAvg1(node.path("avg1-foil").decimalValue());
             foil.setAvg7(node.path("avg7-foil").decimalValue());
             foil.setAvg30(node.path("avg30-foil").decimalValue());

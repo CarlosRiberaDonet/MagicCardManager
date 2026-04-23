@@ -28,7 +28,7 @@ public class CardPriceController {
 
             cardmarketDownloader.downloadGuidePrice();
 
-            return ResponseEntity.ok("Proceso iniciado. Revisa la consola de IntelliJ para ver el progreso.");
+            return ResponseEntity.ok("Proceso de descarga iniciado.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error al conectar con cardmarket: " + e.getMessage());
