@@ -96,16 +96,17 @@ public class CardDAO {
     public List<CardDTO> selectCardByName(String name, int page, int size, boolean foil) {
 
         String SELECT_CARD_BY_NAME =
-                "SELECT cv.id, ca.name, ca.lang, ca.image_url, ca.rarity, " +
-                        "ca.set_name, cv.collector_number, ca.cardmarket_url, " +
-                        "pn.avg as avg, pn.low as low, " +
-                        "pf.avg as avg_foil, pf.low as low_foil " +
-                        "FROM card ca " +
-                        "JOIN card_variant cv ON cv.card_id = ca.id " +
+                "SELECT DISTINCT cv.id, ca_en.name, ca_en.image_url, ca_en.rarity, " +
+                        "    ca_en.set_name, cv.collector_number, ca_en.cardmarket_url, " +
+                        "    pn.avg as avg, pn.low as low, " +
+                        "    pf.avg as avg_foil, pf.low as low_foil " +
+                        "FROM card ca_search " +
+                        "JOIN card_variant cv ON cv.cardmarket_id = ca_search.cardmarket_id " +
+                        "JOIN card ca_en ON ca_en.cardmarket_id = cv.cardmarket_id AND ca_en.lang = 'en' " +
                         "LEFT JOIN card_price pn ON pn.card_variant_id = cv.id AND pn.foil = 0 " +
                         "LEFT JOIN card_price pf ON pf.card_variant_id = cv.id AND pf.foil = 1 " +
-                        "WHERE (ca.name LIKE ? " +
-                        "OR ca.printed_name LIKE ?) " +
+                        "WHERE (ca_search.name LIKE ? COLLATE utf8mb4_unicode_ci " +
+                        "OR ca_search.printed_name LIKE ? COLLATE utf8mb4_unicode_ci) " +
                         "LIMIT ? OFFSET ?";
 
         List<CardDTO> cardListDTO = new ArrayList<>();
