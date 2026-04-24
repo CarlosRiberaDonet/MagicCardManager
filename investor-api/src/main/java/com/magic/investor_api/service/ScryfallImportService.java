@@ -6,7 +6,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.magic.investor_api.model.Card;
+import com.magic.investor_api.model.ScryfallCard;
 import com.magic.investor_api.repository.CardRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -46,14 +46,14 @@ public class ScryfallImportService {
                 throw new IOException("Formato JSON inválido");
             }
 
-            List<Card> batch = new ArrayList<>();
+            List<ScryfallCard> batch = new ArrayList<>();
             int totalProcessed = 0;
 
             while (parser.nextToken() == JsonToken.START_OBJECT) {
                 JsonNode node = objectMapper.readTree(parser);
 
                 // Lógica de mapeo
-                Card card = mapNodeToCard(node);
+                ScryfallCard card = mapNodeToCard(node);
                 batch.add(card);
                 totalProcessed++;
 
@@ -72,8 +72,8 @@ public class ScryfallImportService {
         }
     }
 
-    private Card mapNodeToCard(JsonNode node) {
-        Card card = new Card();
+    private ScryfallCard mapNodeToCard(JsonNode node) {
+        ScryfallCard card = new ScryfallCard();
 
         // Campos de identidad
         card.setScryfallId(node.path("id").asText("")); // scryfall UUID

@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.magic.investor_api.dao.CardDAO;
 import com.magic.investor_api.dao.CardPriceDAO;
 import com.magic.investor_api.model.CardPrice;
-import com.magic.investor_api.model.CardVariant;
+import com.magic.investor_api.model.CardtraderCard;
 import com.magic.investor_api.repository.CardPriceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -110,7 +110,7 @@ public class CardmarketImportService {
     private List<CardPrice> mapNodeToCardPrice(JsonNode node, Long cardVariantId) {
         List<CardPrice> prices = new ArrayList<>();
 
-        CardVariant cardProxy = new CardVariant();
+        CardtraderCard cardProxy = new CardtraderCard();
         cardProxy.setId(cardVariantId);
 
         // Precio normal

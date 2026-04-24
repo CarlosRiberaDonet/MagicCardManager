@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -22,7 +21,7 @@ public class CardPrice {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "card_variant_id", nullable = false)
-    private CardVariant cardVariant;
+    private CardtraderCard cardVariant;
 
     @Enumerated(EnumType.STRING)
     //@Column(name = "source", nullable = false)
