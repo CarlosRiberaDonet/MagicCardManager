@@ -1,8 +1,6 @@
 package com.magic.investor_api.dao;
 
-import com.magic.investor_api.model.Card;
-import com.magic.investor_api.model.CardVariant;
-import com.magic.investor_api.model.CardVariantUnmatched;
+import com.magic.investor_api.model.CardtraderCard;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -19,7 +17,7 @@ public class CardVariantDAO {
     private DataSource dataSource;
 
     // Insertar carta en la tabla card_variant
-    public void insertCardVariant(List<CardVariant> cardVarians){
+    public void insertCardVariant(List<CardtraderCard> cardVarians){
 
         String INSERT_CARD_VARIANT = "INSERT IGNORE INTO card_variant(card_id, cardtrader_id, " +
                 "cardmarket_id, scryfall_id, expansion_id, " +
@@ -27,7 +25,7 @@ public class CardVariantDAO {
 
         try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(INSERT_CARD_VARIANT)){
 
-            for(CardVariant c : cardVarians){
+            for(CardtraderCard c : cardVarians){
                 stmt.setObject(1, c.getCard() != null ? c.getCard().getId() : null); // cardId de la BD
                 stmt.setObject(2, c.getCardtraderId()); // cardtraderId
                 stmt.setObject(3, c.getCardmarketId()); // carmaketId

@@ -8,8 +8,8 @@ import com.magic.investor_api.dao.CardDAO;
 import com.magic.investor_api.dao.CardVariantDAO;
 import com.magic.investor_api.dao.ExpansionDAO;
 import com.magic.investor_api.dto.CardVariantDTO;
-import com.magic.investor_api.model.Card;
-import com.magic.investor_api.model.CardVariant;
+import com.magic.investor_api.model.ScryfallCard;
+import com.magic.investor_api.model.CardtraderCard;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
@@ -76,7 +76,7 @@ public class CardVariantService {
                         new TypeReference<List<CardVariantDTO>>() {}
                 );
 
-                List<CardVariant> cardVariantsList = new ArrayList<>();
+                List<CardtraderCard> cardVariantsList = new ArrayList<>();
 
                 // Itero sobre la lista obtenida de cartas
                 for (CardVariantDTO dto : cardVariantList) {
@@ -104,9 +104,9 @@ public class CardVariantService {
                         cardId = cardmarketMap.get(cardmarketId);
                     }
 
-                    CardVariant cardVariant = new CardVariant();
+                    CardtraderCard cardVariant = new CardtraderCard();
 
-                    Card cardRef = new Card();
+                    ScryfallCard cardRef = new ScryfallCard();
                     cardRef.setId(cardId);
 
                     cardVariant.setCard(cardRef);

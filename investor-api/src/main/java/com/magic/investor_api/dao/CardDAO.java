@@ -1,7 +1,7 @@
 package com.magic.investor_api.dao;
 
 import com.magic.investor_api.dto.CardDTO;
-import com.magic.investor_api.model.Card;
+import com.magic.investor_api.model.ScryfallCard;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -44,9 +44,9 @@ public class CardDAO {
     }
 
     // Obtener los campos id, cardmarket_id y scryfall_id de la tabla card
-    public List<Card> getCardsIds(){
+    public List<ScryfallCard> getCardsIds(){
         String SELECT_IDS = "SELECT id, scryfall_id, cardmarket_id FROM card";
-        List<Card> cardList = new ArrayList<>();
+        List<ScryfallCard> cardList = new ArrayList<>();
 
         try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(SELECT_IDS)){
 
@@ -54,7 +54,7 @@ public class CardDAO {
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    Card card = new Card();
+                    ScryfallCard card = new ScryfallCard();
                     card.setCardmarketId(rs.getLong("cardmarket_id"));
                     card.setId(rs.getLong("id"));
                     card.setScryfallId(rs.getString("scryfall_id"));
@@ -71,7 +71,7 @@ public class CardDAO {
     }
 
     // Obtener carta mediante el campo cardmarketId
-    public Card getCardByCardmarketId(Long cardmarketId) {
+    public ScryfallCard getCardByCardmarketId(Long cardmarketId) {
         String SELECT_CARD_BY_ID = "SELECT id, cardmarket_id FROM card WHERE cardmarket_id = ?";
 
         try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(SELECT_CARD_BY_ID)){
@@ -79,7 +79,7 @@ public class CardDAO {
             stmt.setLong(1, cardmarketId);
             try(ResultSet rs = stmt.executeQuery()){
                 if(rs.next()){
-                    Card card = new Card();
+                    ScryfallCard card = new ScryfallCard();
                     card.setId(rs.getLong("id"));
                     card.setCardmarketId(rs.getLong("cardmarket_id"));
                     return card;

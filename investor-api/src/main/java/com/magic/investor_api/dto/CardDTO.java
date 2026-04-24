@@ -1,7 +1,7 @@
 package com.magic.investor_api.dto;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.magic.investor_api.model.Card;
+import com.magic.investor_api.model.ScryfallCard;
 import com.magic.investor_api.model.CardPrice;
 
 import java.math.BigDecimal;
@@ -57,7 +57,7 @@ public class CardDTO {
     private BigDecimal lowFoil;
 
     // CONSTRUCTOR
-    public CardDTO(Card card, CardPrice cardPrice){
+    public CardDTO(ScryfallCard card, CardPrice cardPrice){
         // Campos de la carta
         this.id = card.getId();
         this.scryfallId = card.getScryfallId();

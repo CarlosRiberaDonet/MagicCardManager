@@ -1,6 +1,5 @@
 package com.magic.investor_api.dao;
 
-import com.magic.investor_api.model.CardVariant;
 import com.magic.investor_api.model.Expansion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
