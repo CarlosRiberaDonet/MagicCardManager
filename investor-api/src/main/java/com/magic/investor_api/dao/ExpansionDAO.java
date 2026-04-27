@@ -18,7 +18,7 @@ public class ExpansionDAO {
     @Autowired
     private DataSource dataSource;
 
-    // Inserta las ediciones en la tabla card_trader_expansion
+    // Inserta las expansiones en la tabla card_trader_expansion
     public void insertExpansion(List<Expansion> expansionList) {
 
         String INSERT_EXPANSION = "INSERT INTO card_trader_expansion VALUES (?, ?, ?)";
@@ -38,7 +38,7 @@ public class ExpansionDAO {
         }
     }
 
-    // Obtiene las ediciones de la tabla card_trader_expansion
+    // Obtiene las expansiones de la tabla card_trader_expansion
     public List<Long> getExpansionList(){
 
         String SELECT_EXPANSION = "SELECT id FROM card_trader_expansion";
@@ -69,7 +69,7 @@ public class ExpansionDAO {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, "card_variant_sync");
+            stmt.setString(1, "sync_progress");
 
             ResultSet rs = stmt.executeQuery();
 
@@ -93,7 +93,7 @@ public class ExpansionDAO {
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setLong(1, id);
-            stmt.setString(2, "card_variant_sync");
+            stmt.setString(2, "sync_progress");
 
             stmt.executeUpdate();
 

@@ -1,7 +1,6 @@
 package com.magic.investor_api.dto;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.magic.investor_api.model.ScryfallCard;
 import com.magic.investor_api.model.CardPrice;
 
 import java.math.BigDecimal;
@@ -29,63 +28,59 @@ import java.time.LocalDate;
         "updatedAt"
 })
 
-public class CardDTO {
+public class ScryfallCardDTO {
 
     private Long id;
     private String scryfallId;
     private Long cardmarketId;
     private Long cardtraderId;
     private String name;
+    private String printedName;
     private String lang;
     private String imageUrl;
     private String rarity;
-    private LocalDate releasedAt;
-    private String setCode;
     private String setName;
+    private String setCode;
     private String collectorNumber;
+    private String cardmarketURL;
+    private BigDecimal price;
+    private BigDecimal priceFoil;
     private String typeLine;
     private String borderColor;
-    private String frameEffects;
+    private String frame;
     private boolean isFoil;
     private boolean isReprint;
-    private String cardmarketURL;
+    private LocalDate  releasedAt;
+    private CardPrice cardPrice;
 
-    // Precios
-    private BigDecimal avg;
-    private BigDecimal low;
-    private BigDecimal avgFoil;
-    private BigDecimal lowFoil;
+   // CONSTRUCTOR
 
-    // CONSTRUCTOR
-    public CardDTO(ScryfallCard card, CardPrice cardPrice){
-        // Campos de la carta
-        this.id = card.getId();
-        this.scryfallId = card.getScryfallId();
-        this.cardmarketId = card.getCardmarketId();
-        this.cardtraderId = card.getCardtraderId();
-        this.name = card.getName();
-        this.lang = card.getLang();
-        this.imageUrl = card.getImageUrl();
-        this.rarity = card.getRarity();
-        this.releasedAt = card.getReleasedAt();
-        this.setCode = card.getSetCode();
-        this.setName = card.getSetName();
-        this.collectorNumber = card.getCollectorNumber();
-        this.typeLine = card.getTypeLine();
-        this.borderColor = card.getBorderColor();
-        this.isFoil = card.isFoil();
-        this.isReprint = card.isReprint();
-        this.cardmarketURL = card.getCardmarketURL();
-
-        // Precios normales
-        if (cardPrice != null) {
-            this.avg = cardPrice.getAvg();
-            this.low = cardPrice.getLow();
-        }
+    public ScryfallCardDTO(Long id, String scryfallId, Long cardmarketId, Long cardtraderId, String name, String printedName, String lang, String imageUrl, String rarity, String setName, String setCode, String collectorNumber, String cardmarketURL, BigDecimal price, BigDecimal priceFoil, String typeLine, String borderColor, String frame, boolean isFoil, boolean isReprint, LocalDate releasedAt, CardPrice cardPrice) {
+        this.id = id;
+        this.scryfallId = scryfallId;
+        this.cardmarketId = cardmarketId;
+        this.cardtraderId = cardtraderId;
+        this.name = name;
+        this.printedName = printedName;
+        this.lang = lang;
+        this.imageUrl = imageUrl;
+        this.rarity = rarity;
+        this.setName = setName;
+        this.setCode = setCode;
+        this.collectorNumber = collectorNumber;
+        this.cardmarketURL = cardmarketURL;
+        this.price = price;
+        this.priceFoil = priceFoil;
+        this.typeLine = typeLine;
+        this.borderColor = borderColor;
+        this.frame = frame;
+        this.isFoil = isFoil;
+        this.isReprint = isReprint;
+        this.releasedAt = releasedAt;
+        this.cardPrice = cardPrice;
     }
 
-    public CardDTO(){
-
+    public ScryfallCardDTO() {
     }
 
     // GETTERS Y SETTERS
@@ -130,6 +125,14 @@ public class CardDTO {
         this.name = name;
     }
 
+    public String getPrintedName() {
+        return printedName;
+    }
+
+    public void setPrintedName(String printedName) {
+        this.printedName = printedName;
+    }
+
     public String getLang() {
         return lang;
     }
@@ -154,12 +157,12 @@ public class CardDTO {
         this.rarity = rarity;
     }
 
-    public LocalDate getReleasedAt() {
-        return releasedAt;
+    public String getSetName() {
+        return setName;
     }
 
-    public void setReleasedAt(LocalDate releasedAt) {
-        this.releasedAt = releasedAt;
+    public void setSetName(String setName) {
+        this.setName = setName;
     }
 
     public String getSetCode() {
@@ -170,20 +173,36 @@ public class CardDTO {
         this.setCode = setCode;
     }
 
-    public String getSetName() {
-        return setName;
-    }
-
-    public void setSetName(String setName) {
-        this.setName = setName;
-    }
-
     public String getCollectorNumber() {
         return collectorNumber;
     }
 
     public void setCollectorNumber(String collectorNumber) {
         this.collectorNumber = collectorNumber;
+    }
+
+    public String getCardmarketURL() {
+        return cardmarketURL;
+    }
+
+    public void setCardmarketURL(String cardmarketURL) {
+        this.cardmarketURL = cardmarketURL;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+
+    public BigDecimal getPriceFoil() {
+        return priceFoil;
+    }
+
+    public void setPriceFoil(BigDecimal priceFoil) {
+        this.priceFoil = priceFoil;
     }
 
     public String getTypeLine() {
@@ -202,12 +221,12 @@ public class CardDTO {
         this.borderColor = borderColor;
     }
 
-    public String getFrameEffects() {
-        return frameEffects;
+    public String getFrame() {
+        return frame;
     }
 
-    public void setFrameEffects(String frameEffects) {
-        this.frameEffects = frameEffects;
+    public void setFrame(String frame) {
+        this.frame = frame;
     }
 
     public boolean isFoil() {
@@ -226,43 +245,19 @@ public class CardDTO {
         isReprint = reprint;
     }
 
-    public String getCardmarketURL() {
-        return cardmarketURL;
+    public LocalDate getReleasedAt() {
+        return releasedAt;
     }
 
-    public void setCardmarketURL(String cardmarketURL) {
-        this.cardmarketURL = cardmarketURL;
+    public void setReleasedAt(LocalDate releasedAt) {
+        this.releasedAt = releasedAt;
     }
 
-    public BigDecimal getAvg() {
-        return avg;
+    public CardPrice getCardPrice() {
+        return cardPrice;
     }
 
-    public void setAvg(BigDecimal avg) {
-        this.avg = avg;
-    }
-
-    public BigDecimal getLow() {
-        return low;
-    }
-
-    public void setLow(BigDecimal low) {
-        this.low = low;
-    }
-
-    public BigDecimal getAvgFoil() {
-        return avgFoil;
-    }
-
-    public void setAvgFoil(BigDecimal avgFoil) {
-        this.avgFoil = avgFoil;
-    }
-
-    public BigDecimal getLowFoil() {
-        return lowFoil;
-    }
-
-    public void setLowFoil(BigDecimal lowFoil) {
-        this.lowFoil = lowFoil;
+    public void setCardPrice(CardPrice cardPrice) {
+        this.cardPrice = cardPrice;
     }
 }

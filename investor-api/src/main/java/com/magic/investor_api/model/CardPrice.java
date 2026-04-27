@@ -19,13 +19,8 @@ public class CardPrice {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "card_variant_id", nullable = false)
-    private CardtraderCard cardVariant;
-
-    @Enumerated(EnumType.STRING)
-    //@Column(name = "source", nullable = false)
-    private Source source;
+    @Column(name = "cardmarket_id")
+    private Long cardmarketId;
 
     @Column(name = "avg", precision = 10, scale = 2)
     private BigDecimal avg;
@@ -45,14 +40,35 @@ public class CardPrice {
     @Column(name = "avg30", precision = 10, scale = 2)
     private BigDecimal avg30;
 
-    @Column(name = "foil")
-    private Boolean foil;
+    @Column(name = "avg_foil", precision = 10, scale = 2)
+    private BigDecimal avgFoil;
+
+    @Column(name = "low_foil", precision = 10, scale = 2)
+    private BigDecimal lowFoil;
+
+    @Column(name = "trend_foil", precision = 10, scale = 2)
+    private BigDecimal trendFoil;
+
+    @Column(name = "avg1_foil", precision = 10, scale = 2)
+    private BigDecimal avg1Foil;
+
+    @Column(name = "avg7_foil", precision = 10, scale = 2)
+    private BigDecimal avg7Foil;
+
+    @Column(name = "avg30_foil", precision = 10, scale = 2)
+    private BigDecimal avg30Foil;
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    public enum Source {
-        CARDMARKET,
-        CARDTRADER
+    public static class PricePair {
+        private BigDecimal avg;
+        private BigDecimal avgFoil;
+
+        public BigDecimal getAvg() { return avg; }
+        public void setAvg(BigDecimal avg) { this.avg = avg; }
+
+        public BigDecimal getAvgFoil() { return avgFoil; }
+        public void setAvgFoil(BigDecimal avgFoil) { this.avgFoil = avgFoil; }
     }
 }
