@@ -1,6 +1,6 @@
 package com.magic.investor_api.API;
 
-import com.magic.investor_api.service.ScryfallImportService;
+import com.magic.investor_api.service.ScryfallService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +13,7 @@ import java.net.URL;
 @RequiredArgsConstructor
 public class ScryfallDownloader {
 
-    private final ScryfallImportService importService;
+    private final ScryfallService importService;
     private static final String URL_SCRYFALL = "https://data.scryfall.io/all-cards/all-cards-20260401092717.json";
     private final String basePath = System.getProperty("user.dir");
     String CARDS = basePath + "/src/main/resources/cards.json";

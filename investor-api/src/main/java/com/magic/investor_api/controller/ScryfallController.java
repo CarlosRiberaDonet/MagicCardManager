@@ -2,7 +2,7 @@ package com.magic.investor_api.controller;
 
 
 import com.magic.investor_api.API.ScryfallDownloader;
-import com.magic.investor_api.service.ScryfallImportService;
+import com.magic.investor_api.service.ScryfallService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +19,7 @@ import java.io.InputStream;
 public class ScryfallController {
 
     private final ScryfallDownloader scryfallDownloader;
-    private final ScryfallImportService scryfallImportService;
+    private final ScryfallService scryfallImportService;
 
 
     // Descargar JSON de scryfall
@@ -55,5 +55,10 @@ public class ScryfallController {
             e.printStackTrace();
         }
         return ResponseEntity.ok("Base de datos actualizada.");
+    }
+
+    @PostMapping("update-prices")
+    public void updatePrices(){
+        scryfallImportService.updateScryfallPrices();
     }
 }

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.magic.investor_api.dao.CardDAO;
+import com.magic.investor_api.dao.ScryfallCardDAO;
 import com.magic.investor_api.dao.CardPriceDAO;
 import com.magic.investor_api.model.CardPrice;
 import com.magic.investor_api.model.CardtraderCard;
@@ -28,7 +28,7 @@ public class CardmarketImportService {
     @Autowired
     private final CardPriceRepository cardPriceRepository;
     @Autowired
-    private CardDAO cardDAO;
+    private ScryfallCardDAO cardDAO;
     @Autowired
     private CardPriceDAO cardPriceDAO;
     private ObjectMapper objectMapper = new ObjectMapper();
@@ -37,9 +37,6 @@ public class CardmarketImportService {
 
         // Limpiar precios anteriores antes de insertar los nuevos
         cardPriceDAO.truncateCardPrice();
-
-        // Llenar Mapa <CardmarketID, ScryfallUUID>
-        Map<Long, Long> cardMap = cardDAO.getAllCardsIds();
 
         List<CardPrice> batch = new ArrayList<>();
 
@@ -56,49 +53,34 @@ public class CardmarketImportService {
 
             // Itero sobre cada campo del objeto raíz
             while (parser.nextToken() != JsonToken.END_OBJECT) {
-                String nombreCampo = parser.getCurrentName();
 
                 // Avanzo al valor del campo
                 parser.nextToken();
 
-                if ("priceGuides".equals(nombreCampo)) {
+                // Convierto todo el array en memoria
+                JsonNode priceGuidesArray = objectMapper.readTree(parser);
 
-                    // Convierto todo el array en memoria
-                    JsonNode priceGuidesArray = objectMapper.readTree(parser);
+                // Recorro cada elemento dentro del array
+                for (JsonNode guide : priceGuidesArray) {
 
-                    // Recorro cada elemento dentro del array
-                    for (JsonNode guide : priceGuidesArray) {
+                    List<CardPrice> newPrices = mapNodeToCardPrice(guide);
+                    batch.addAll(newPrices);
 
-                        // Extraigo el identificador que conecta con la BD
-                        Long idProduct = guide.path("idProduct").asLong();
-
-                        // Busca el cardmarketId en el diccionario
-                        Long cardId = cardMap.get(idProduct);
-
-                        // Si no existe en BD
-                        if(cardId == null) {
-                            System.out.println("No se encontró cardmarketId: " + idProduct);
-                            continue;
-                        }
-
-                        List<CardPrice> newPrices = mapNodeToCardPrice(guide, cardId);
-                        batch.addAll(newPrices);
-                        // Guardamos cada 1000 elementos
-                        if (batch.size() >= 1000) {
-                            cardPriceRepository.saveAll(batch);
-                            batch.clear();
-                            System.out.println(" Cartas volcadas a la BD:");
-                        }
-                        else {
-                            // Si el campo no te interesa, lo ignoras completamente
-                            parser.skipChildren();
-                        }
-                    }
-                    // Guardamos los últimos elementos que queden en batch
-                    if (!batch.isEmpty()) {
+                    // Guardo cada 1000 elementos
+                    if (batch.size() >= 1000) {
                         cardPriceRepository.saveAll(batch);
-                        System.out.println("📦 Cartas en BD (resto final)");
+                        batch.clear();
+                        System.out.println(" Cartas volcadas a la BD:");
                     }
+                    /*else {
+                        // Si el campo no te interesa, lo ignoras completamente
+                        parser.skipChildren();
+                    }*/
+                }
+                // Guardamos los últimos elementos que queden en batch
+                if (!batch.isEmpty()) {
+                    cardPriceRepository.saveAll(batch);
+                    System.out.println("📦 Cartas en BD (resto final)");
                 }
             }
         }
@@ -107,41 +89,28 @@ public class CardmarketImportService {
         }
     }
 
-    private List<CardPrice> mapNodeToCardPrice(JsonNode node, Long cardVariantId) {
+    private List<CardPrice> mapNodeToCardPrice(JsonNode node) {
+
         List<CardPrice> prices = new ArrayList<>();
 
-        CardtraderCard cardProxy = new CardtraderCard();
-        cardProxy.setId(cardVariantId);
+        CardPrice newPrice = new CardPrice();
+        newPrice.setCardmarketId(node.path("idProduct").asLong());
+        newPrice.setAvg(node.path("avg").decimalValue());
+        newPrice.setLow(node.path("low").decimalValue());
+        newPrice.setTrend(node.path("trend").decimalValue());
+        newPrice.setAvg1(node.path("avg1").decimalValue());
+        newPrice.setAvg7(node.path("avg7").decimalValue());
+        newPrice.setAvg30(node.path("avg30").decimalValue());
+        newPrice.setAvgFoil(node.path("avg_foil").decimalValue());
+        newPrice.setLowFoil(node.path("low_foil").decimalValue());
+        newPrice.setTrendFoil(node.path("trend_foil").decimalValue());
+        newPrice.setAvg1Foil(node.path("avg1_foil").decimalValue());
+        newPrice.setAvg7Foil(node.path("avg7_foil").decimalValue());
+        newPrice.setAvg30Foil(node.path("avg30_foil").decimalValue());
 
-        // Precio normal
-        CardPrice normal = new CardPrice();
-        normal.setCardVariant(cardProxy);
-        normal.setSource(CardPrice.Source.CARDMARKET);
-        normal.setFoil(false);
-        normal.setAvg(node.path("avg").decimalValue());
-        normal.setLow(node.path("low").decimalValue());
-        normal.setTrend(node.path("trend").decimalValue());
-        normal.setAvg1(node.path("avg1").decimalValue());
-        normal.setAvg7(node.path("avg7").decimalValue());
-        normal.setAvg30(node.path("avg30").decimalValue());
-        normal.setUpdatedAt(LocalDateTime.now());
-        prices.add(normal);
+        newPrice.setUpdatedAt(LocalDateTime.now());
 
-        // Precio foil (solo si existe)
-        if (!node.path("avg-foil").isNull()) {
-            CardPrice foil = new CardPrice();
-            foil.setCardVariant(cardProxy);
-            foil.setSource(CardPrice.Source.CARDMARKET);
-            foil.setFoil(true);
-            foil.setAvg(node.path("avg-foil").decimalValue());
-            foil.setLow(node.path("low-foil").decimalValue());
-            foil.setTrend(node.path("trend-foil").decimalValue());
-            foil.setAvg1(node.path("avg1-foil").decimalValue());
-            foil.setAvg7(node.path("avg7-foil").decimalValue());
-            foil.setAvg30(node.path("avg30-foil").decimalValue());
-            foil.setUpdatedAt(LocalDateTime.now());
-            prices.add(foil);
-        }
+        prices.add(newPrice);
 
         return prices;
     }

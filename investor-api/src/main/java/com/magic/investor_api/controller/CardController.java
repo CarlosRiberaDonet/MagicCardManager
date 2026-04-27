@@ -1,11 +1,9 @@
 package com.magic.investor_api.controller;
 
-import com.magic.investor_api.dto.CardDTO;
+import com.magic.investor_api.dto.ScryfallCardDTO;
 import com.magic.investor_api.dto.CardPageDTO;
 import com.magic.investor_api.service.CardService;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/cards")
@@ -23,21 +21,17 @@ public class CardController {
     public CardPageDTO searchCardByName(
             @RequestParam String name,
             @RequestParam int page,
-            @RequestParam int size,
-            @RequestParam(defaultValue = "false") boolean foil) {
-        System.out.println("Búsqueda recibida: [" + name + "]");
-        System.out.println("Longitud: " + name.length());
-        return cardService.getCardByName(name, page, size, foil);
+            @RequestParam int size) {
+        return cardService.getCardByName(name, page, size);
     }
 
     // Buscar carta por UUID scryfall
     @GetMapping("id")
-    public CardDTO searchCardById(@RequestParam String s){
-
-        return null;
-        // return cardService.getCardById(id);
+    public ScryfallCardDTO searchCardById(@RequestParam Long cardId){
+        return cardService.getCardById(cardId);
     }
 
+    // Mapear cardmarketId desde cartrader_card a scryfall_card
     @PutMapping("update")
     public void updateCardmarketId() {
 

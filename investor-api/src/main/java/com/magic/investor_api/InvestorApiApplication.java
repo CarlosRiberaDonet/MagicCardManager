@@ -10,4 +10,4 @@ public class
 	public static void main(String[] args)  {
 		SpringApplication.run(InvestorApiApplication.class, args);
 	}
-}	
+}

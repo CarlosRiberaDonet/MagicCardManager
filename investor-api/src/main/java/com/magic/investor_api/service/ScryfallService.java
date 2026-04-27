@@ -6,10 +6,13 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.magic.investor_api.dao.CardPriceDAO;
+import com.magic.investor_api.dao.ScryfallCardDAO;
 import com.magic.investor_api.model.ScryfallCard;
-import com.magic.investor_api.repository.CardRepository;
+import com.magic.investor_api.repository.ScryfallRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
@@ -19,9 +22,11 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-public class ScryfallImportService {
+public class ScryfallService {
 
-    private final CardRepository cardRepository;
+    private final ScryfallRepository cardRepository;
+    private final ScryfallCardDAO scryfallCardDAO;
+    private final CardPriceDAO cardPriceDAO;
     private ObjectMapper objectMapper = new ObjectMapper(); // Spring ya lo tiene configurado
 
     private static final Map<String, String> LANGUAGE_MAP = Map.ofEntries(
@@ -53,7 +58,7 @@ public class ScryfallImportService {
                 JsonNode node = objectMapper.readTree(parser);
 
                 // Lógica de mapeo
-                ScryfallCard card = mapNodeToCard(node);
+                ScryfallCard card = mapNodeToScryfallCard(node);
                 batch.add(card);
                 totalProcessed++;
 
@@ -72,7 +77,7 @@ public class ScryfallImportService {
         }
     }
 
-    private ScryfallCard mapNodeToCard(JsonNode node) {
+    private ScryfallCard mapNodeToScryfallCard(JsonNode node) {
         ScryfallCard card = new ScryfallCard();
 
         // Campos de identidad
@@ -86,20 +91,23 @@ public class ScryfallImportService {
 
         // Métodos para extraer la url de la carta
         card.setImageUrl(extractImageUrl(node));
-        card.setCardmarketURL(buildCardmarketUrl(node));
-
         card.setRarity(node.path("rarity").asText("common"));
-        String releasedAtStr = node.path("released_at").asText("");
-        card.setReleasedAt(LocalDate.parse(releasedAtStr));
-
-        // Campos de edición
         card.setSetName(node.path("set_name").asText(""));
         card.setSetCode(node.path("set").asText(""));
         card.setCollectorNumber(node.path("collector_number").asText(""));
+        card.setCardmarketURL(buildCardmarketUrl(node));
+
+        // Obtener precios de la carta
+        JsonNode prices = node.path("prices");
+        card.setPrice(prices.path("eur").isNull() ? null : prices.path("eur").decimalValue());
+        card.setPriceFoil(prices.path("eur_foil").isNull() ? null : prices.path("eur_foil").decimalValue());
         card.setTypeLine(node.path("type_line").asText(""));
         card.setBorderColor(node.path("border_color").asText(""));
+        card.setFrame(node.path("frame").asText());
         card.setFoil(node.path("foil").asBoolean(false));
         card.setReprint(node.path("reprint").asBoolean(false));
+        String releasedAtStr = node.path("released_at").asText("");
+        card.setReleasedAt(LocalDate.parse(releasedAtStr));
 
         return card;
     }
@@ -156,5 +164,9 @@ public class ScryfallImportService {
         }
 
         return url;
+    }
+
+    public void updateScryfallPrices(){
+        scryfallCardDAO.updateScryfallPrices();
     }
 }

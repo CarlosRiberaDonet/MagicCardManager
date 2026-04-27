@@ -6,14 +6,12 @@ public class CardPageDTO {
 
     private int totalCards;
     private int page;
-    private int size;
-    private List<CardDTO> cardDTOList;
+    private List<ScryfallCardDTO> cardDTOList;
 
     // CONSTRUCTOR
-    public CardPageDTO(int totalCards, int page, int size, List<CardDTO> cardDTOList) {
+    public CardPageDTO(int totalCards, int page, List<ScryfallCardDTO> cardDTOList) {
         this.totalCards = totalCards;
         this.page = page;
-        this.size = size;
         this.cardDTOList = cardDTOList;
     }
 
@@ -23,20 +21,12 @@ public class CardPageDTO {
 
     // GETTERS Y  SETTERS
 
-    public List<CardDTO> getCardDTOList() {
+    public List<ScryfallCardDTO> getCardDTOList() {
         return cardDTOList;
     }
 
-    public void setCardDTOList(List<CardDTO> cardDTOList) {
+    public void setCardDTOList(List<ScryfallCardDTO> cardDTOList) {
         this.cardDTOList = cardDTOList;
-    }
-
-    public int getSize() {
-        return size;
-    }
-
-    public void setSize(int size) {
-        this.size = size;
     }
 
     public int getPage() {

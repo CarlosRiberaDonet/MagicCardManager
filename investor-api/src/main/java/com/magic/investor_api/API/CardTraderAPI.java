@@ -29,7 +29,7 @@ public class CardTraderAPI {
             "Uu51Wc-ku3TePnhGJ2u1_qcS5R2Rw-NKxWdtS9lTELhxxEVxkfe85Zji5VFiWISTZlNcWIIOPU-Wqdh8nS4q8mAdJzN6wKzTy2jVtbVw";
 
     // Obtener lista de expansiones de CardTrader
-    public List<Expansion> fetchExpansions() {
+    public List<Expansion> getExpansions() {
 
         String url = "https://api.cardtrader.com/api/v2/expansions";
 
@@ -60,7 +60,7 @@ public class CardTraderAPI {
     }
 
     // Obtener cartas mediante su expansion
-    public String fetchBlueprints(Long expansionId) {
+    public String getCardtraderCards(Long expansionId) {
 
         String url = "https://api.cardtrader.com/api/v2/blueprints/export"
                 + "?expansion_id=" + expansionId;

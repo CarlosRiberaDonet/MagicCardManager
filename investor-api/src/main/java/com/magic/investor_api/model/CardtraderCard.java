@@ -1,24 +1,22 @@
 package com.magic.investor_api.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
-@Table(name = "card_variant")
+@Table(name = "cardtrader_card")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class CardtraderCard {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-     @Column
 
     @Column(name = "cardtrader_id", unique = true)
     private Long cardtraderId;
@@ -32,9 +30,18 @@ public class CardtraderCard {
     @Column(name = "expansion_id")
     private Long expansionId;
 
-    @Column(name = "version")
-    private String version;
+    @Column(name = "name")
+    private String name;
+
+    @Column(name = "image_url")
+    private String imageUrl;
+
+    @Column(name = "rarity")
+    private String rarity;
 
     @Column(name = "collector_number")
     private String collectorNumber;
+
+    @Column(name = "version")
+    private String version;
 }
