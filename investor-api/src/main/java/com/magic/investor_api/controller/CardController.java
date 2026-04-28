@@ -18,14 +18,18 @@ public class CardController {
 
     // Buscar carta por nombre
     @GetMapping("/search")
-    public CardPageDTO searchCardByName(
+    public CardPageDTO searchCards(
             @RequestParam String name,
+            @RequestParam(required = false) String rarity,
+            @RequestParam(required = false) String lang,
+            @RequestParam(required = false) String typeLine,
             @RequestParam int page,
-            @RequestParam int size) {
-        return cardService.getCardByName(name, page, size);
+            @RequestParam int size
+    ) {
+        return cardService.searchCards(name, rarity, lang, typeLine, page, size);
     }
 
-    // Buscar carta por UUID scryfall
+    // Buscar carta por id
     @GetMapping("id")
     public ScryfallCardDTO searchCardById(@RequestParam Long cardId){
         return cardService.getCardById(cardId);
