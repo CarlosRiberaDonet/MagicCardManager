@@ -23,19 +23,20 @@ public class CardService {
     }
 
     // Obtiene lista de cartas mediante su nombre
-    public CardPageDTO getCardByName(String name, int page, int size) {
+    public CardPageDTO searchCards(String name, String rarity, String lang, String typeLine, int page, int size) {
 
+        // Calcula la fila de inicio según la página — ej: página 2 con 20 resultados empieza en la fila 20
+        int offset = (page - 1) * size;
         // Total de cartas que coinciden con la búsqueda
-        int totalCards = scryfallCardDAO.countCardsByName(name);
+        int totalCards = scryfallCardDAO.countCardsByName(name, rarity, lang, typeLine);
         // Busco la carta mediante su nombre
-        List<ScryfallCardDTO> cardListDTO = scryfallCardDAO.selectCardByName(name, page, size);
+        List<ScryfallCardDTO> cardListDTO = scryfallCardDAO.selectCardByName(name, rarity, lang, typeLine, page, size, offset);
         cardPageDTO = new CardPageDTO(totalCards, page, cardListDTO);
         return cardPageDTO;
     }
 
     // Obtiene carta con datos completos mediante su id
     public ScryfallCardDTO getCardById(Long cardId){
-
         return scryfallCardDAO.getScryfallCardById(cardId);
     }
 }

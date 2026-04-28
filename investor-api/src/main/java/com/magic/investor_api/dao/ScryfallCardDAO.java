@@ -19,29 +19,38 @@ public class ScryfallCardDAO {
     private DataSource dataSource;
 
     // Obtener carta mediante su nombre
-    public List<ScryfallCardDTO> selectCardByName(String name, int page, int size) {
+    public List<ScryfallCardDTO> selectCardByName(String name, String rarity, String lang, String typeLine, int page, int size, int offset) {
 
-        String SELECT_CARD_BY_NAME =
-                "SELECT DISTINCT sc.id sc.name, sc.printed_name, sc.lang, " +
+        StringBuilder query = new StringBuilder(
+                "SELECT DISTINCT sc.id, sc.name, sc.printed_name, sc.lang, " +
                         "sc.image_url, sc.rarity, sc.set_name, " +
                         "sc.collector_number, sc.cardmarket_url, sc.price " +
                         "FROM scryfall_card sc " +
-                        "WHERE sc.name LIKE ? OR sc.printed_name LIKE ? " +
-                        "LIMIT ? OFFSET ?";
+                        "WHERE (sc.name LIKE ? OR sc.printed_name LIKE ?)"
+        );
+
+        if (rarity != null)   query.append(" AND sc.rarity = ?");
+        if (lang != null)     query.append(" AND sc.lang = ?");
+        if (typeLine != null) query.append(" AND sc.type_line LIKE ?");
+        query.append(" LIMIT ? OFFSET ?");
 
         List<ScryfallCardDTO> cardListDTO = new ArrayList<>();
 
         try(Connection conn = dataSource.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(SELECT_CARD_BY_NAME)){System.out.println("Buscando printed_name: [" + name + "%]");
-            System.out.println("Bytes: " + Arrays.toString(name.getBytes()));
+            PreparedStatement stmt = conn.prepareStatement(query.toString())) {
 
-            stmt.setString(1, name + "%");
-            stmt.setString(2, name + "%");
-            stmt.setInt(3, size);
-            stmt.setInt(4, (page - 1) * size);
+
+            int idx = 1;
+            stmt.setString(idx++, name + "%");
+            stmt.setString(idx++, name + "%");
+            if (rarity != null) stmt.setString(idx++, rarity);
+            if (lang != null) stmt.setString(idx++, lang);
+            if (typeLine != null) stmt.setString(idx++, "%" + typeLine + "%");
+            stmt.setInt(idx++, size);
+            stmt.setInt(idx++, offset);
             ResultSet rs = stmt.executeQuery();
 
-            while(rs.next()){
+            while (rs.next()) {
                 ScryfallCardDTO cardDTO = new ScryfallCardDTO();
                 cardDTO.setId(rs.getLong("id"));
                 cardDTO.setName(rs.getString("name"));
@@ -56,9 +65,8 @@ public class ScryfallCardDAO {
 
                 cardListDTO.add(cardDTO);
             }
-
-        } catch(SQLException e){
-            throw new RuntimeException(e);
+        }catch (SQLException e){
+            e.printStackTrace();
         }
 
         return cardListDTO;
@@ -104,14 +112,26 @@ public class ScryfallCardDAO {
         }
     }
     // Contador de cartas por nombre
-    public int countCardsByName(String name){
+    public int countCardsByName(String name, String rarity, String lang, String typeLine){
 
-        String query = "SELECT COUNT(*) FROM scryfall_card " +
-                "WHERE name LIKE ? OR printed_name LIKE ?";
+        StringBuilder query = new StringBuilder(
+                "SELECT COUNT(*) FROM scryfall_card " +
+                        "WHERE (name LIKE ? OR printed_name LIKE ?)"
+        );
 
-        try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)){
-            stmt.setString(1, name + "%");
-            stmt.setString(2, name + "%");
+        if (rarity != null) query.append(" AND rarity = ?");
+        if (lang != null) query.append(" AND lang = ?");
+        if (typeLine != null) query.append(" AND type_line LIKE ?");
+
+        try(Connection conn = dataSource.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(query.toString())) {
+
+            int idx = 1;
+            stmt.setString(idx++, name + "%");
+            stmt.setString(idx++, name + "%");
+            if (rarity != null)   stmt.setString(idx++, rarity);
+            if (lang != null)     stmt.setString(idx++, lang);
+            if (typeLine != null) stmt.setString(idx++, "%" + typeLine + "%");
 
             ResultSet rs = stmt.executeQuery();
             if(rs.next()){
@@ -133,7 +153,7 @@ public class ScryfallCardDAO {
                 "cp.low, cp.trend, cp.avg1, cp.avg7, cp.avg30, cp.low_foil, cp.trend_foil, cp.avg1_foil, " +
                 "cp.avg7_foil, cp.avg30_foil, cp.updated_at " +
                 "FROM scryfall_card sc " +
-                "JOIN card_price cp ON cp.cardmarket_id = sc.cardmarket_id " +
+                "LEFT JOIN  card_price cp ON cp.cardmarket_id = sc.cardmarket_id " +
                 "WHERE sc.id = ?";
 
         try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)){
@@ -171,7 +191,8 @@ public class ScryfallCardDAO {
                 cardPrice.setAvg1Foil(rs.getBigDecimal("avg1_foil"));
                 cardPrice.setAvg7Foil(rs.getBigDecimal("avg7_foil"));
                 cardPrice.setAvg30Foil(rs.getBigDecimal("avg30_foil"));
-                cardPrice.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
+                if (rs.getTimestamp("updated_at") != null)
+                    cardPrice.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
 
                 card.setCardPrice(cardPrice);
 
