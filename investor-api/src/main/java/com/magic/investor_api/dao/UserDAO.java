@@ -1,8 +1,6 @@
 package com.magic.investor_api.dao;
 
-import com.magic.investor_api.dto.UserDTO;
 import com.magic.investor_api.model.User;
-import io.jsonwebtoken.security.Password;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
