@@ -1,4 +1,4 @@
-package com.magic.investor_api.controller;
+package Auth;
 
 import com.magic.investor_api.dto.UserDTO;
 import com.magic.investor_api.service.UserService;
@@ -15,10 +15,12 @@ public class AuthController {
     private final UserService userService;
 
     public AuthController(UserService userService){
+
         this.userService = userService;
     }
     @PostMapping("/login")
     public String login(@RequestBody UserDTO request) {
+
         return userService.authUser(request);
     }
 }

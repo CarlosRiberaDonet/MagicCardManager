@@ -1,9 +1,9 @@
 package com.magic.investor_api.service;
 
+import Auth.JwtService;
 import com.magic.investor_api.dao.UserDAO;
 import com.magic.investor_api.dto.UserDTO;
 import com.magic.investor_api.model.User;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -12,10 +12,12 @@ public class UserService {
 
     private final UserDAO userDAO;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
-    public UserService(UserDAO userDAO, PasswordEncoder passwordEncoder) {
+    public UserService(UserDAO userDAO, PasswordEncoder passwordEncoder, JwtService jwtService) {
         this.userDAO = userDAO;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
     public String authUser(UserDTO userDTO){
@@ -26,6 +28,6 @@ public class UserService {
 
         if (!passwordEncoder.matches(userDTO.getPassword(), user.getPassword())) return null; // password incorrecta
 
-        return "TOKEN";
+        return jwtService.generateToken(user);
     }
 }
