@@ -13,6 +13,7 @@ import com.magic.investor_api.repository.ScryfallRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
@@ -26,7 +27,7 @@ public class ScryfallService {
 
     private final ScryfallRepository cardRepository;
     private final ScryfallCardDAO scryfallCardDAO;
-    private final CardPriceDAO cardPriceDAO;
+    private static final String path= System.getProperty("user.dir");
     private ObjectMapper objectMapper = new ObjectMapper(); // Spring ya lo tiene configurado
 
     private static final Map<String, String> LANGUAGE_MAP = Map.ofEntries(
@@ -43,8 +44,13 @@ public class ScryfallService {
             Map.entry("zht", "language=11")
     );
 
-    public void importToDatabase(InputStream input) throws IOException {
+    public void importScryfallCardsToBD() throws IOException {
+
+        String CARDS = path + "/src/main/resources/cards.json";
+        InputStream input = new FileInputStream(CARDS);
+
         JsonFactory factory = new JsonFactory();
+
         try (JsonParser parser = factory.createParser(input)) {
 
             if (parser.nextToken() != JsonToken.START_ARRAY) {

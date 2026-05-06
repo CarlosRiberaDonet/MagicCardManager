@@ -1,6 +1,6 @@
 package com.magic.investor_api.config;
 
-import Auth.JwtAuthFilter;
+import com.magic.investor_api.Auth.JwtAuthFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -45,6 +45,7 @@ public class SecurityConfig {
                         .requestMatchers("/cards/**").permitAll()
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/prices/**").hasRole("ADMIN")
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

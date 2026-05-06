@@ -9,8 +9,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
-
 
 @RestController
 @RequestMapping("/prices")
@@ -18,8 +16,7 @@ import java.io.IOException;
 public class CardPriceController {
 
     private final CardmarketDownloader cardmarketDownloader;
-    private final CardmarketImportService cardmarketService;
-    private final String basePath = System.getProperty("user.dir");
+    private final CardmarketImportService cardmarketImportService;
 
     // Descargar el price guide de cardmarket
     @PostMapping("/import")
@@ -41,8 +38,7 @@ public class CardPriceController {
         try {
             System.out.println("Actualizando lista de precios...");
 
-            String GUIDE_PRICES_JSON_PATH = basePath + "/src/main/resources/guide-prices.json";
-            cardmarketService.importToDatabase(GUIDE_PRICES_JSON_PATH);
+            cardmarketImportService.importGuidePricesToBD();
 
             System.out.println("¡Proceso total finalizado con éxito!");
 

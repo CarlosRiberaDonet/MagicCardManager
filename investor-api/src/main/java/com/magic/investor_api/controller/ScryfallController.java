@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.InputStream;
-
 
 @RestController
 @RequestMapping("/scryfall")
@@ -42,10 +40,7 @@ public class ScryfallController {
         try {
             System.out.println("Iniciando procesado de JSON a BD...");
 
-            InputStream input = getClass()
-                    .getClassLoader()
-                    .getResourceAsStream("cards.json");
-            scryfallImportService.importToDatabase(input);
+            scryfallImportService.importScryfallCardsToBD();
 
             System.out.println("¡Proceso total finalizado con éxito!");
 
@@ -59,6 +54,7 @@ public class ScryfallController {
 
     @PostMapping("update-prices")
     public void updatePrices(){
+
         scryfallImportService.updateScryfallPrices();
     }
 }

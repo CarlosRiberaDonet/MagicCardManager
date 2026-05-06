@@ -32,13 +32,7 @@ public class CardController {
     // Buscar carta por id
     @GetMapping("id")
     public ScryfallCardDTO searchCardById(@RequestParam Long cardId){
+
         return cardService.getCardById(cardId);
-    }
-
-    // Mapear cardmarketId desde cartrader_card a scryfall_card
-    @PutMapping("update")
-    public void updateCardmarketId() {
-
-        cardService.updateCardMarketId();
     }
 }

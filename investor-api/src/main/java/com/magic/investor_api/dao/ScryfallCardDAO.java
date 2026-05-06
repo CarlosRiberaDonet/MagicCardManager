@@ -71,28 +71,7 @@ public class ScryfallCardDAO {
 
         return cardListDTO;
     }
-    // Actualizar cardmarket id en tabla card mediante scryfallUUID de la tabla card_variant
-    public boolean updateCardmarketId(){
-        String UPDATE_CARDMARKET_ID = "UPDATE card c " +
-                "JOIN card_variant cv ON cv.scryfall_id = c.scryfall_id " +
-                "SET c.cardmarket_id = cv.cardmarket_id " +
-                "WHERE (c.cardmarket_id IS NULL OR c.cardmarket_id = 0) " +
-                "AND cv.cardmarket_id IS NOT NULL AND cv.cardmarket_id > 0";
 
-        try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(UPDATE_CARDMARKET_ID)){
-
-            int filasAfectadas = stmt.executeUpdate();
-
-            if(filasAfectadas > 0){
-                System.out.println("Cartas actualizadas en tabla card_variant: " + filasAfectadas);
-                return true;
-            }
-
-        }catch(SQLException e){
-            e.printStackTrace();
-        }
-        return false;
-    }
     // mapear precios card_price a scryfall_card
     public void updateScryfallPrices(){
         String query = "UPDATE scryfall_card sc " +
