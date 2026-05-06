@@ -1,4 +1,4 @@
-package Auth;
+package com.magic.investor_api.Auth;
 
 import com.magic.investor_api.dto.UserDTO;
 import com.magic.investor_api.service.UserService;
@@ -18,6 +18,13 @@ public class AuthController {
 
         this.userService = userService;
     }
+
+    // Crear endpoint para registrarme en la BD
+    @PostMapping("/register")
+    public boolean  register(@RequestBody UserDTO request){
+       return userService.regUser(request);
+    }
+
     @PostMapping("/login")
     public String login(@RequestBody UserDTO request) {
 

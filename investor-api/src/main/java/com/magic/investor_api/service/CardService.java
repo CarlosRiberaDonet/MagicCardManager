@@ -17,11 +17,6 @@ public class CardService {
         this.scryfallCardDAO = cardDAO;
     }
 
-    // Actualizar cardmarket_id de la tabla card
-    public void updateCardMarketId(){
-        scryfallCardDAO.updateCardmarketId();
-    }
-
     // Obtiene lista de cartas mediante su nombre
     public CardPageDTO searchCards(String name, String rarity, String lang, String typeLine, int page, int size) {
 

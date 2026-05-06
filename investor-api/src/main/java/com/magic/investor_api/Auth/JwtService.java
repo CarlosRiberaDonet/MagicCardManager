@@ -1,4 +1,4 @@
-package Auth;
+package com.magic.investor_api.Auth;
 
 import com.magic.investor_api.model.User;
 import io.jsonwebtoken.Jwts;
@@ -42,5 +42,14 @@ public class JwtService {
                 .parseSignedClaims(token)
                 .getPayload()
                 .getSubject();
+    }
+
+    public String extractRole(String token) {
+        return Jwts.parser()
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .get("role", String.class);
     }
 }

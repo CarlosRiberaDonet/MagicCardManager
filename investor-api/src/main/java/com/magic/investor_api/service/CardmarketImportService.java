@@ -8,7 +8,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.magic.investor_api.dao.ScryfallCardDAO;
 import com.magic.investor_api.dao.CardPriceDAO;
 import com.magic.investor_api.model.CardPrice;
-import com.magic.investor_api.model.CardtraderCard;
 import com.magic.investor_api.repository.CardPriceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +18,6 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -32,19 +30,21 @@ public class CardmarketImportService {
     @Autowired
     private CardPriceDAO cardPriceDAO;
     private ObjectMapper objectMapper = new ObjectMapper();
+    private final String basePath = System.getProperty("user.dir");
 
-    public void importToDatabase(String filePath) throws IOException {
+    public void importGuidePricesToBD() throws IOException {
 
         // Limpiar precios anteriores antes de insertar los nuevos
         cardPriceDAO.truncateCardPrice();
 
+        String GUIDE_PRICES_JSON_PATH = basePath + "/src/main/resources/guide-prices.json";
         List<CardPrice> batch = new ArrayList<>();
 
         // Factoría de Jackson para parseo en streaming (no carga todo el JSON en memoria)
         JsonFactory factory = new JsonFactory();
 
         // Abro el parser sobre el fichero
-        try (JsonParser parser = factory.createParser(new File(filePath))) {
+        try (JsonParser parser = factory.createParser(new File(GUIDE_PRICES_JSON_PATH))) {
 
             // Primer token del JSON: debe ser un objeto raíz {...}
             if (parser.nextToken() != JsonToken.START_OBJECT) {
