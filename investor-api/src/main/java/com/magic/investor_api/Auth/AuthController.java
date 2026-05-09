@@ -2,6 +2,8 @@ package com.magic.investor_api.Auth;
 
 import com.magic.investor_api.dto.UserDTO;
 import com.magic.investor_api.service.UserService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,12 +24,14 @@ public class AuthController {
     // Crear endpoint para registrarme en la BD
     @PostMapping("/register")
     public boolean  register(@RequestBody UserDTO request){
-       return userService.regUser(request);
+
+        return userService.regUser(request);
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody UserDTO request) {
-
-        return userService.authUser(request);
+    public ResponseEntity<String> login(@RequestBody UserDTO request) {
+        String token = userService.authUser(request);
+        if (token == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        return ResponseEntity.ok(token);
     }
 }

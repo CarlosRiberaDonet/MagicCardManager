@@ -1,6 +1,7 @@
 package com.magic.investor_api.Auth;
 
 import com.magic.investor_api.model.User;
+import io.jsonwebtoken.Jwt;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -19,6 +20,7 @@ public class JwtService {
     // Genera un token JWT para un usuario
     public String generateToken(User user) {
         return Jwts.builder()
+                .claim("userId", user.getId())
                 .subject(user.getEmail())
                 .claim("role", user.getRole())
                 .issuedAt(new Date())
@@ -35,6 +37,17 @@ public class JwtService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
+    // Extraer id del user a través del token de sesión
+    public Long extractUserId(String token){
+        return Jwts.parser()
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .get("userId", Long.class);
+    }
+
+    // Extraer email del user a través del token de sesión
     public String extractEmail(String token) {
         return Jwts.parser()
                 .verifyWith(getSigningKey())
