@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.magic.investor_api.dao.ScryfallCardDAO;
 import com.magic.investor_api.dao.CardPriceDAO;
+import com.magic.investor_api.mapper.CardPriceMapper;
 import com.magic.investor_api.model.CardPrice;
 import com.magic.investor_api.repository.CardPriceRepository;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +35,7 @@ public class CardmarketImportService {
 
     public void importGuidePricesToBD() throws IOException {
 
+        CardPriceMapper cardPriceMapper = new CardPriceMapper();
         // Limpiar precios anteriores antes de insertar los nuevos
         cardPriceDAO.truncateCardPrice();
 
@@ -63,7 +65,7 @@ public class CardmarketImportService {
                 // Recorro cada elemento dentro del array
                 for (JsonNode guide : priceGuidesArray) {
 
-                    List<CardPrice> newPrices = mapNodeToCardPrice(guide);
+                    List<CardPrice> newPrices = cardPriceMapper.mapNodeToCardPrice(guide);
                     batch.addAll(newPrices);
 
                     // Guardo cada 1000 elementos
@@ -87,31 +89,5 @@ public class CardmarketImportService {
         if (!batch.isEmpty()) {
             cardPriceRepository.saveAll(batch);
         }
-    }
-
-    private List<CardPrice> mapNodeToCardPrice(JsonNode node) {
-
-        List<CardPrice> prices = new ArrayList<>();
-
-        CardPrice newPrice = new CardPrice();
-        newPrice.setCardmarketId(node.path("idProduct").asLong());
-        newPrice.setAvg(node.path("avg").decimalValue());
-        newPrice.setLow(node.path("low").decimalValue());
-        newPrice.setTrend(node.path("trend").decimalValue());
-        newPrice.setAvg1(node.path("avg1").decimalValue());
-        newPrice.setAvg7(node.path("avg7").decimalValue());
-        newPrice.setAvg30(node.path("avg30").decimalValue());
-        newPrice.setAvgFoil(node.path("avg_foil").decimalValue());
-        newPrice.setLowFoil(node.path("low_foil").decimalValue());
-        newPrice.setTrendFoil(node.path("trend_foil").decimalValue());
-        newPrice.setAvg1Foil(node.path("avg1_foil").decimalValue());
-        newPrice.setAvg7Foil(node.path("avg7_foil").decimalValue());
-        newPrice.setAvg30Foil(node.path("avg30_foil").decimalValue());
-
-        newPrice.setUpdatedAt(LocalDateTime.now());
-
-        prices.add(newPrice);
-
-        return prices;
     }
 }
