@@ -38,8 +38,8 @@ public class ExpansionDAO {
         }
     }
 
-    // Obtiene las expansiones de la tabla card_trader_expansion
-    public List<Long> getExpansionList(){
+    // Obtiene los id de las expansiones de la tabla card_trader_expansion
+    public List<Long> getExpansionListId(){
 
         String SELECT_EXPANSION = "SELECT id FROM card_trader_expansion";
 
@@ -100,5 +100,29 @@ public class ExpansionDAO {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    // Obtiene los nombres de las expansiones de la tabla card_trader_expansion
+    public List<String> selectExpansionNamesList(){
+
+        String SELECT_EXPANSION = "SELECT name FROM card_trader_expansion";
+
+        List<String> expansionList = new ArrayList<>();
+
+        try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(SELECT_EXPANSION)){
+
+            ResultSet rs = stmt.executeQuery();
+            while(rs.next()){
+                String expansionName = rs.getString("name");
+                expansionList.add(expansionName);
+            }
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+
+        for(String e : expansionList){
+            System.out.println(e);
+        }
+        return expansionList;
     }
 }
