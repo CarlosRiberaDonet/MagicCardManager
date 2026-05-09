@@ -1,5 +1,6 @@
 package com.magic.investor_api;
 
+import com.magic.investor_api.dao.ExpansionDAO;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;

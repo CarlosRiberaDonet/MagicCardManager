@@ -19,7 +19,7 @@ public class ScryfallCardDAO {
     private DataSource dataSource;
 
     // Obtener carta mediante su nombre
-    public List<ScryfallCardDTO> selectCardByName(String name, String rarity, String lang, String typeLine, int page, int size, int offset) {
+    public List<ScryfallCardDTO> selectFiltersCard(String name, String edition, String rarity, String lang, String typeLine, int page, int size, int offset) {
 
         StringBuilder query = new StringBuilder(
                 "SELECT DISTINCT sc.id, sc.name, sc.printed_name, sc.lang, " +
@@ -29,8 +29,9 @@ public class ScryfallCardDAO {
                         "WHERE (sc.name LIKE ? OR sc.printed_name LIKE ?)"
         );
 
-        if (rarity != null)   query.append(" AND sc.rarity = ?");
-        if (lang != null)     query.append(" AND sc.lang = ?");
+        if(edition != null) query.append("AND sc.set_name = ?");
+        if (rarity != null) query.append(" AND sc.rarity = ?");
+        if (lang != null) query.append(" AND sc.lang = ?");
         if (typeLine != null) query.append(" AND sc.type_line LIKE ?");
         query.append(" LIMIT ? OFFSET ?");
 
@@ -91,13 +92,14 @@ public class ScryfallCardDAO {
         }
     }
     // Contador de cartas por nombre
-    public int countCardsByName(String name, String rarity, String lang, String typeLine){
+    public int countCardsByName(String name, String edition, String rarity, String lang,
+                                String typeLine){
 
         StringBuilder query = new StringBuilder(
                 "SELECT COUNT(*) FROM scryfall_card " +
                         "WHERE (name LIKE ? OR printed_name LIKE ?)"
         );
-
+        if(edition != null) query.append("AND set_name = ?");
         if (rarity != null) query.append(" AND rarity = ?");
         if (lang != null) query.append(" AND lang = ?");
         if (typeLine != null) query.append(" AND type_line LIKE ?");

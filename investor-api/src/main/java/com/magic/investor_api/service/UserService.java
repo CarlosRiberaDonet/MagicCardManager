@@ -8,6 +8,8 @@ import com.magic.investor_api.model.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class UserService {
 
@@ -22,13 +24,13 @@ public class UserService {
     }
 
 
-    // registrar nuevo usuario en la BD
+    // Registrar nuevo usuario en la BD
     public boolean regUser(UserDTO userDTO){
         userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         return userDAO.insertNewUser(userDTO);
     }
 
-    // autenticar usuario y contraseña
+    // Autenticar usuario y contraseña
     public String authUser(UserDTO userDTO){
 
         User user = userDAO.finfByEmail(userDTO.getEmail());
@@ -40,15 +42,38 @@ public class UserService {
         return jwtService.generateToken(user);
     }
 
-    // Insertar carta en la tabla user_collection
-    public boolean saveUserCard(Long userId, UserCollectionDTO userCollectionDTO) {
-        userCollectionDTO.setUserId(userId);
-        return userDAO.insertCard(userCollectionDTO);
+    //Obtener lista de user_collection mediante userId
+    public List<Long> getCollectionCards(Long userId){
+        return userDAO.selectCollectionCards(userId);
     }
 
-    // Eliminar carta de la tabla user_collection
-    public boolean removeCard(Long userId, UserCollectionDTO userCollectionDTO){
+    // Envía userId y cardId a consulta SQL
+    public boolean getWatchlistCardId(Long userId, Long cardId){
+       return userDAO.selectWatchlistCardId(userId, cardId);
+    }
+
+    // Insertar carta a tabla user_collection
+    public boolean cardToCollection(Long userId, UserCollectionDTO userCollectionDTO) {
         userCollectionDTO.setUserId(userId);
-        return userDAO.deleteCardById(userCollectionDTO);
+        return userDAO.insertCollectionCard(userCollectionDTO);
+    }
+
+    // Eliminar carta de tabla user_collection
+    public boolean delFromCollection(Long userId, UserCollectionDTO userCollectionDTO){
+        System.out.println("ELIMINANDO CARTA DEL USUARIO" + userId);
+        userCollectionDTO.setUserId(userId);
+        return userDAO.deleteCollectionCard(userCollectionDTO);
+    }
+
+    // Añadir carta a tabla user_watchlist
+    public boolean addToWatchlist(Long userId, UserCollectionDTO userCollectionDTO){
+        userCollectionDTO.setUserId(userId);
+        return userDAO.insertWatchlistCard(userCollectionDTO);
+    }
+
+    // Eliminar carta de tabla user_watchlist
+    public boolean delFromWatchlist(Long userId, UserCollectionDTO userCollectionDTO){
+        userCollectionDTO.setUserId(userId);
+        return userDAO.deleteWatchlistCard(userCollectionDTO);
     }
 }

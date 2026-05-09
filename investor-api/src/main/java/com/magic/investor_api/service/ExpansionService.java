@@ -9,10 +9,8 @@ import com.magic.investor_api.model.CardtraderCard;
 import com.magic.investor_api.model.Expansion;
 import com.magic.investor_api.repository.CardtraderRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -32,6 +30,7 @@ public class ExpansionService {
     // Obtengo las expansiones desde la API de cardtrader
     public void importExpansion() {
         List<Expansion> expansions = cardTraderAPI.getExpansions();
+
         // Inserto la lista de expansiones en la tabla card_trader_expansion
         expansionDAO.insertExpansion(expansions);
     }
@@ -41,7 +40,7 @@ public class ExpansionService {
 
         List<CardtraderCard> batch = new ArrayList<>();
         // id de expansiones ordenados
-        List<Long> expansionList = expansionDAO.getExpansionList();
+        List<Long> expansionList = expansionDAO.getExpansionListId();
         Collections.sort(expansionList);
         // Obtengo el id de la última expansión procesada
         Long lasExpansionProcessed = expansionDAO.getLastExpansionId();
@@ -90,5 +89,10 @@ public class ExpansionService {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    // Obtengo lista con los nombres de las expansiones
+    public List<String> getExpansionListName(){
+        return expansionDAO.selectExpansionNamesList();
     }
 }
