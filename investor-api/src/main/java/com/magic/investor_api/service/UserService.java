@@ -47,7 +47,7 @@ public class UserService {
         return userDAO.selectCollectionCards(userId);
     }
 
-    // Comprobar si el usuario tiene la carta en user_card
+    // Comprobar si el usuario tiene la carta en user_collection
     public int getCardQuantity(Long userId, Long cardId){
         return userDAO.selectCollectionCardQuantity(userId, cardId);
     }

@@ -27,6 +27,7 @@ public class UserDAO {
         this.passwordEncoder = passwordEncoder;
     }
 
+    // Registrar usuario
     public boolean insertNewUser(UserDTO userDTO){
 
         String query = "INSERT INTO user (email, password, role) VALUES(?, ?, ?)";
@@ -107,8 +108,7 @@ public class UserDAO {
     // Eliminar una carta de user_collection
     public boolean deleteCollectionCard(UserCollectionDTO dto){
 
-        int quantity = getCollectionQuantity(dto.getUserId(), dto.getCardId());
-        System.out.println("Cantidad de cartas en la coleccion" + quantity);
+        int quantity = selectCollectionCardQuantity(dto.getUserId(), dto.getCardId());
         
         // Si quantity > 1
         if(quantity > 1){
@@ -132,10 +132,6 @@ public class UserDAO {
     // Insertar carta en la tabla user_watchlist
     public boolean insertWatchlistCard(UserCollectionDTO dto){
 
-        if (selectWatchlistCardId(dto.getUserId(), dto.getCardId())) {
-            return updateQuantityWatchlist(dto.getUserId(), dto.getCardId(), +1);
-        }
-
         String query = "INSERT INTO user_watchlist (user_id, card_id) VALUES (?, ?)";
 
         try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)){
@@ -153,7 +149,7 @@ public class UserDAO {
         return false;
     }
 
-    // Eliminar una carta de user_collection
+    // Eliminar una carta de user_watchlist
     public boolean deleteWatchlistCard(UserCollectionDTO dto){
 
         String query = "DELETE FROM user_watchlist WHERE user_id = ? AND card_id = ?";
@@ -169,7 +165,7 @@ public class UserDAO {
     return false;
     }
 
-    // Comprobar si la carta ya está en user_collection
+    // Obtener cantidad de una carta en user_collection
     public int selectCollectionCardQuantity(Long userId, Long cardId){
         String query = "SELECT quantity FROM user_collection WHERE user_id = ? AND card_id = ?";
         try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)){
@@ -201,64 +197,9 @@ public class UserDAO {
         return false;
     }
 
-    // Obtener cantidad de una carta en user_collection
-    public int getCollectionQuantity(Long userId, Long cardId){
-        String query = "SELECT quantity FROM user_collection WHERE user_id = ? AND card_id = ?";
-
-        try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)){
-            stmt.setLong(1, userId);
-            stmt.setLong(2, cardId);
-            ResultSet rs = stmt.executeQuery();
-            if(rs.next()){
-                return rs.getInt("quantity");
-            }
-        }catch (SQLException e){
-            e.printStackTrace();
-        }
-        return -1;
-    }
-
-    // Obtener cantidad de una carta en user_watchlist
-    public int getWatchListQuantity(Long userId, Long cardId){
-        String query = "SELECT quantity FROM user_watchlist WHERE user_id = ? AND card_id = ?";
-
-        try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)){
-            stmt.setLong(1, userId);
-            stmt.setLong(2, cardId);
-            ResultSet rs = stmt.executeQuery();
-            if(rs.next()){
-                return rs.getInt("quantity");
-            }
-        }catch (SQLException e){
-            e.printStackTrace();
-        }
-        return -1;
-    }
-
     // Actualiza la cantidad de una carta en user_collection
     public boolean updateQuantityCollection(Long userId, Long cardId, int quantity){
         String query = "UPDATE user_collection SET quantity = quantity + ? WHERE user_id = ? AND card_id = ?";
-
-        try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)){
-            stmt.setInt(1, quantity);
-            stmt.setLong(2, userId);
-            stmt.setLong(3, cardId);
-
-            int filasAfectadas = stmt.executeUpdate();
-            if(filasAfectadas > 0){
-                return true;
-            }
-        }catch (SQLException e){
-            e.printStackTrace();
-        }
-
-        return false;
-    }
-
-    // Actualiza la cantidad de una carta en user_watchlist
-    public boolean updateQuantityWatchlist(Long userId, Long cardId, int quantity){
-        String query = "UPDATE user_collection SET quantity = quantity + ? WHERE user_id = ? " +
-                " AND card_id = ?";
 
         try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)){
             stmt.setInt(1, quantity);
