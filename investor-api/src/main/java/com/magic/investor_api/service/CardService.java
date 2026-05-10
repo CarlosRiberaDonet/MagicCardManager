@@ -27,7 +27,7 @@ public class CardService {
         int totalCards = scryfallCardDAO.countCardsByName(name, edition, rarity, lang, typeLine);
         // Busco la carta mediante su nombre
         List<ScryfallCardDTO> cardListDTO = scryfallCardDAO.selectFiltersCard(name, edition, rarity,
-                lang, typeLine, page, size, offset);
+                lang, typeLine, size, offset);
         cardPageDTO = new CardPageDTO(totalCards, page, cardListDTO);
         return cardPageDTO;
     }

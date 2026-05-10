@@ -19,15 +19,15 @@ public class CardController {
     // Buscar carta por nombre
     @GetMapping("/search")
     public CardPageDTO searchCards(
-            @RequestParam String name,
-            @RequestParam(required = false) String edition,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String setName,
             @RequestParam(required = false) String rarity,
             @RequestParam(required = false) String lang,
             @RequestParam(required = false) String typeLine,
             @RequestParam int page,
             @RequestParam int size
     ) {
-        return cardService.searchCards(name, edition, rarity, lang, typeLine, page, size);
+        return cardService.searchCards(name, setName, rarity, lang, typeLine, page, size);
     }
 
     // Buscar carta por id
