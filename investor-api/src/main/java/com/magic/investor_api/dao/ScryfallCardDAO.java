@@ -19,7 +19,8 @@ public class ScryfallCardDAO {
     private DataSource dataSource;
 
     // Obtener carta mediante su nombre
-    public List<ScryfallCardDTO> selectFiltersCard(String name, String edition, String rarity, String lang, String typeLine, int page, int size, int offset) {
+    public List<ScryfallCardDTO> selectFiltersCard(String name, String edition, String rarity,
+                                String lang, String typeLine, int page, int size, int offset) {
 
         StringBuilder query = new StringBuilder(
                 "SELECT DISTINCT sc.id, sc.name, sc.printed_name, sc.lang, " +

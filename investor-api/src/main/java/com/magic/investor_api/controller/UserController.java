@@ -3,14 +3,11 @@ package com.magic.investor_api.controller;
 import com.magic.investor_api.Auth.JwtService;
 import com.magic.investor_api.dto.UserCollectionDTO;
 import com.magic.investor_api.service.UserService;
-import com.sun.net.httpserver.HttpServer;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.util.List;
 
 @RestController
@@ -25,7 +22,7 @@ public class UserController {
     }
 
 
-    // Obtener colección de cartas del usuario mediante su userId
+    // Obtener colección de cartas del usuario mediante su userId user_collection
     @GetMapping("collection")
     public List<Long> getUserCollection(HttpServletRequest httpRequest){
         String token = httpRequest.getHeader("Authorization").substring(7);
@@ -33,9 +30,18 @@ public class UserController {
         return userService.getCollectionCards(userId);
     }
 
+    // Recibe userId y cardId para comprobar si el usuario tiene añadida esa carta en user_watchlist
+    @GetMapping("/collection/contains")
+    public ResponseEntity<Integer> collectionQuantity(HttpServletRequest httpRequest, @RequestParam Long cardId) {
+        String token = httpRequest.getHeader("Authorization").substring(7);
+        Long userId = jwtService.extractUserId(token);
+        int quantity = userService.getCardQuantity(userId, cardId);
+        return ResponseEntity.ok(quantity); // 0 si no tiene la carta, >0 si la tiene
+    }
+
     // Recibe userId y cardId para comprobar si el usuario tiene añadida esa carta
-    @GetMapping("collection/contains")
-    public ResponseEntity<Boolean>  getCardCollectionById(HttpServletRequest httpRequest, @RequestParam Long cardId){
+    @GetMapping("/watchlist/contains")
+    public ResponseEntity<Boolean>  getCardWatchlistById(HttpServletRequest httpRequest, @RequestParam Long cardId){
         String token = httpRequest.getHeader("Authorization").substring(7);
         Long userId = jwtService.extractUserId(token);
         boolean result = userService.getWatchlistCardId(userId, cardId);
@@ -43,12 +49,12 @@ public class UserController {
         return ResponseEntity.ok(false);
     }
 
-    // Ingresar carta en user_collection mediante card_id
+    // Añadir carta en user_collection mediante card_id
     @PostMapping("/collection/add")
     public ResponseEntity<String> addToCollection(@RequestBody UserCollectionDTO request, HttpServletRequest httpRequest) {
         String token = httpRequest.getHeader("Authorization").substring(7);
         Long userId = jwtService.extractUserId(token);
-        boolean result = userService.cardToCollection(userId, request);
+        boolean result = userService.addToCollection(userId, request);
         if(result) return ResponseEntity.ok("Carta añadida correctamente");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al añadir carta");
     }
@@ -64,6 +70,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al añadir carta");
     }
 
+    // Añadir carta en user_watchlist mediante card_id
     @PostMapping("/watchlist/add")
     public ResponseEntity<String> addToWatchlist(@RequestBody UserCollectionDTO request, HttpServletRequest httpRequest){
         String token = httpRequest.getHeader("Authorization").substring(7);
@@ -73,6 +80,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al añadir carta");
     }
 
+    // Eliminar carta en user_watchlist mediante card_id
     @DeleteMapping("/watchlist/del")
     public ResponseEntity<String> delFromWatchlist(@RequestBody UserCollectionDTO request, HttpServletRequest httpRequest){
         String token = httpRequest.getHeader("Authorization").substring(7);
