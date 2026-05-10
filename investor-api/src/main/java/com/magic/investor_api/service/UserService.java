@@ -47,20 +47,24 @@ public class UserService {
         return userDAO.selectCollectionCards(userId);
     }
 
-    // Envía userId y cardId a consulta SQL
+    // Comprobar si el usuario tiene la carta en user_card
+    public int getCardQuantity(Long userId, Long cardId){
+        return userDAO.selectCollectionCardQuantity(userId, cardId);
+    }
+
+    // Comprobar si el usuario tiene la carta en user_watchlist
     public boolean getWatchlistCardId(Long userId, Long cardId){
        return userDAO.selectWatchlistCardId(userId, cardId);
     }
 
-    // Insertar carta a tabla user_collection
-    public boolean cardToCollection(Long userId, UserCollectionDTO userCollectionDTO) {
+    // Añadir carta a tabla user_collection
+    public boolean addToCollection(Long userId, UserCollectionDTO userCollectionDTO) {
         userCollectionDTO.setUserId(userId);
         return userDAO.insertCollectionCard(userCollectionDTO);
     }
 
     // Eliminar carta de tabla user_collection
     public boolean delFromCollection(Long userId, UserCollectionDTO userCollectionDTO){
-        System.out.println("ELIMINANDO CARTA DEL USUARIO" + userId);
         userCollectionDTO.setUserId(userId);
         return userDAO.deleteCollectionCard(userCollectionDTO);
     }
