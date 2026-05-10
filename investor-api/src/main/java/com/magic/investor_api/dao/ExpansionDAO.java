@@ -105,7 +105,7 @@ public class ExpansionDAO {
     // Obtiene los nombres de las expansiones de la tabla card_trader_expansion
     public List<String> selectExpansionNamesList(){
 
-        String SELECT_EXPANSION = "SELECT name FROM card_trader_expansion";
+        String SELECT_EXPANSION = "SELECT name FROM card_trader_expansion ORDER BY name ASC";
 
         List<String> expansionList = new ArrayList<>();
 
@@ -118,10 +118,6 @@ public class ExpansionDAO {
             }
         } catch (SQLException e){
             e.printStackTrace();
-        }
-
-        for(String e : expansionList){
-            System.out.println(e);
         }
         return expansionList;
     }

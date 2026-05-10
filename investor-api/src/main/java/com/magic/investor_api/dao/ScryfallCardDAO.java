@@ -19,39 +19,52 @@ public class ScryfallCardDAO {
     private DataSource dataSource;
 
     // Obtener carta mediante su nombre
-    public List<ScryfallCardDTO> selectFiltersCard(String name, String edition, String rarity,
-                                String lang, String typeLine, int page, int size, int offset) {
+    // Busca cartas aplicando filtros opcionales: nombre, set, rareza, idioma y tipo.
+// Todos los parámetros son opcionales excepto page, size y offset.
+    public List<ScryfallCardDTO> selectFiltersCard(String name, String setName, String rarity,
+                                                   String lang, String typeLine,
+                                                   int size, int offset) {
 
+        // Construimos la query dinámicamente según los filtros recibidos
         StringBuilder query = new StringBuilder(
                 "SELECT DISTINCT sc.id, sc.name, sc.printed_name, sc.lang, " +
                         "sc.image_url, sc.rarity, sc.set_name, " +
                         "sc.collector_number, sc.cardmarket_url, sc.price " +
                         "FROM scryfall_card sc " +
-                        "WHERE (sc.name LIKE ? OR sc.printed_name LIKE ?)"
+                        "WHERE 1=1"
         );
 
-        if(edition != null) query.append("AND sc.set_name = ?");
-        if (rarity != null) query.append(" AND sc.rarity = ?");
-        if (lang != null) query.append(" AND sc.lang = ?");
+        // Añadimos condiciones solo si el parámetro no es nulo ni vacío
+        if (name != null && !name.isEmpty()) query.append(" AND (sc.name LIKE ? OR sc.printed_name LIKE ?)");
+        if (setName  != null) query.append(" AND sc.set_name = ?");
+        if (rarity   != null) query.append(" AND sc.rarity = ?");
+        if (lang     != null) query.append(" AND sc.lang = ?");
         if (typeLine != null) query.append(" AND sc.type_line LIKE ?");
+
         query.append(" LIMIT ? OFFSET ?");
 
         List<ScryfallCardDTO> cardListDTO = new ArrayList<>();
 
-        try(Connection conn = dataSource.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(query.toString())) {
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query.toString())) {
 
-
+            // Asignamos los parámetros en el mismo orden en que aparecen los ? en la query
             int idx = 1;
-            stmt.setString(idx++, name + "%");
-            stmt.setString(idx++, name + "%");
-            if (rarity != null) stmt.setString(idx++, rarity);
-            if (lang != null) stmt.setString(idx++, lang);
+            if (name != null && !name.isEmpty()) {
+                stmt.setString(idx++, name + "%");  // sc.name LIKE ?
+                stmt.setString(idx++, name + "%");  // sc.printed_name LIKE ?
+            }
+            if (setName  != null) stmt.setString(idx++, setName);
+            if (rarity   != null) stmt.setString(idx++, rarity);
+            if (lang     != null) stmt.setString(idx++, lang);
             if (typeLine != null) stmt.setString(idx++, "%" + typeLine + "%");
-            stmt.setInt(idx++, size);
-            stmt.setInt(idx++, offset);
+
+            stmt.setInt(idx++, size);    // LIMIT
+            stmt.setInt(idx,   offset);  // OFFSET
+
             ResultSet rs = stmt.executeQuery();
 
+            // Mapeamos cada fila del ResultSet a un DTO
             while (rs.next()) {
                 ScryfallCardDTO cardDTO = new ScryfallCardDTO();
                 cardDTO.setId(rs.getLong("id"));
@@ -64,10 +77,10 @@ public class ScryfallCardDAO {
                 cardDTO.setCollectorNumber(rs.getString("collector_number"));
                 cardDTO.setCardmarketURL(rs.getString("cardmarket_url"));
                 cardDTO.setPrice(rs.getBigDecimal("price"));
-
                 cardListDTO.add(cardDTO);
             }
-        }catch (SQLException e){
+
+        } catch (SQLException e) {
             e.printStackTrace();
         }
 
@@ -92,40 +105,50 @@ public class ScryfallCardDAO {
             e.printStackTrace();
         }
     }
-    // Contador de cartas por nombre
-    public int countCardsByName(String name, String edition, String rarity, String lang,
-                                String typeLine){
 
+    // Contador de cartas por nombre
+    // Cuenta el total de cartas que coinciden con los filtros opcionales.
+// Se usa para calcular el número de páginas en la paginación.
+    public int countCardsByName(String name, String setName, String rarity, String lang, String typeLine) {
+
+        // Construimos la query dinámicamente según los filtros recibidos
         StringBuilder query = new StringBuilder(
-                "SELECT COUNT(*) FROM scryfall_card " +
-                        "WHERE (name LIKE ? OR printed_name LIKE ?)"
+                "SELECT COUNT(*) FROM scryfall_card WHERE 1=1"
         );
-        if(edition != null) query.append("AND set_name = ?");
-        if (rarity != null) query.append(" AND rarity = ?");
-        if (lang != null) query.append(" AND lang = ?");
+
+        // Añadimos condiciones solo si el parámetro no es nulo ni vacío
+        if (name != null && !name.isEmpty()) query.append(" AND (name LIKE ? OR printed_name LIKE ?)");
+        if (setName  != null) query.append(" AND set_name = ?");
+        if (rarity   != null) query.append(" AND rarity = ?");
+        if (lang     != null) query.append(" AND lang = ?");
         if (typeLine != null) query.append(" AND type_line LIKE ?");
 
-        try(Connection conn = dataSource.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(query.toString())) {
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query.toString())) {
 
+            // Asignamos los parámetros en el mismo orden en que aparecen los ? en la query
             int idx = 1;
-            stmt.setString(idx++, name + "%");
-            stmt.setString(idx++, name + "%");
-            if (rarity != null)   stmt.setString(idx++, rarity);
-            if (lang != null)     stmt.setString(idx++, lang);
+            if (name != null && !name.isEmpty()) {
+                stmt.setString(idx++, name + "%");  // name LIKE ?
+                stmt.setString(idx++, name + "%");  // printed_name LIKE ?
+            }
+            if (setName  != null) stmt.setString(idx++, setName);
+            if (rarity   != null) stmt.setString(idx++, rarity);
+            if (lang     != null) stmt.setString(idx++, lang);
             if (typeLine != null) stmt.setString(idx++, "%" + typeLine + "%");
 
             ResultSet rs = stmt.executeQuery();
-            if(rs.next()){
+            if (rs.next()) {
                 return rs.getInt(1);
             }
-        }catch (SQLException e){
+
+        } catch (SQLException e) {
             e.printStackTrace();
         }
 
-
-        return -1;
+        return 0; // Si hay error devolvemos 0 en vez de -1
     }
+
     // Obtener detalles de carta mediante id de scryfall_card
     public ScryfallCardDTO getScryfallCardById(Long cardId){
 

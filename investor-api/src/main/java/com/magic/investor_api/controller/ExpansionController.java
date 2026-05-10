@@ -9,13 +9,14 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/expansion")
+@RequestMapping("/sets")
 public class ExpansionController {
 
     private final ExpansionService expansionService;
     public ExpansionController(ExpansionService expansionService){
         this.expansionService = expansionService;
     }
+
     // Obtiene lista con todas las expansiones
     @GetMapping("/all")
     public List<String> downloadEdition() {
