@@ -1,12 +1,18 @@
 package com.magic.investor_api.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.time.LocalDate;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Expansion {
 
     private Long id;
     private String code;
     private String name;
+    private String iconSvgUri;
+    private LocalDate releasedAt;
+
+   // GETTERS Y SETTERS
 
     public Long getId() {
         return id;
@@ -30,5 +36,21 @@ public class Expansion {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getIconSvgUri() {
+        return iconSvgUri;
+    }
+
+    public void setIconSvgUri(String iconSvgUri) {
+        this.iconSvgUri = iconSvgUri;
+    }
+
+    public LocalDate getReleasedAt() {
+        return releasedAt;
+    }
+
+    public void setReleasedAt(LocalDate releasedAt) {
+        this.releasedAt = releasedAt;
     }
 }

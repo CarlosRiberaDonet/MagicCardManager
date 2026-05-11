@@ -21,7 +21,7 @@ public class CardTraderController {
     }
 
     // Método para descargar ediciones desde CardTrader
-    @GetMapping("/edition")
+    /*@GetMapping("/edition")
     public void downloadEdition() {
         expansionService.importExpansion();
     }
@@ -38,5 +38,5 @@ public class CardTraderController {
             @RequestParam(defaultValue = "1") int page
     ) {
         return cardTraderApi.fetchCardProducts(blueprintId, page);
-    }
+    }*/
 }

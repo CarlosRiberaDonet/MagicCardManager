@@ -2,6 +2,8 @@ package com.magic.investor_api.service;
 
 import com.magic.investor_api.Auth.JwtService;
 import com.magic.investor_api.dao.UserDAO;
+import com.magic.investor_api.dto.CardPageDTO;
+import com.magic.investor_api.dto.ScryfallCardDTO;
 import com.magic.investor_api.dto.UserCollectionDTO;
 import com.magic.investor_api.dto.UserDTO;
 import com.magic.investor_api.model.User;
@@ -42,7 +44,7 @@ public class UserService {
         return jwtService.generateToken(user);
     }
 
-    //Obtener lista de user_collection mediante userId
+    //Obtener ids de user_collection mediante userId
     public List<Long> getCollectionCards(Long userId){
         return userDAO.selectCollectionCards(userId);
     }
@@ -79,5 +81,10 @@ public class UserService {
     public boolean delFromWatchlist(Long userId, UserCollectionDTO userCollectionDTO){
         userCollectionDTO.setUserId(userId);
         return userDAO.deleteWatchlistCard(userCollectionDTO);
+    }
+
+    // Obtener lista de cartas de la colección del usuario
+    public List<ScryfallCardDTO> getMyCollection(Long userId){
+        return userDAO.selectMyCollection(userId);
     }
 }

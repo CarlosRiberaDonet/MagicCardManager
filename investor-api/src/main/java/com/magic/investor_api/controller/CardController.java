@@ -20,14 +20,18 @@ public class CardController {
     @GetMapping("/search")
     public CardPageDTO searchCards(
             @RequestParam(required = false) String name,
-            @RequestParam(required = false) String setName,
-            @RequestParam(required = false) String rarity,
-            @RequestParam(required = false) String lang,
-            @RequestParam(required = false) String typeLine,
+            @RequestParam(required = false) String setCode,  // Edición
+            @RequestParam(required = false) String rarity,   // Rareza
+            @RequestParam(required = false) String lang,     // Idioma
+            @RequestParam(required = false) String typeLine, // Tipo de carta
+            @RequestParam(required = false) Double minPrice, // Precio mínimo
+            @RequestParam(required = false) Double maxPrice, // Precio máximo
+            @RequestParam(required = false) String orderBy,   // "price_asc" o "price_desc"
             @RequestParam int page,
             @RequestParam int size
     ) {
-        return cardService.searchCards(name, setName, rarity, lang, typeLine, page, size);
+        return cardService.searchCards(name, setCode, rarity, lang, typeLine, orderBy,
+                minPrice, maxPrice, page, size);
     }
 
     // Buscar carta por id

@@ -1,7 +1,10 @@
 package com.magic.investor_api.dao;
 
+import com.magic.investor_api.dto.CardPageDTO;
+import com.magic.investor_api.dto.ScryfallCardDTO;
 import com.magic.investor_api.dto.UserCollectionDTO;
 import com.magic.investor_api.dto.UserDTO;
+import com.magic.investor_api.model.CardPrice;
 import com.magic.investor_api.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -231,5 +234,68 @@ public class UserDAO {
             e.printStackTrace();
         }
         return collectionIdList;
+    }
+
+    // Obtener cartas de la colección del usuario de user_collection
+    public List<ScryfallCardDTO> selectMyCollection(Long userId){
+        List<ScryfallCardDTO> cardListDTO = new ArrayList<>();
+        String query = "SELECT uc.*,  sc.id AS card_id, sc.cardmarket_id, sc.cardtrader_id, " +
+                "sc.name, sc.printed_name, sc.lang, sc.image_url, sc.rarity, sc.set_name, " +
+                "sc.collector_number, sc.cardmarket_url, sc.type_line, " +
+                "sc.border_color, sc.frame, sc.is_reprint, sc.released_at, " +
+                "cp.low, cp.trend, cp.avg1, cp.avg7, cp.avg30, cp.low_foil, cp.trend_foil, " +
+                "cp.avg1_foil, cp.avg7_foil, cp.avg30_foil, cp.updated_at " +
+                "FROM user_collection uc " +
+                "JOIN scryfall_card sc ON uc.card_id = sc.id " +
+                "LEFT JOIN card_price cp ON cp.cardmarket_id = sc.cardmarket_id " +
+                "WHERE user_id = ?";
+
+        try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)){
+            stmt.setLong(1, userId);
+
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                ScryfallCardDTO cardDTO = new ScryfallCardDTO();
+                cardDTO.setId(rs.getLong("card_id"));
+                cardDTO.setScryfallId(rs.getString("sc.scryfall_id"));
+                cardDTO.setCardmarketId(rs.getLong("sc.cardmarket_id"));
+                cardDTO.setCardtraderId(rs.getLong("sc.cardtrader_id"));
+                cardDTO.setName(rs.getString("sc.name"));
+                cardDTO.setPrintedName(rs.getString("sc.printed_name"));
+                cardDTO.setLang(rs.getString("sc.lang"));
+                cardDTO.setImageUrl(rs.getString("sc.image_url"));
+                cardDTO.setRarity(rs.getString("sc.rarity"));
+                cardDTO.setSetName(rs.getString("sc.set_name"));
+                cardDTO.setCollectorNumber(rs.getString("sc.collector_number"));
+                cardDTO.setCardmarketURL(rs.getString("sc.cardmarket_url"));
+                cardDTO.setTypeLine(rs.getString("sc.type_line"));
+                cardDTO.setBorderColor(rs.getString("sc.border_color"));
+                cardDTO.setFrame(rs.getString("sc.frame"));
+                cardDTO.setReprint(rs.getBoolean("sc.is_reprint"));
+                cardDTO.setReleasedAt(rs.getDate("sc.released_at") != null ? rs.getDate("released_at").toLocalDate() : null);
+
+                CardPrice cardPrice = new CardPrice();
+                cardPrice.setLow(rs.getBigDecimal("uc.low"));
+                cardPrice.setTrend(rs.getBigDecimal("uc.trend"));
+                cardPrice.setAvg1(rs.getBigDecimal("uc.avg1"));
+                cardPrice.setAvg7(rs.getBigDecimal("uc.avg7"));
+                cardPrice.setAvg30(rs.getBigDecimal("uc.avg30"));
+                cardPrice.setLowFoil(rs.getBigDecimal("uc.low_foil"));
+                cardPrice.setTrendFoil(rs.getBigDecimal("uc.trend_foil"));
+                cardPrice.setAvg1Foil(rs.getBigDecimal("uc.avg1_foil"));
+                cardPrice.setAvg7Foil(rs.getBigDecimal("uc.avg7_foil"));
+                cardPrice.setAvg30Foil(rs.getBigDecimal("uc.avg30_foil"));
+                if (rs.getTimestamp("uc.updated_at") != null)
+                    cardPrice.setUpdatedAt(rs.getTimestamp("uc.updated_at").toLocalDateTime());
+
+                cardDTO.setCardPrice(cardPrice);
+                cardListDTO.add(cardDTO);
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+
+        return cardListDTO;
     }
 }
