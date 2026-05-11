@@ -18,53 +18,78 @@ public class ScryfallCardDAO {
     @Autowired
     private DataSource dataSource;
 
-    // Obtener carta mediante su nombre
-    // Busca cartas aplicando filtros opcionales: nombre, set, rareza, idioma y tipo.
-// Todos los parámetros son opcionales excepto page, size y offset.
-    public List<ScryfallCardDTO> selectFiltersCard(String name, String setName, String rarity,
-                                                   String lang, String typeLine,
+    // Busca cartas aplicando filtros opcionales: nombre, set, rareza, idioma, tipo y precio.
+    // Todos los parámetros son opcionales excepto size y offset.
+    public List<ScryfallCardDTO> selectFiltersCard(String name, String setCode, String rarity,
+                                                   String lang, String typeLine, String orderBy,
+                                                   Double minPrice, Double maxPrice,
                                                    int size, int offset) {
 
-        // Construimos la query dinámicamente según los filtros recibidos
+        List<ScryfallCardDTO> cardListDTO = new ArrayList<>();
+        // =============================================
+        // CONSTRUCCIÓN DINÁMICA DE LA QUERY
+        // =============================================
         StringBuilder query = new StringBuilder(
                 "SELECT DISTINCT sc.id, sc.name, sc.printed_name, sc.lang, " +
                         "sc.image_url, sc.rarity, sc.set_name, " +
-                        "sc.collector_number, sc.cardmarket_url, sc.price " +
+                        "sc.collector_number, sc.cardmarket_url, sc.price, s.icon_svg_uri " +
                         "FROM scryfall_card sc " +
+                        "JOIN scryfall_set s ON sc.set_code = s.code " +
                         "WHERE 1=1"
         );
 
-        // Añadimos condiciones solo si el parámetro no es nulo ni vacío
+        // Filtros de texto — solo si no son nulos ni vacíos
         if (name != null && !name.isEmpty()) query.append(" AND (sc.name LIKE ? OR sc.printed_name LIKE ?)");
-        if (setName  != null) query.append(" AND sc.set_name = ?");
+        if (setCode  != null) query.append(" AND sc.set_code = ?");
         if (rarity   != null) query.append(" AND sc.rarity = ?");
         if (lang     != null) query.append(" AND sc.lang = ?");
         if (typeLine != null) query.append(" AND sc.type_line LIKE ?");
 
-        query.append(" LIMIT ? OFFSET ?");
+        // Filtros de precio
+        if (minPrice != null) query.append(" AND (price >= ? OR price = 0 OR price IS NULL)");
+        if (maxPrice != null) query.append(" AND (price <= ? OR price = 0 OR price IS NULL)");
 
-        List<ScryfallCardDTO> cardListDTO = new ArrayList<>();
+        // Ordenación — por defecto sin orden específico
+        if ("price_asc".equals(orderBy))  query.append(" ORDER BY sc.price ASC");
+        if ("price_desc".equals(orderBy)) query.append(" ORDER BY sc.price DESC");
+        if ("name_asc".equals(orderBy))   query.append(" ORDER BY sc.name ASC");
+        if ("name_desc".equals(orderBy))  query.append(" ORDER BY sc.name DESC");
+
+        // Paginación siempre al final
+        query.append(" LIMIT ? OFFSET ?");
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query.toString())) {
 
-            // Asignamos los parámetros en el mismo orden en que aparecen los ? en la query
+            // =============================================
+            // ASIGNACIÓN DE PARÁMETROS
+            // Deben ir en el mismo orden que los ? de la query
+            // =============================================
             int idx = 1;
+
+            // Parámetros de texto
             if (name != null && !name.isEmpty()) {
                 stmt.setString(idx++, name + "%");  // sc.name LIKE ?
                 stmt.setString(idx++, name + "%");  // sc.printed_name LIKE ?
             }
-            if (setName  != null) stmt.setString(idx++, setName);
+            if (setCode  != null) stmt.setString(idx++, setCode);
             if (rarity   != null) stmt.setString(idx++, rarity);
             if (lang     != null) stmt.setString(idx++, lang);
             if (typeLine != null) stmt.setString(idx++, "%" + typeLine + "%");
 
-            stmt.setInt(idx++, size);    // LIMIT
-            stmt.setInt(idx,   offset);  // OFFSET
+            // Parámetros de precio
+            if (minPrice != null) stmt.setDouble(idx++, minPrice);
+            if (maxPrice != null) stmt.setDouble(idx++, maxPrice);
+
+            // Paginación
+            stmt.setInt(idx++, size);   // LIMIT
+            stmt.setInt(idx,   offset); // OFFSET
 
             ResultSet rs = stmt.executeQuery();
 
-            // Mapeamos cada fila del ResultSet a un DTO
+            // =============================================
+            // MAPEO DEL RESULTADO A DTOs
+            // =============================================
             while (rs.next()) {
                 ScryfallCardDTO cardDTO = new ScryfallCardDTO();
                 cardDTO.setId(rs.getLong("id"));
@@ -74,6 +99,7 @@ public class ScryfallCardDAO {
                 cardDTO.setImageUrl(rs.getString("image_url"));
                 cardDTO.setRarity(rs.getString("rarity"));
                 cardDTO.setSetName(rs.getString("set_name"));
+                cardDTO.setIconSvgUri(rs.getString("icon_svg_uri"));
                 cardDTO.setCollectorNumber(rs.getString("collector_number"));
                 cardDTO.setCardmarketURL(rs.getString("cardmarket_url"));
                 cardDTO.setPrice(rs.getBigDecimal("price"));
@@ -91,8 +117,8 @@ public class ScryfallCardDAO {
     public void updateScryfallPrices(){
         String query = "UPDATE scryfall_card sc " +
                 "JOIN card_price cp ON cp.cardmarket_id = sc.cardmarket_id " +
-                "SET sc.price = cp.avg, " +
-                "sc.price_foil = cp.avg_foil";
+                "SET sc.price = COALESCE(cp.low, cp.avg), " +
+                "sc.price_foil = COALESCE(cp.low_foil, cp.avg_foil)";
 
         try(Connection conn = dataSource.getConnection();
             PreparedStatement stmt = conn.prepareStatement(query)){
@@ -106,36 +132,47 @@ public class ScryfallCardDAO {
         }
     }
 
-    // Contador de cartas por nombre
     // Cuenta el total de cartas que coinciden con los filtros opcionales.
-// Se usa para calcular el número de páginas en la paginación.
-    public int countCardsByName(String name, String setName, String rarity, String lang, String typeLine) {
+    // Se usa para calcular el número de páginas en la paginación.
+    // NOTA: orderBy no se incluye aquí porque ORDER BY no afecta al COUNT
+    public int countCardsByName(String name, String setCode, String rarity, String lang,
+                                String typeLine, Double minPrice, Double maxPrice) {
 
         // Construimos la query dinámicamente según los filtros recibidos
         StringBuilder query = new StringBuilder(
                 "SELECT COUNT(*) FROM scryfall_card WHERE 1=1"
         );
 
-        // Añadimos condiciones solo si el parámetro no es nulo ni vacío
+        // Filtros de texto — solo si no son nulos ni vacíos
         if (name != null && !name.isEmpty()) query.append(" AND (name LIKE ? OR printed_name LIKE ?)");
-        if (setName  != null) query.append(" AND set_name = ?");
+        if (setCode  != null) query.append(" AND set_code = ?");
         if (rarity   != null) query.append(" AND rarity = ?");
         if (lang     != null) query.append(" AND lang = ?");
         if (typeLine != null) query.append(" AND type_line LIKE ?");
 
+        // Filtros de precio
+        if (minPrice != null) query.append(" AND (price >= ? OR price = 0 OR price IS NULL)");
+        if (maxPrice != null) query.append(" AND (price <= ? OR price = 0 OR price IS NULL)");
+
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query.toString())) {
 
-            // Asignamos los parámetros en el mismo orden en que aparecen los ? en la query
+            // Asignamos los parámetros en el mismo orden que aparecen los ? en la query
             int idx = 1;
+
+            // Parámetros de texto
             if (name != null && !name.isEmpty()) {
                 stmt.setString(idx++, name + "%");  // name LIKE ?
                 stmt.setString(idx++, name + "%");  // printed_name LIKE ?
             }
-            if (setName  != null) stmt.setString(idx++, setName);
+            if (setCode  != null) stmt.setString(idx++, setCode);
             if (rarity   != null) stmt.setString(idx++, rarity);
             if (lang     != null) stmt.setString(idx++, lang);
             if (typeLine != null) stmt.setString(idx++, "%" + typeLine + "%");
+
+            // Parámetros de precio
+            if (minPrice != null) stmt.setDouble(idx++, minPrice);
+            if (maxPrice != null) stmt.setDouble(idx++, maxPrice);
 
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
@@ -146,7 +183,7 @@ public class ScryfallCardDAO {
             e.printStackTrace();
         }
 
-        return 0; // Si hay error devolvemos 0 en vez de -1
+        return 0;
     }
 
     // Obtener detalles de carta mediante id de scryfall_card

@@ -15,6 +15,7 @@ import java.time.LocalDate;
         "releasedAt",
         "setCode",
         "setName",
+        "iconSvgUri",
         "collectorNumber",
         "typeLine",
         "borderColor",
@@ -41,6 +42,7 @@ public class ScryfallCardDTO {
     private String rarity;
     private String setName;
     private String setCode;
+    private String iconSvgUri;
     private String collectorNumber;
     private String cardmarketURL;
     private BigDecimal price;
@@ -55,7 +57,13 @@ public class ScryfallCardDTO {
 
    // CONSTRUCTOR
 
-    public ScryfallCardDTO(Long id, String scryfallId, Long cardmarketId, Long cardtraderId, String name, String printedName, String lang, String imageUrl, String rarity, String setName, String setCode, String collectorNumber, String cardmarketURL, BigDecimal price, BigDecimal priceFoil, String typeLine, String borderColor, String frame, boolean isFoil, boolean isReprint, LocalDate releasedAt, CardPrice cardPrice) {
+    public ScryfallCardDTO(Long id, String scryfallId, Long cardmarketId, Long cardtraderId,
+                           String name, String printedName, String lang, String imageUrl,
+                           String rarity, String setName, String setCode, String iconSvgUri, String collectorNumber,
+                           String cardmarketURL, BigDecimal price, BigDecimal priceFoil,
+                           String typeLine, String borderColor, String frame,
+                           boolean isFoil, boolean isReprint,
+                           LocalDate releasedAt, CardPrice cardPrice) {
         this.id = id;
         this.scryfallId = scryfallId;
         this.cardmarketId = cardmarketId;
@@ -67,6 +75,7 @@ public class ScryfallCardDTO {
         this.rarity = rarity;
         this.setName = setName;
         this.setCode = setCode;
+        this.iconSvgUri = iconSvgUri;
         this.collectorNumber = collectorNumber;
         this.cardmarketURL = cardmarketURL;
         this.price = price;
@@ -161,9 +170,7 @@ public class ScryfallCardDTO {
         return setName;
     }
 
-    public void setSetName(String setName) {
-        this.setName = setName;
-    }
+    public void setSetName(String setName) {this.setName = setName;}
 
     public String getSetCode() {
         return setCode;
@@ -171,6 +178,14 @@ public class ScryfallCardDTO {
 
     public void setSetCode(String setCode) {
         this.setCode = setCode;
+    }
+
+    public String getIconSvgUri() {
+        return iconSvgUri;
+    }
+
+    public void setIconSvgUri(String iconSvgUri) {
+        this.iconSvgUri = iconSvgUri;
     }
 
     public String getCollectorNumber() {

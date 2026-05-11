@@ -1,7 +1,7 @@
 package com.magic.investor_api.controller;
 
 
-import com.magic.investor_api.API.ScryfallDownloader;
+import com.magic.investor_api.API.ScryfallAPI;
 import com.magic.investor_api.service.ScryfallService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,17 +16,27 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class ScryfallController {
 
-    private final ScryfallDownloader scryfallDownloader;
     private final ScryfallService scryfallImportService;
 
 
+    // Descargar ediciones desde scryfall
+    @PostMapping("/editions")
+    public ResponseEntity<String> editions(){
+        try{
+            System.out.println("Proceso de descarga iniciado...");
+            scryfallImportService.importScryfallEditionsToDB();
+            return ResponseEntity.ok("Descarga completada.");
+        }catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al conectar con Scryfall: " + e.getMessage());
+        }
+    }
     // Descargar JSON de scryfall
-    @PostMapping("/import")
-    public ResponseEntity<String> startImport() {
+    @PostMapping("/cards")
+    public ResponseEntity<String> cards() {
         try {
             System.out.println("Proceso de descarga iniciado...");
-            scryfallDownloader.startFullImport();
-
+            scryfallImportService.importScryfallEditionsToDB();
             return ResponseEntity.ok("Descarga completada.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -34,8 +44,14 @@ public class ScryfallController {
         }
     }
 
+    @PostMapping("update-prices")
+    public void updatePrices(){
+
+        scryfallImportService.updateScryfallPrices();
+    }
+
     // Volcar JSON a BD
-    @PostMapping("/sync")
+    /*@PostMapping("/sync")
     public ResponseEntity<String> importJsonToDB(){
         try {
             System.out.println("Iniciando procesado de JSON a BD...");
@@ -50,11 +66,7 @@ public class ScryfallController {
             e.printStackTrace();
         }
         return ResponseEntity.ok("Base de datos actualizada.");
-    }
+    }*/
 
-    @PostMapping("update-prices")
-    public void updatePrices(){
 
-        scryfallImportService.updateScryfallPrices();
-    }
 }

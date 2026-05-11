@@ -5,10 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,17 +15,18 @@ public class ExpansionDAO {
     @Autowired
     private DataSource dataSource;
 
-    // Inserta las expansiones en la tabla card_trader_expansion
-    public void insertExpansion(List<Expansion> expansionList) {
+    // Inserta las expansiones en la tabla scryfall_set
+    public void insertScryfallSet(List<Expansion> expansionList) {
 
-        String INSERT_EXPANSION = "INSERT INTO card_trader_expansion VALUES (?, ?, ?)";
-
+        String INSERT_EXPANSION = "INSERT INTO scryfall_set(id, code, name, icon_svg_uri, released_at) " +
+                "VALUES (?, ?, ?, ?, ?)";
         try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(INSERT_EXPANSION)){
-
             for(Expansion e : expansionList){
                 stmt.setLong(1, e.getId());
                 stmt.setString(2, e.getCode());
                 stmt.setString(3, e.getName());
+                stmt.setString(4, e.getIconSvgUri());
+                stmt.setDate(5, Date.valueOf(e.getReleasedAt()));
 
                 stmt.addBatch();
             }
@@ -36,6 +34,28 @@ public class ExpansionDAO {
         } catch(SQLException e){
             e.printStackTrace();
         }
+    }
+
+    // Obtiene los nombres de las expansiones de la tabla card_trader_expansion
+    public List<Expansion> selectScryfallExpansionList(){
+
+        String SELECT_EXPANSION = "SELECT code, name FROM scryfall_set ORDER BY name ASC";
+
+        List<Expansion> expansionList = new ArrayList<>();
+
+        try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(SELECT_EXPANSION)){
+
+            ResultSet rs = stmt.executeQuery();
+            while(rs.next()){
+                Expansion e = new Expansion();
+                e.setCode(rs.getString("code"));
+                e.setName(rs.getString("name"));
+                expansionList.add(e);
+            }
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+        return expansionList;
     }
 
     // Obtiene los id de las expansiones de la tabla card_trader_expansion
@@ -103,18 +123,20 @@ public class ExpansionDAO {
     }
 
     // Obtiene los nombres de las expansiones de la tabla card_trader_expansion
-    public List<String> selectExpansionNamesList(){
+    public List<Expansion> selectExpansionList(){
 
-        String SELECT_EXPANSION = "SELECT name FROM card_trader_expansion ORDER BY name ASC";
+        String SELECT_EXPANSION = "SELECT code, name FROM scryfall_set ORDER BY name ASC";
 
-        List<String> expansionList = new ArrayList<>();
+        List<Expansion> expansionList = new ArrayList<>();
 
         try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(SELECT_EXPANSION)){
 
             ResultSet rs = stmt.executeQuery();
             while(rs.next()){
-                String expansionName = rs.getString("name");
-                expansionList.add(expansionName);
+                Expansion e = new Expansion();
+                e.setCode(rs.getString("code"));
+                e.setName(rs.getString("name"));
+                expansionList.add(e);
             }
         } catch (SQLException e){
             e.printStackTrace();

@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 // El primer parámetro es la Entidad (Card)
 // El segundo es el tipo de su ID (String, porque es el UUID de Scryfall)
 public interface ScryfallRepository extends JpaRepository<ScryfallCard, String> {
-    ScryfallCard findByCardmarketId(Long cardmarketId);
+
 }

@@ -1,6 +1,7 @@
 package com.magic.investor_api.controller;
 
 import com.magic.investor_api.Auth.JwtService;
+import com.magic.investor_api.dto.ScryfallCardDTO;
 import com.magic.investor_api.dto.UserCollectionDTO;
 import com.magic.investor_api.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,7 +25,7 @@ public class UserController {
 
     // Obtener colección de cartas del usuario mediante su userId user_collection
     @GetMapping("collection")
-    public List<Long> getUserCollection(HttpServletRequest httpRequest){
+    public List<Long> getUserCollectionIds(HttpServletRequest httpRequest){
         String token = httpRequest.getHeader("Authorization").substring(7);
         Long userId = jwtService.extractUserId(token);
         return userService.getCollectionCards(userId);
@@ -90,5 +91,11 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al añadir carta");
     }
 
-
+    // Obtener colección de cartas del usuario
+    @GetMapping("/mycollection")
+    public List<ScryfallCardDTO> getUserCards(HttpServletRequest httpRequest) {
+        String token = httpRequest.getHeader("Authorization").substring(7);
+        Long userId = jwtService.extractUserId(token);
+        return userService.getMyCollection(userId);
+    }
 }
