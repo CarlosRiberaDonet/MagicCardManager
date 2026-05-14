@@ -27,11 +27,12 @@ public class CardController {
             @RequestParam(required = false) Double minPrice, // Precio mínimo
             @RequestParam(required = false) Double maxPrice, // Precio máximo
             @RequestParam(required = false) String orderBy,   // "price_asc" o "price_desc"
+            @RequestParam(required = false) boolean hideNA, // false -> muestra cartas con precio N/A, true oculta
             @RequestParam int page,
             @RequestParam int size
     ) {
         return cardService.searchCards(name, setCode, rarity, lang, typeLine, orderBy,
-                minPrice, maxPrice, page, size);
+                minPrice, maxPrice, page, size, hideNA);
     }
 
     // Buscar carta por id

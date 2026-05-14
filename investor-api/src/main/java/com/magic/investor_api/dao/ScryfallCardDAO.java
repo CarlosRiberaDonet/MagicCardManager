@@ -23,7 +23,7 @@ public class ScryfallCardDAO {
     public List<ScryfallCardDTO> selectFiltersCard(String name, String setCode, String rarity,
                                                    String lang, String typeLine, String orderBy,
                                                    Double minPrice, Double maxPrice,
-                                                   int size, int offset) {
+                                                   int size, int offset, boolean hideNA) {
 
         List<ScryfallCardDTO> cardListDTO = new ArrayList<>();
         // =============================================
@@ -54,6 +54,7 @@ public class ScryfallCardDAO {
         if ("price_desc".equals(orderBy)) query.append(" ORDER BY sc.price DESC");
         if ("name_asc".equals(orderBy))   query.append(" ORDER BY sc.name ASC");
         if ("name_desc".equals(orderBy))  query.append(" ORDER BY sc.name DESC");
+        if (hideNA) query.append("AND price IS NOT NULL AND price > 0 ");
 
         // Paginación siempre al final
         query.append(" LIMIT ? OFFSET ?");
@@ -136,7 +137,7 @@ public class ScryfallCardDAO {
     // Se usa para calcular el número de páginas en la paginación.
     // NOTA: orderBy no se incluye aquí porque ORDER BY no afecta al COUNT
     public int countCardsByName(String name, String setCode, String rarity, String lang,
-                                String typeLine, Double minPrice, Double maxPrice) {
+                                String typeLine, Double minPrice, Double maxPrice, boolean hideNA) {
 
         // Construimos la query dinámicamente según los filtros recibidos
         StringBuilder query = new StringBuilder(
@@ -153,6 +154,7 @@ public class ScryfallCardDAO {
         // Filtros de precio
         if (minPrice != null) query.append(" AND (price >= ? OR price = 0 OR price IS NULL)");
         if (maxPrice != null) query.append(" AND (price <= ? OR price = 0 OR price IS NULL)");
+        if (hideNA) query.append("AND price IS NOT NULL AND price > 0 ");
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query.toString())) {
