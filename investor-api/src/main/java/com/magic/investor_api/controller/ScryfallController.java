@@ -19,7 +19,7 @@ public class ScryfallController {
     private final ScryfallService scryfallImportService;
 
 
-    // Descargar ediciones desde scryfall
+    // Descargar ediciones desde scryfall e importarlas a la BD
     @PostMapping("/editions")
     public ResponseEntity<String> editions(){
         try{
@@ -31,12 +31,13 @@ public class ScryfallController {
                     .body("Error al conectar con Scryfall: " + e.getMessage());
         }
     }
-    // Descargar JSON de scryfall
+
+    // Descargar cartas de scryfall e importarlas a la BD
     @PostMapping("/cards")
     public ResponseEntity<String> cards() {
         try {
             System.out.println("Proceso de descarga iniciado...");
-            scryfallImportService.importScryfallEditionsToDB();
+            scryfallImportService.importScryfallCardsToBD();
             return ResponseEntity.ok("Descarga completada.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

@@ -1,7 +1,7 @@
 package com.magic.investor_api.controller;
 
 import com.magic.investor_api.API.CardmarketDownloader;
-import com.magic.investor_api.service.CardmarketImportService;
+import com.magic.investor_api.service.CardmarketService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,11 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class CardPriceController {
 
     private final CardmarketDownloader cardmarketDownloader;
-    private final CardmarketImportService cardmarketImportService;
+    private final CardmarketService cardmarketService;
 
     // Descargar el price guide de cardmarket
-    @PostMapping("/import")
-    public ResponseEntity<String> startImportGuidePrices(){
+    @PostMapping("/download")
+    public ResponseEntity<String> startDownloadGuidePrices(){
         try {
 
             cardmarketDownloader.downloadGuidePrice();
@@ -33,12 +33,12 @@ public class CardPriceController {
     }
 
     // Actualizar precios de card_price
-    @PostMapping("/update")
+    @PostMapping("/import")
     public ResponseEntity<String> updatePrices(){
         try {
             System.out.println("Actualizando lista de precios...");
 
-            cardmarketImportService.importGuidePricesToBD();
+            cardmarketService.importGuidePricesToBD();
 
             System.out.println("¡Proceso total finalizado con éxito!");
 

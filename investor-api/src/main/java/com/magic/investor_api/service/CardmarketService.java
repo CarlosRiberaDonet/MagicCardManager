@@ -16,13 +16,12 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class CardmarketImportService {
+public class CardmarketService {
 
     @Autowired
     private final CardPriceRepository cardPriceRepository;

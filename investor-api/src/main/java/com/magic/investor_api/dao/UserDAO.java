@@ -258,36 +258,36 @@ public class UserDAO {
             while (rs.next()) {
                 ScryfallCardDTO cardDTO = new ScryfallCardDTO();
                 cardDTO.setId(rs.getLong("card_id"));
-                cardDTO.setScryfallId(rs.getString("sc.scryfall_id"));
-                cardDTO.setCardmarketId(rs.getLong("sc.cardmarket_id"));
-                cardDTO.setCardtraderId(rs.getLong("sc.cardtrader_id"));
-                cardDTO.setName(rs.getString("sc.name"));
-                cardDTO.setPrintedName(rs.getString("sc.printed_name"));
-                cardDTO.setLang(rs.getString("sc.lang"));
-                cardDTO.setImageUrl(rs.getString("sc.image_url"));
-                cardDTO.setRarity(rs.getString("sc.rarity"));
-                cardDTO.setSetName(rs.getString("sc.set_name"));
-                cardDTO.setCollectorNumber(rs.getString("sc.collector_number"));
-                cardDTO.setCardmarketURL(rs.getString("sc.cardmarket_url"));
-                cardDTO.setTypeLine(rs.getString("sc.type_line"));
-                cardDTO.setBorderColor(rs.getString("sc.border_color"));
-                cardDTO.setFrame(rs.getString("sc.frame"));
-                cardDTO.setReprint(rs.getBoolean("sc.is_reprint"));
-                cardDTO.setReleasedAt(rs.getDate("sc.released_at") != null ? rs.getDate("released_at").toLocalDate() : null);
+                cardDTO.setScryfallId(rs.getString("scryfall_id"));
+                cardDTO.setCardmarketId(rs.getLong("cardmarket_id"));
+                cardDTO.setCardtraderId(rs.getLong("cardtrader_id"));
+                cardDTO.setName(rs.getString("name"));
+                cardDTO.setPrintedName(rs.getString("printed_name"));
+                cardDTO.setLang(rs.getString("lang"));
+                cardDTO.setImageUrl(rs.getString("image_url"));
+                cardDTO.setRarity(rs.getString("rarity"));
+                cardDTO.setSetName(rs.getString("set_name"));
+                cardDTO.setCollectorNumber(rs.getString("collector_number"));
+                cardDTO.setCardmarketURL(rs.getString("cardmarket_url"));
+                cardDTO.setTypeLine(rs.getString("type_line"));
+                cardDTO.setBorderColor(rs.getString("border_color"));
+                cardDTO.setFrame(rs.getString("frame"));
+                cardDTO.setReprint(rs.getBoolean("is_reprint"));
+                cardDTO.setReleasedAt(rs.getDate("released_at") != null ? rs.getDate("released_at").toLocalDate() : null);
 
                 CardPrice cardPrice = new CardPrice();
-                cardPrice.setLow(rs.getBigDecimal("uc.low"));
-                cardPrice.setTrend(rs.getBigDecimal("uc.trend"));
-                cardPrice.setAvg1(rs.getBigDecimal("uc.avg1"));
-                cardPrice.setAvg7(rs.getBigDecimal("uc.avg7"));
-                cardPrice.setAvg30(rs.getBigDecimal("uc.avg30"));
-                cardPrice.setLowFoil(rs.getBigDecimal("uc.low_foil"));
-                cardPrice.setTrendFoil(rs.getBigDecimal("uc.trend_foil"));
-                cardPrice.setAvg1Foil(rs.getBigDecimal("uc.avg1_foil"));
-                cardPrice.setAvg7Foil(rs.getBigDecimal("uc.avg7_foil"));
-                cardPrice.setAvg30Foil(rs.getBigDecimal("uc.avg30_foil"));
-                if (rs.getTimestamp("uc.updated_at") != null)
-                    cardPrice.setUpdatedAt(rs.getTimestamp("uc.updated_at").toLocalDateTime());
+                cardPrice.setLow(rs.getBigDecimal("low"));
+                cardPrice.setTrend(rs.getBigDecimal("trend"));
+                cardPrice.setAvg1(rs.getBigDecimal("avg1"));
+                cardPrice.setAvg7(rs.getBigDecimal("avg7"));
+                cardPrice.setAvg30(rs.getBigDecimal("avg30"));
+                cardPrice.setLowFoil(rs.getBigDecimal("low_foil"));
+                cardPrice.setTrendFoil(rs.getBigDecimal("trend_foil"));
+                cardPrice.setAvg1Foil(rs.getBigDecimal("avg1_foil"));
+                cardPrice.setAvg7Foil(rs.getBigDecimal("avg7_foil"));
+                cardPrice.setAvg30Foil(rs.getBigDecimal("avg30_foil"));
+                if (rs.getTimestamp("updated_at") != null)
+                    cardPrice.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
 
                 cardDTO.setCardPrice(cardPrice);
                 cardListDTO.add(cardDTO);
