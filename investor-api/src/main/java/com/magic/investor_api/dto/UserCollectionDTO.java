@@ -1,11 +1,17 @@
 package com.magic.investor_api.dto;
 
+import com.magic.investor_api.model.ScryfallCard;
+
+import java.time.LocalDate;
+
 public class UserCollectionDTO {
 
     private Long userId;
     private Long cardId;
     private Double purchasePrice;
     private int quantity;
+    private LocalDate addedAt;
+    private ScryfallCardDTO card;
 
     // CONSTRUTOR
     public UserCollectionDTO() {
@@ -42,5 +48,21 @@ public class UserCollectionDTO {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+    public LocalDate getAddedAt() {
+        return addedAt;
+    }
+
+    public void setAddedAt(LocalDate addedAt) {
+        this.addedAt = addedAt;
+    }
+
+    public ScryfallCardDTO getScryfallCard() {
+        return card;
+    }
+
+    public void setScryfallCard(ScryfallCardDTO card) {
+        this.card = card;
     }
 }

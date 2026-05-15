@@ -5,6 +5,7 @@ import com.magic.investor_api.dto.ScryfallCardDTO;
 import com.magic.investor_api.dto.UserCollectionDTO;
 import com.magic.investor_api.dto.UserDTO;
 import com.magic.investor_api.model.CardPrice;
+import com.magic.investor_api.model.ScryfallCard;
 import com.magic.investor_api.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -221,32 +222,40 @@ public class UserDAO {
     }
 
     // Obtener todas las cartas del usuario de user_watchlist
-    public List<Long> selectCollectionCards(Long userId){
-        List<Long> collectionIdList = new ArrayList<>();
-        String query = "SELECT card_id FROM user_watchlist WHERE user_id= ?";
+    public List<UserCollectionDTO> selectCollectionCards(Long userId){
+        List<UserCollectionDTO> userCollectionDTOList = new ArrayList<>();
+        String query = "SELECT user_id, card_id, purchase_price, quantity, added_at " +
+                "FROM user_collection WHERE user_id= ?";
         try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)){
             stmt.setLong(1, userId);
             ResultSet rs = stmt.executeQuery();
             while(rs.next()){
-                collectionIdList.add(rs.getLong("card_id"));
+                UserCollectionDTO dto = new UserCollectionDTO();
+                dto.setUserId(rs.getLong("user_id"));
+                dto.setCardId(rs.getLong("card_id"));
+                dto.setQuantity(rs.getInt("quantity"));
+                dto.setAddedAt(rs.getDate("added_ad").toLocalDate().atStartOfDay().toLocalDate());
+                userCollectionDTOList.add(dto);
             }
         }catch(SQLException e){
             e.printStackTrace();
         }
-        return collectionIdList;
+        return userCollectionDTOList;
     }
 
     // Obtener cartas de la colección del usuario de user_collection
-    public List<ScryfallCardDTO> selectMyCollection(Long userId){
-        List<ScryfallCardDTO> cardListDTO = new ArrayList<>();
-        String query = "SELECT uc.*,  sc.id AS card_id, sc.cardmarket_id, sc.cardtrader_id, " +
+    public List<UserCollectionDTO> selectMyCollection(Long userId){
+
+        List<UserCollectionDTO> userCollectionDTO = new ArrayList<>();
+
+        String query = "SELECT uc.user_id, uc.card_id, uc.purchase_price, uc.quantity, uc.added_at, " +
                 "sc.name, sc.printed_name, sc.lang, sc.image_url, sc.rarity, sc.set_name, " +
-                "sc.collector_number, sc.cardmarket_url, sc.type_line, " +
-                "sc.border_color, sc.frame, sc.is_reprint, sc.released_at, " +
-                "cp.low, cp.trend, cp.avg1, cp.avg7, cp.avg30, cp.low_foil, cp.trend_foil, " +
-                "cp.avg1_foil, cp.avg7_foil, cp.avg30_foil, cp.updated_at " +
+                "sc.collector_number, sc.type_line, sc.border_color, sc.frame, sc.is_reprint, " +
+                "sc.released_at, cp.low, cp.trend, cp.low_foil, cp.trend_foil, cp.updated_at, " +
+                "s.icon_svg_uri " +
                 "FROM user_collection uc " +
                 "JOIN scryfall_card sc ON uc.card_id = sc.id " +
+                "JOIN scryfall_set s ON sc.set_code = s.code " +
                 "LEFT JOIN card_price cp ON cp.cardmarket_id = sc.cardmarket_id " +
                 "WHERE user_id = ?";
 
@@ -256,46 +265,44 @@ public class UserDAO {
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                ScryfallCardDTO cardDTO = new ScryfallCardDTO();
-                cardDTO.setId(rs.getLong("card_id"));
-                cardDTO.setScryfallId(rs.getString("scryfall_id"));
-                cardDTO.setCardmarketId(rs.getLong("cardmarket_id"));
-                cardDTO.setCardtraderId(rs.getLong("cardtrader_id"));
-                cardDTO.setName(rs.getString("name"));
-                cardDTO.setPrintedName(rs.getString("printed_name"));
-                cardDTO.setLang(rs.getString("lang"));
-                cardDTO.setImageUrl(rs.getString("image_url"));
-                cardDTO.setRarity(rs.getString("rarity"));
-                cardDTO.setSetName(rs.getString("set_name"));
-                cardDTO.setCollectorNumber(rs.getString("collector_number"));
-                cardDTO.setCardmarketURL(rs.getString("cardmarket_url"));
-                cardDTO.setTypeLine(rs.getString("type_line"));
-                cardDTO.setBorderColor(rs.getString("border_color"));
-                cardDTO.setFrame(rs.getString("frame"));
-                cardDTO.setReprint(rs.getBoolean("is_reprint"));
-                cardDTO.setReleasedAt(rs.getDate("released_at") != null ? rs.getDate("released_at").toLocalDate() : null);
-
                 CardPrice cardPrice = new CardPrice();
                 cardPrice.setLow(rs.getBigDecimal("low"));
                 cardPrice.setTrend(rs.getBigDecimal("trend"));
-                cardPrice.setAvg1(rs.getBigDecimal("avg1"));
-                cardPrice.setAvg7(rs.getBigDecimal("avg7"));
-                cardPrice.setAvg30(rs.getBigDecimal("avg30"));
                 cardPrice.setLowFoil(rs.getBigDecimal("low_foil"));
                 cardPrice.setTrendFoil(rs.getBigDecimal("trend_foil"));
-                cardPrice.setAvg1Foil(rs.getBigDecimal("avg1_foil"));
-                cardPrice.setAvg7Foil(rs.getBigDecimal("avg7_foil"));
-                cardPrice.setAvg30Foil(rs.getBigDecimal("avg30_foil"));
-                if (rs.getTimestamp("updated_at") != null)
-                    cardPrice.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
+                cardPrice.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
 
-                cardDTO.setCardPrice(cardPrice);
-                cardListDTO.add(cardDTO);
+                ScryfallCardDTO scryfallCardDTO = new ScryfallCardDTO();
+                scryfallCardDTO.setId(rs.getLong("card_id"));
+                scryfallCardDTO.setName(rs.getString("name"));
+                scryfallCardDTO.setPrintedName(rs.getString("printed_name"));
+                scryfallCardDTO.setLang(rs.getString("lang"));
+                scryfallCardDTO.setImageUrl(rs.getString("image_url"));
+                scryfallCardDTO.setRarity(rs.getString("rarity"));
+                scryfallCardDTO.setSetName(rs.getString("set_name"));
+                scryfallCardDTO.setCollectorNumber(rs.getString("collector_number"));
+                scryfallCardDTO.setTypeLine(rs.getString("type_line"));
+                scryfallCardDTO.setBorderColor(rs.getString("border_color"));
+                scryfallCardDTO.setFrame(rs.getString("frame"));
+                scryfallCardDTO.setReprint(rs.getBoolean("is_reprint"));
+                scryfallCardDTO.setReleasedAt(rs.getDate("released_at") != null ? rs.getDate("released_at").toLocalDate() : null);
+                scryfallCardDTO.setCardPrice(cardPrice);
+                scryfallCardDTO.setIconSvgUri(rs.getString("icon_svg_uri"));
+
+                UserCollectionDTO collectionDTO = new UserCollectionDTO();
+                collectionDTO.setUserId(rs.getLong("user_id"));
+                collectionDTO.setCardId(rs.getLong("card_id"));
+                collectionDTO.setPurchasePrice(rs.getDouble("purchase_price"));
+                collectionDTO.setQuantity(rs.getInt("quantity"));
+                collectionDTO.setAddedAt(rs.getDate("added_at").toLocalDate());
+                collectionDTO.setScryfallCard(scryfallCardDTO);
+
+                userCollectionDTO.add(collectionDTO);
             }
         }catch (SQLException e){
             e.printStackTrace();
         }
 
-        return cardListDTO;
+        return userCollectionDTO;
     }
 }

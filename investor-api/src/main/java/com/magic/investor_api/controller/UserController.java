@@ -22,15 +22,6 @@ public class UserController {
         this.jwtService = jwtService;
     }
 
-
-    // Obtener colección de cartas del usuario mediante su userId user_collection
-    @GetMapping("collection")
-    public List<Long> getUserCollectionIds(HttpServletRequest httpRequest){
-        String token = httpRequest.getHeader("Authorization").substring(7);
-        Long userId = jwtService.extractUserId(token);
-        return userService.getCollectionCards(userId);
-    }
-
     // Recibe userId y cardId para comprobar si el usuario tiene añadida esa carta en user_watchlist
     @GetMapping("/collection/contains")
     public ResponseEntity<Integer> collectionQuantity(HttpServletRequest httpRequest, @RequestParam Long cardId) {
@@ -93,7 +84,7 @@ public class UserController {
 
     // Obtener colección de cartas del usuario
     @GetMapping("/mycollection")
-    public List<ScryfallCardDTO> getUserCards(HttpServletRequest httpRequest) {
+    public List<UserCollectionDTO> getUserCards(HttpServletRequest httpRequest) {
         String token = httpRequest.getHeader("Authorization").substring(7);
         Long userId = jwtService.extractUserId(token);
         return userService.getMyCollection(userId);

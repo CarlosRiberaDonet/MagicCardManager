@@ -45,7 +45,7 @@ public class UserService {
     }
 
     //Obtener ids de user_collection mediante userId
-    public List<Long> getCollectionCards(Long userId){
+    public List<UserCollectionDTO> getCollectionCards(Long userId){
         return userDAO.selectCollectionCards(userId);
     }
 
@@ -84,7 +84,7 @@ public class UserService {
     }
 
     // Obtener lista de cartas de la colección del usuario
-    public List<ScryfallCardDTO> getMyCollection(Long userId){
+    public List<UserCollectionDTO> getMyCollection(Long userId){
         return userDAO.selectMyCollection(userId);
     }
 }
