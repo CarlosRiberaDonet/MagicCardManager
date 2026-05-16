@@ -81,8 +81,12 @@ public class UserDAO {
     // Insertar carta en la tabla user_collection
     public boolean insertCollectionCard(UserCollectionDTO dto){
 
+        // Compruebo si la carta ya está en la colección del usuario
         if (selectCollectionCardQuantity(dto.getUserId(), dto.getCardId()) > 0) {
-            return updateQuantityCollection(dto.getUserId(), dto.getCardId(), +1);
+            // Compruebo si el precio de compra es el mismo
+            if(selectCollectionCardPrice(dto.getUserId(), dto.getCardId()) == dto.getPurchasePrice().doubleValue()){
+                return updateQuantityCollection(dto.getUserId(), dto.getCardId(), +1); // Sumo +1 a la cantidad de la carta
+            }
         }
 
         String query = "INSERT INTO user_collection (user_id, card_id, purchase_price, quantity) " +
@@ -92,15 +96,12 @@ public class UserDAO {
 
             stmt.setLong(1, dto.getUserId());
             stmt.setLong(2, dto.getCardId());
-            if (dto.getPurchasePrice() != null) {
-                stmt.setDouble(3, dto.getPurchasePrice());
-            } else {
-                stmt.setNull(3, java.sql.Types.DECIMAL);
-            }
-            stmt.setInt(4, 1);
+            stmt.setDouble(3, dto.getPurchasePrice());
+            stmt.setInt(4, dto.getQuantity());
 
             int filasAfectadas = stmt.executeUpdate();
             if(filasAfectadas > 0){
+                System.out.println("Guardando: " + dto.toString());
                 return true;
             }
         }catch (SQLException e){
@@ -185,6 +186,22 @@ public class UserDAO {
         return 0;
     }
 
+    // Obtener precio de una carta en user_collection
+    public Double selectCollectionCardPrice(Long userId, Long cardId){
+        String query = "SELECT purchase_price FROM user_collection WHERE user_id = ? AND card_id = ?";
+        try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)){
+            stmt.setLong(1, userId);
+            stmt.setLong(2, cardId);
+            ResultSet rs = stmt.executeQuery();
+            if(rs.next()){
+                return rs.getDouble("purchase_price");
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        return 0.0;
+    }
+
     // Comprobar si la carta ya está en user_watchlist
     public boolean selectWatchlistCardId(Long userId, Long cardId){
         String query = "SELECT id FROM user_watchlist WHERE user_id = ? AND card_id = ?";
@@ -256,7 +273,7 @@ public class UserDAO {
                 "FROM user_collection uc " +
                 "JOIN scryfall_card sc ON uc.card_id = sc.id " +
                 "JOIN scryfall_set s ON sc.set_code = s.code " +
-                "LEFT JOIN card_price cp ON cp.cardmarket_id = sc.cardmarket_id " +
+                "JOIN card_price cp ON cp.cardmarket_id = sc.cardmarket_id " +
                 "WHERE user_id = ?";
 
         try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)){
