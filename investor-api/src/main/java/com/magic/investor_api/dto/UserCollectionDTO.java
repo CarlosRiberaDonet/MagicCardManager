@@ -17,6 +17,11 @@ public class UserCollectionDTO {
     public UserCollectionDTO() {
     }
 
+    public UserCollectionDTO(Long userId, Long cardId){
+        this.userId = userId;
+        this.cardId = cardId;
+    }
+
     // GETTERS Y SETTERS
     public Long getCardId() {
         return cardId;
@@ -64,5 +69,17 @@ public class UserCollectionDTO {
 
     public void setScryfallCard(ScryfallCardDTO card) {
         this.card = card;
+    }
+
+    @Override
+    public String toString() {
+        return "UserCollectionDTO{" +
+                "userId=" + userId +
+                ", cardId=" + cardId +
+                ", purchasePrice=" + purchasePrice +
+                ", quantity=" + quantity +
+                ", addedAt=" + addedAt +
+                ", card=" + card +
+                '}';
     }
 }

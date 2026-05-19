@@ -28,7 +28,7 @@ public class UserController {
         String token = httpRequest.getHeader("Authorization").substring(7);
         Long userId = jwtService.extractUserId(token);
         int quantity = userService.getCardQuantity(userId, cardId);
-        return ResponseEntity.ok(quantity); // 0 si no tiene la carta, >0 si la tiene
+        return ResponseEntity.ok(quantity); // 0 si no tiene la carta, > 0 si la tiene
     }
 
     // Recibe userId y cardId para comprobar si el usuario tiene añadida esa carta
@@ -54,7 +54,6 @@ public class UserController {
     // Eliminar carta en user_collection mediante card_id
     @DeleteMapping("/collection/del")
     public ResponseEntity<String> delFromCollection(@RequestBody UserCollectionDTO request, HttpServletRequest httpRequest){
-        System.out.println("ELIMINANDO CARTA DE LA COLECCIÓN.");
         String token = httpRequest.getHeader("Authorization").substring(7);
         Long userId = jwtService.extractUserId(token);
         boolean result = userService.delFromCollection(userId, request);

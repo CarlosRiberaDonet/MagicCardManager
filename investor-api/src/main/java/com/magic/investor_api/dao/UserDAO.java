@@ -82,7 +82,7 @@ public class UserDAO {
     public boolean insertCollectionCard(UserCollectionDTO dto){
 
         // Compruebo si la carta ya está en la colección del usuario
-        if (selectCollectionCardQuantity(dto.getUserId(), dto.getCardId()) > 0) {
+        if (selectCollectionCardQuantity(dto) > 0) {
             // Compruebo si el precio de compra es el mismo
             if(selectCollectionCardPrice(dto.getUserId(), dto.getCardId()) == dto.getPurchasePrice().doubleValue()){
                 return updateQuantityCollection(dto.getUserId(), dto.getCardId(), +1); // Sumo +1 a la cantidad de la carta
@@ -113,7 +113,7 @@ public class UserDAO {
     // Eliminar una carta de user_collection
     public boolean deleteCollectionCard(UserCollectionDTO dto){
 
-        int quantity = selectCollectionCardQuantity(dto.getUserId(), dto.getCardId());
+        int quantity = selectCollectionCardQuantity(dto);
         
         // Si quantity > 1
         if(quantity > 1){
@@ -170,12 +170,36 @@ public class UserDAO {
     return false;
     }
 
-    // Obtener cantidad de una carta en user_collection
-    public int selectCollectionCardQuantity(Long userId, Long cardId){
+    // Obtener cantidad total de una carta en user_collection (sin diferenciar purchase_price)
+    public int selectCollectionCardQuantity(UserCollectionDTO dto){
+
+        int total = 0;
+
         String query = "SELECT quantity FROM user_collection WHERE user_id = ? AND card_id = ?";
+
         try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)){
-            stmt.setLong(1, userId);
-            stmt.setLong(2, cardId);
+            stmt.setLong(1, dto.getUserId());
+            stmt.setLong(2, dto.getCardId());
+
+
+
+            ResultSet rs = stmt.executeQuery();
+            while(rs.next()){
+                total += rs.getInt("quantity");
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        return total;
+    }
+
+    // Obtener cantidad de una carta en user_collection diferenciando purchase_price
+    public int selectCollectionCardPriceQuantity(UserCollectionDTO dto){
+        String query = "SELECT quantity FROM user_collection WHERE user_id = ? AND card_id = ? AND purchase_price = ?";
+        try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)){
+            stmt.setLong(1, dto.getUserId());
+            stmt.setLong(2, dto.getCardId());
+            stmt.setDouble(3, dto.getPurchasePrice());
             ResultSet rs = stmt.executeQuery();
             if(rs.next()){
                 return rs.getInt("quantity");
@@ -318,6 +342,10 @@ public class UserDAO {
             }
         }catch (SQLException e){
             e.printStackTrace();
+        }
+
+        for(UserCollectionDTO u : userCollectionDTO){
+            System.out.println("MI COLECCION: " + u.toString());
         }
 
         return userCollectionDTO;

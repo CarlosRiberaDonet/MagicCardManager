@@ -52,7 +52,7 @@ public class ScryfallCardDTO {
     private String frame;
     private boolean isFoil;
     private boolean isReprint;
-    private LocalDate  releasedAt;
+    private LocalDate releasedAt;
     private CardPrice cardPrice;
 
    // CONSTRUCTOR
