@@ -51,7 +51,8 @@ public class UserService {
 
     // Comprobar si el usuario tiene la carta en user_collection
     public int getCardQuantity(Long userId, Long cardId){
-        return userDAO.selectCollectionCardQuantity(userId, cardId);
+        UserCollectionDTO dto = new UserCollectionDTO(userId, cardId);
+        return userDAO.selectCollectionCardQuantity(dto);
     }
 
     // Comprobar si el usuario tiene la carta en user_watchlist
