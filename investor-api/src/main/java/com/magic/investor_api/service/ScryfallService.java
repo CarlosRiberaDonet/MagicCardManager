@@ -2,7 +2,6 @@ package com.magic.investor_api.service;
 
 
 import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -10,14 +9,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.magic.investor_api.API.ScryfallAPI;
 import com.magic.investor_api.dao.ExpansionDAO;
 import com.magic.investor_api.dao.ScryfallCardDAO;
-import com.magic.investor_api.model.Expansion;
+import com.magic.investor_api.model.ScryfallExpansion;
 import com.magic.investor_api.model.ScryfallCard;
 import com.magic.investor_api.repository.ScryfallRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
@@ -57,15 +55,15 @@ public class ScryfallService {
         String EDITIONS = path + "/src/main/resources/editions.json";
         try{
             InputStream input = new FileInputStream(EDITIONS);
-            List<Expansion> expansionList = new ArrayList<>();
+            List<ScryfallExpansion> scryfallExpansionList = new ArrayList<>();
             JsonNode root = objectMapper.readTree(input);
             JsonNode data = root.get("data");
             for(JsonNode node : data){
-                Expansion edition = mapNodeToScryfallSet(node);
-                expansionList.add(edition);
+                ScryfallExpansion edition = mapNodeToScryfallSet(node);
+                scryfallExpansionList.add(edition);
             }
             // Insertar lista de expansiones en la BD
-            expansionDAO.insertScryfallSet(expansionList);
+            expansionDAO.insertScryfallSet(scryfallExpansionList);
         } catch (IOException e){
             e.printStackTrace();
         }
@@ -115,8 +113,8 @@ public class ScryfallService {
         }
     }
 
-    private Expansion mapNodeToScryfallSet(JsonNode node){
-        Expansion set = new Expansion();
+    private ScryfallExpansion mapNodeToScryfallSet(JsonNode node){
+        ScryfallExpansion set = new ScryfallExpansion();
         set.setId(node.path("id").asLong());
         set.setCode(node.path("code").asText());
         set.setName(node.path("name").asText());

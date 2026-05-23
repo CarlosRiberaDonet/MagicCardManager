@@ -1,7 +1,6 @@
 package com.magic.investor_api.controller;
 
-import com.magic.investor_api.dao.ExpansionDAO;
-import com.magic.investor_api.model.Expansion;
+import com.magic.investor_api.model.ScryfallExpansion;
 import com.magic.investor_api.service.ExpansionService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,7 +19,8 @@ public class ExpansionController {
 
     // Obtiene lista con todas las expansiones de scryfall
     @GetMapping("/scryfall")
-    public List<Expansion> scryfallSets() {
+    public List<ScryfallExpansion> scryfallSets() {
         return expansionService.getExpansionListName();
     }
+
 }
