@@ -26,9 +26,6 @@ public class ScryfallCardDAO {
                                                    int size, int offset, boolean hideNA) {
 
         List<ScryfallCardDTO> cardListDTO = new ArrayList<>();
-        // =============================================
-        // CONSTRUCCIÓN DINÁMICA DE LA QUERY
-        // =============================================
         StringBuilder query = new StringBuilder(
                 "SELECT DISTINCT sc.id, sc.name, sc.printed_name, sc.lang, " +
                         "sc.image_url, sc.rarity, sc.set_name, " +
@@ -38,7 +35,7 @@ public class ScryfallCardDAO {
                         "WHERE 1=1"
         );
 
-        // Filtros de texto — solo si no son nulos ni vacíos
+        // Filtros
         if (name != null && !name.isEmpty()) query.append(" AND (sc.name LIKE ? OR sc.printed_name LIKE ?)");
         if (setCode  != null) query.append(" AND sc.set_code = ?");
         if (rarity   != null) query.append(" AND sc.rarity = ?");
@@ -49,23 +46,20 @@ public class ScryfallCardDAO {
         if (minPrice != null) query.append(" AND (price >= ? OR price = 0 OR price IS NULL)");
         if (maxPrice != null) query.append(" AND (price <= ? OR price = 0 OR price IS NULL)");
 
-        // Ordenación — por defecto sin orden específico
+        // Ordenación
         if ("price_asc".equals(orderBy))  query.append(" ORDER BY sc.price ASC");
         if ("price_desc".equals(orderBy)) query.append(" ORDER BY sc.price DESC");
         if ("name_asc".equals(orderBy))   query.append(" ORDER BY sc.name ASC");
         if ("name_desc".equals(orderBy))  query.append(" ORDER BY sc.name DESC");
         if (hideNA) query.append("AND price IS NOT NULL AND price > 0 ");
 
-        // Paginación siempre al final
+        // Paginación
         query.append(" LIMIT ? OFFSET ?");
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query.toString())) {
 
-            // =============================================
             // ASIGNACIÓN DE PARÁMETROS
-            // Deben ir en el mismo orden que los ? de la query
-            // =============================================
             int idx = 1;
 
             // Parámetros de texto
@@ -88,9 +82,7 @@ public class ScryfallCardDAO {
 
             ResultSet rs = stmt.executeQuery();
 
-            // =============================================
-            // MAPEO DEL RESULTADO A DTOs
-            // =============================================
+            // MAPEO EL RESULTADO A DTOs
             while (rs.next()) {
                 ScryfallCardDTO cardDTO = new ScryfallCardDTO();
                 cardDTO.setId(rs.getLong("id"));
@@ -264,4 +256,5 @@ public class ScryfallCardDAO {
         }
         return "";
     }
+
 }

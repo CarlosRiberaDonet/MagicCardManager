@@ -61,9 +61,9 @@ public class CardTraderAPI {
         }
     }
 
-    // Obtener cartas mediante su expansion
+    // Obtener cartas mediante su id de expansion
     public JsonNode getCardtraderCards(Long expansionId) {
-
+        System.out.println("Obteniendo cartas de la expansion: " + expansionId);
         String url = "https://api.cardtrader.com/api/v2/blueprints/export"
                 + "?expansion_id=" + expansionId;
 

@@ -28,7 +28,7 @@ import java.util.Map;
 public class ScryfallService {
 
     private final ScryfallAPI scryfallDownloader;
-    private final ScryfallRepository cardRepository;
+    private final ScryfallRepository ScryfallCardRepository;
     private final ExpansionDAO expansionDAO;
     private final ScryfallCardDAO scryfallCardDAO;
     private static final String path= System.getProperty("user.dir");
@@ -48,7 +48,7 @@ public class ScryfallService {
             Map.entry("zht", "language=11")
     );
 
-    // Insertar editions.json en la BD
+    // Insertar ediciones de scryfall json en la BD
     public void importScryfallEditionsToDB() {
         // Descarga JSON con las ediciones
         scryfallDownloader.getEditions();
@@ -69,7 +69,7 @@ public class ScryfallService {
         }
     }
 
-    // Inserta cards.json en la BDD
+    // Inserta cards de scryfall json en la BD
     public void importScryfallCardsToBD() throws IOException {
 
         // Descargar cartas de scryfall
@@ -98,7 +98,7 @@ public class ScryfallService {
 
                 // Cada 1000 cartas, vuelco a la BD
                 if (totalProcessed % 1000 == 0) {
-                    cardRepository.saveAll(batch);
+                    ScryfallCardRepository.saveAll(batch);
                     batch.clear();
                     System.out.println("Cartas en BD: " + totalProcessed);
                 }
@@ -106,7 +106,8 @@ public class ScryfallService {
 
             // Volcar las cartas que queden
             if (!batch.isEmpty()) {
-                cardRepository.saveAll(batch);
+                ScryfallCardRepository.saveAll(batch);
+                batch.clear();
             }
         } catch (IOException e){
             e.printStackTrace();
@@ -124,6 +125,7 @@ public class ScryfallService {
         return set;
     }
 
+    // Convierte JSON en objeto de tipo ScryfallCard
     private ScryfallCard mapNodeToScryfallCard(JsonNode node) {
         ScryfallCard card = new ScryfallCard();
 
@@ -159,7 +161,7 @@ public class ScryfallService {
         return card;
     }
 
-    // Método para extraer las imagen de la URL
+    // Extraer las imagen de la URL
     public String extractImageUrl(JsonNode node) {
         // Buscar la URL de la imagen en la raíz del JSON
         JsonNode imageUris = node.path("image_uris");
@@ -174,6 +176,7 @@ public class ScryfallService {
         return imageUris.path("normal").isMissingNode() ? null : imageUris.path("normal").asText();
     }
 
+    // Obtener URL de cardmarket
     public String buildCardmarketUrl(JsonNode node) {
         // Acceso seguro al nodo de la URL
         JsonNode cmNode = node.path("purchase_uris").path("cardmarket");
@@ -213,6 +216,7 @@ public class ScryfallService {
         return url;
     }
 
+    // Actualizar precios de la tabla scryfall_card a través de tabla card_price(cardmarket)
     public void updateScryfallPrices(){
         scryfallCardDAO.updateScryfallPrices();
     }
