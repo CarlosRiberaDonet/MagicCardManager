@@ -13,12 +13,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/scryfall")
 @RequiredArgsConstructor
-public class ScryfallSetController {
+public class ScryfallController {
 
     private final ScryfallService scryfallImportService;
 
-    // Descargar ediciones desde scryfall e importarlas a la BD
-    @PostMapping("/editions")
+    // Descargar ediciones desde scryfall
     public ResponseEntity<String> editions(){
         try{
             System.out.println("Proceso de descarga iniciado...");
@@ -45,7 +44,6 @@ public class ScryfallSetController {
 
     @PostMapping("update-prices")
     public void updatePrices(){
-
         scryfallImportService.updateScryfallPrices();
     }
 }

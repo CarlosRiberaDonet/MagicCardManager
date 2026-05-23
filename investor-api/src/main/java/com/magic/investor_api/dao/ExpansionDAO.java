@@ -23,7 +23,8 @@ public class ExpansionDAO {
     // Inserta las expansiones en la tabla scryfall_set
     public void insertScryfallSet(List<ScryfallExpansion> scryfallExpansionList) {
 
-        String INSERT_EXPANSION = "INSERT INTO scryfall_set(id, code, name, icon_svg_uri, released_at) " +
+        String INSERT_EXPANSION = "INSERT INTO scryfall_set(id, code, name, icon_svg_uri," +
+                " released_at) " +
                 "VALUES (?, ?, ?, ?, ?)";
         try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(INSERT_EXPANSION)){
             for(ScryfallExpansion e : scryfallExpansionList){
@@ -41,9 +42,10 @@ public class ExpansionDAO {
         }
     }
 
+    // Inserta las expansiones en la tabla card_trader_expansion
     public void insertCardtraderExpansion(List<CardtraderExpansion> cardtraderExpansions){
 
-        String query = " INSERT INTO card_trader_expansion (id, code, name) " +
+        String query = "INSERT INTO card_trader_expansion (id, code, name) " +
                 "VALUES (?, ?, ?)";
 
         try (Connection conn = dataSource.getConnection();
@@ -92,20 +94,20 @@ public class ExpansionDAO {
 
         String SELECT_EXPANSION = "SELECT id FROM card_trader_expansion";
 
-        List<Long> expansionList = new ArrayList<>();
+        List<Long> expansionListId = new ArrayList<>();
 
         try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(SELECT_EXPANSION)){
 
             ResultSet rs = stmt.executeQuery();
             while(rs.next()){
                 Long expansionId = rs.getLong("id");
-                expansionList.add(expansionId);
+                expansionListId.add(expansionId);
             }
         } catch (SQLException e){
             e.printStackTrace();
         }
 
-        return expansionList;
+        return expansionListId;
     }
 
     // Obtener progreso de la tabla sync_progress
@@ -149,27 +151,5 @@ public class ExpansionDAO {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    // Obtiene los nombres de las expansiones de la tabla card_trader_expansion
-    public List<ScryfallExpansion> selectExpansionList(){
-
-        String SELECT_EXPANSION = "SELECT code, name FROM scryfall_set ORDER BY name ASC";
-
-        List<ScryfallExpansion> scryfallExpansionList = new ArrayList<>();
-
-        try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(SELECT_EXPANSION)){
-
-            ResultSet rs = stmt.executeQuery();
-            while(rs.next()){
-                ScryfallExpansion e = new ScryfallExpansion();
-                e.setCode(rs.getString("code"));
-                e.setName(rs.getString("name"));
-                scryfallExpansionList.add(e);
-            }
-        } catch (SQLException e){
-            e.printStackTrace();
-        }
-        return scryfallExpansionList;
     }
 }

@@ -2,7 +2,6 @@ package com.magic.investor_api.controller;
 
 import com.magic.investor_api.API.CardTraderAPI;
 import com.magic.investor_api.service.CardTraderService;
-import com.magic.investor_api.service.ExpansionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,13 +11,12 @@ import org.springframework.web.bind.annotation.*;
 public class CardTraderController {
 
     private final CardTraderAPI cardTraderApi;
-    private final ExpansionService expansionService;
     private final CardTraderService cardTraderService;
 
-    // Método para descargar ediciones desde CardTrader
+    // Descargar ediciones desde CardTrader
     @GetMapping("/edition")
-    public void downloadEdition() {
-        expansionService.getScryfallExpansions();
+    public void downloadCardtradesExpanion() {
+        cardTraderService.downloadCardtraderExpansion();
     }
 
     // Obtener todas las cartas de cada expansión

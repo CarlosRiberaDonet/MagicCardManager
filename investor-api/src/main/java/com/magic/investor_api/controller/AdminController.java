@@ -18,7 +18,7 @@ public class AdminController {
         this.scheduledTask = scheduledTask;
     }
 
-    @PostMapping("/update")
+    @PostMapping("/updateDB")
     public ResponseEntity<String> forceUpdate() throws IOException {
         scheduledTask.updateBBDD();
         return ResponseEntity.ok("Actualización iniciada");

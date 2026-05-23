@@ -37,6 +37,10 @@ public class SchedulerTask {
     @Scheduled(cron = "0 0 6 * * *") // todos los días a las 6:00 AM
     public void updateBBDD() throws IOException {
 
+        // Descargar ediciones de scryfall
+        scryfallService.importScryfallEditionsToDB();
+        //Descargar ediciones de cardtrader
+
         // cardmarketDownloader.downloadGuidePrice();
 
         // cardmarketImportService.importGuidePricesToBD();
