@@ -39,6 +39,4 @@ public class CardService {
         return scryfallCardDAO.getScryfallCardById(cardId);
     }
 
-
-
 }

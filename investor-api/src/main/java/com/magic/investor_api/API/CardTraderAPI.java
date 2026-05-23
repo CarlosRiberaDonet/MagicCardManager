@@ -1,8 +1,10 @@
 package com.magic.investor_api.API;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.magic.investor_api.model.Expansion;
+import com.magic.investor_api.model.CardtraderExpansion;
+import com.magic.investor_api.model.ScryfallExpansion;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -24,7 +26,7 @@ public class CardTraderAPI {
     private final String apiToken = [REDACTED-SECRET];
 
     // Obtener lista de expansiones de CardTrader
-    public List<Expansion> getExpansions() {
+    public List<CardtraderExpansion> getExpansions() {
 
         String url = "https://api.cardtrader.com/api/v2/expansions";
 
@@ -46,7 +48,7 @@ public class CardTraderAPI {
 
             return mapper.readValue(
                     response.getBody(),
-                    new TypeReference<List<Expansion>>() {}
+                    new TypeReference<List<CardtraderExpansion>>() {}
             );
 
         } catch (Exception e) {
@@ -55,7 +57,7 @@ public class CardTraderAPI {
     }
 
     // Obtener cartas mediante su expansion
-    public String getCardtraderCards(Long expansionId) {
+    public JsonNode getCardtraderCards(Long expansionId) {
 
         String url = "https://api.cardtrader.com/api/v2/blueprints/export"
                 + "?expansion_id=" + expansionId;
@@ -73,7 +75,12 @@ public class CardTraderAPI {
                 String.class
         );
 
-        return response.getBody();
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            return mapper.readTree(response.getBody());
+        } catch (Exception e) {
+            throw new RuntimeException("Error parsing CardTrader response", e);
+        }
     }
 
     // Obtener cartas mediante id de cardtrader (blueprint)

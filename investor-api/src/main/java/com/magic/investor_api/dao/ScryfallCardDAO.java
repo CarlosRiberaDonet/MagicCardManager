@@ -247,4 +247,21 @@ public class ScryfallCardDAO {
         }
         return null;
     }
+
+    // Obtiene carta mediante cardId
+    public String getUrlCard(Long cardId){
+
+        String query = "SELECT url FROM scryfall_card WHERE id = ? ";
+        try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)){
+
+            stmt.setLong(1, cardId);
+            ResultSet rs = stmt.executeQuery();
+            if(rs.next()){
+                return rs.getString("url");
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        return "";
+    }
 }

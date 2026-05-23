@@ -1,18 +1,18 @@
 package com.magic.investor_api.model;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Expansion {
+public class CardtraderExpansion {
 
     private Long id;
     private String code;
     private String name;
-    private String iconSvgUri;
-    private LocalDate releasedAt;
+    private LocalDateTime updatedAt;
 
-   // GETTERS Y SETTERS
+    // GETTERS Y SETTERS
 
     public Long getId() {
         return id;
@@ -38,19 +38,21 @@ public class Expansion {
         this.name = name;
     }
 
-    public String getIconSvgUri() {
-        return iconSvgUri;
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
     }
 
-    public void setIconSvgUri(String iconSvgUri) {
-        this.iconSvgUri = iconSvgUri;
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
-    public LocalDate getReleasedAt() {
-        return releasedAt;
-    }
-
-    public void setReleasedAt(LocalDate releasedAt) {
-        this.releasedAt = releasedAt;
+    @Override
+    public String toString() {
+        return "CardtraderExpansion{" +
+                "id=" + id +
+                ", code='" + code + '\'' +
+                ", name='" + name + '\'' +
+                ", updatedAt=" + updatedAt +
+                '}';
     }
 }

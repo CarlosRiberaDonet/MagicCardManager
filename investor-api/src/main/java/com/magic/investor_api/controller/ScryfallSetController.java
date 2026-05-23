@@ -1,7 +1,6 @@
 package com.magic.investor_api.controller;
 
 
-import com.magic.investor_api.API.ScryfallAPI;
 import com.magic.investor_api.service.ScryfallService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,10 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/scryfall")
 @RequiredArgsConstructor
-public class ScryfallController {
+public class ScryfallSetController {
 
     private final ScryfallService scryfallImportService;
-
 
     // Descargar ediciones desde scryfall e importarlas a la BD
     @PostMapping("/editions")
@@ -50,24 +48,4 @@ public class ScryfallController {
 
         scryfallImportService.updateScryfallPrices();
     }
-
-    // Volcar JSON a BD
-    /*@PostMapping("/sync")
-    public ResponseEntity<String> importJsonToDB(){
-        try {
-            System.out.println("Iniciando procesado de JSON a BD...");
-
-            scryfallImportService.importScryfallCardsToBD();
-
-            System.out.println("¡Proceso total finalizado con éxito!");
-
-        } catch (Exception e) {
-            System.err.println("Error en el proceso: " + e.getMessage());
-            System.out.println("Erro en ScryfallController importJsonToDB:");
-            e.printStackTrace();
-        }
-        return ResponseEntity.ok("Base de datos actualizada.");
-    }*/
-
-
 }
