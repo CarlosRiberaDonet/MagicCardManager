@@ -256,5 +256,15 @@ public class ScryfallCardDAO {
         }
         return "";
     }
+    // Borra los datos de la tabla scryfall_card
+    public void truncateScryfallCard(){
+        String query = "TRUNCATE TABLE scryfall_card";
 
+        try(Connection conn = dataSource.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(query)){
+            stmt.executeUpdate();
+        }catch (SQLException e){
+            throw new RuntimeException(e);
+        }
+    }
 }
