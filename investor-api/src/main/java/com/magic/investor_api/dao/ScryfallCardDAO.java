@@ -100,7 +100,7 @@ public class ScryfallCardDAO {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         return cardListDTO;
@@ -121,7 +121,7 @@ public class ScryfallCardDAO {
             System.out.println("Precios actualizados: " + filasAfectadas);
 
         }catch(SQLException e){
-            e.printStackTrace();
+            e.throw new RuntimeException(e);
         }
     }
 
@@ -174,7 +174,7 @@ public class ScryfallCardDAO {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         return 0;
@@ -235,7 +235,7 @@ public class ScryfallCardDAO {
                 return card;
             }
         }catch (SQLException e){
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return null;
     }
@@ -252,10 +252,11 @@ public class ScryfallCardDAO {
                 return rs.getString("url");
             }
         }catch (SQLException e){
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return "";
     }
+
     // Borra los datos de la tabla scryfall_card
     public void truncateScryfallCard(){
         String query = "TRUNCATE TABLE scryfall_card";
@@ -266,5 +267,23 @@ public class ScryfallCardDAO {
         }catch (SQLException e){
             throw new RuntimeException(e);
         }
+    }
+
+    // Obtiene todos los scryfall_id
+    public List<String> getScryfallIdList(){
+        List<String> scryfallIdList = new ArrayList<>();
+        String query = "SELECT ct.cardtrader_id FROM cardtrader_card ct " +
+                "WHERE EXISTS (SELECT 1 ";
+        try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)){
+
+            ResultSet rs = stmt.executeQuery();
+            while(rs.next()){
+                String id = rs.getString("scryfall_id");
+                scryfallIdList.add(id);
+            }
+        }catch (SQLException e){
+            throw new RuntimeException(e);
+        }
+        return scryfallIdList;
     }
 }
