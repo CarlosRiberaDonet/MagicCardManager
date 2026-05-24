@@ -32,6 +32,7 @@ public class CardmarketService {
     private ObjectMapper objectMapper = new ObjectMapper();
     private final String basePath = System.getProperty("user.dir");
 
+    // Importar precios de JSON carmarket a card_price
     public void importGuidePricesToBD() throws IOException {
 
         CardPriceMapper cardPriceMapper = new CardPriceMapper();

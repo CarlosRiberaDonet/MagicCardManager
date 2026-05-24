@@ -7,7 +7,6 @@ import com.magic.investor_api.model.CardtraderCard;
 import com.magic.investor_api.repository.CardtraderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,35 +21,41 @@ public class CardTraderService {
 
     // Obtiene lista de expansiones de la API cardtrader
     public void downloadCardtraderExpansion(){
-        // Inserto la lista obtenida en la BD
+        // Obtengo lista de expansiones de cardtrader y la inserto en la BD
         expansionDAO.insertCardtraderExpansion(cardTraderAPI.getExpansions());
     }
 
     // Obtiene todas las cartas de las expansiones
     public void cardsByExpansion() {
+        List<CardtraderCard> batch = new ArrayList<>();
+        // CheckPoint de la última expansión procesada
+        Long lastExpansionProcessed = expansionDAO.getLastExpansionId();
         // Lista con ids de card_trader_expansion
         List<Long> expansionList = expansionDAO.getExpansionListId();
-        List<CardtraderCard> batch = new ArrayList<>();
 
-        for (Long expansionId : expansionList) {
+        for(Long e : expansionList){
+            try{
+                // Obtiene todas las cartas de cada expansión
+                JsonNode root = cardTraderAPI.getCardtraderCards(e);
 
-            // Obtiene todas las cartas de cada expansión
-            JsonNode root = cardTraderAPI.getCardtraderCards(expansionId);
-            System.out.println(root.toPrettyString());
-            if (root == null || root.isMissingNode() || !root.isArray()) {
-                return;
+                if (root == null || root.isMissingNode() || !root.isArray()) {
+                    continue;
+                }
+                // Iteración de cartas dentro de la expansión
+                for (JsonNode node : root) {
+                    // Mapeo los datos obtenidos del JSON a objeto CardtraderCard
+                    batch.add(mapNodeToCardtraderCard(node)); // Agrego la carta al batch
+                }
+                // Vuelco el batch a la tabla cardtrader_card
+                if (!batch.isEmpty()) {
+                    cardtraderRepository.saveAll(batch);
+                    System.out.println("Expansión: " + e + " Añadida. Cartas: " + batch.size());
+                    batch.clear();
+                    expansionDAO.updateLastExpansionId(e);
+                }
+            }catch (Exception ex){
+                ex.printStackTrace();
             }
-
-            // Iteración de cartas dentro de la expansión
-            for (JsonNode node : root) {
-               // Mapeo los datos obtenidos del JSON a objeto CardtraderCard
-                batch.add(mapNodeToCardtraderCard(node)); // Agrego la carta al batch
-            }
-            // Vuelco el batch a la tabla cardtrader_card
-            cardtraderRepository.saveAll(batch);
-            System.out.println("Expansión: " + batch.getFirst().getExpansionId() + " Añadida.");
-            batch.clear();
-            break;
         }
     }
 

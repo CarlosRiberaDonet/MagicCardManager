@@ -92,7 +92,7 @@ public class ExpansionDAO {
     // Obtiene los id de las expansiones de la tabla card_trader_expansion
     public List<Long> getExpansionListId(){
 
-        String SELECT_EXPANSION = "SELECT id FROM card_trader_expansion";
+        String SELECT_EXPANSION = "SELECT id FROM card_trader_expansion ORDER BY id ASC";
 
         List<Long> expansionListId = new ArrayList<>();
 
@@ -115,12 +115,10 @@ public class ExpansionDAO {
     // las cartas de cardtrader
     public Long getLastExpansionId() {
 
-        String sql = "SELECT last_expansion_id FROM sync_progress WHERE process_name = ?";
+        String sql = "SELECT last_expansion_id FROM sync_progress";
 
         try (Connection conn = dataSource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, "sync_progress");
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             ResultSet rs = stmt.executeQuery();
 
@@ -138,14 +136,13 @@ public class ExpansionDAO {
     // Actualiza el checkpoint de la tabla sync_progress
     public void updateLastExpansionId(Long id) {
 
-        String sql = "UPDATE sync_progress SET last_expansion_id = ? WHERE process_name = ?";
+        String sql = "UPDATE sync_progress SET last_expansion_id = ? WHERE code_expansion = ?";
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setLong(1, id);
-            stmt.setString(2, "sync_progress");
-
+            stmt.setString(2, "card_variant_sync");
             stmt.executeUpdate();
 
         } catch (SQLException e) {
