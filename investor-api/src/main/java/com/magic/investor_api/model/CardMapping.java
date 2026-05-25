@@ -12,16 +12,16 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CardMapping {
 
-    @id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "scryfall_card_id")
+    @Column(name = "scryfall_id")
     private String scryfallId;
 
-    @Column(name = "carmarket_card_id")
+    @Column(name = "cardmarket_id")
     private Long cardmarketId;
 
-    @Column(name = "cardtrader_card_id")
+    @Column(name = "cardtrader_id")
     private Long cardtraderId;
 }

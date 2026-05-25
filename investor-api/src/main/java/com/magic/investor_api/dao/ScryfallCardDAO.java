@@ -121,7 +121,7 @@ public class ScryfallCardDAO {
             System.out.println("Precios actualizados: " + filasAfectadas);
 
         }catch(SQLException e){
-            e.throw new RuntimeException(e);
+            throw new RuntimeException(e);
         }
     }
 

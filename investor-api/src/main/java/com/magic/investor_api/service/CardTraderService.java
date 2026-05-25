@@ -2,6 +2,8 @@ package com.magic.investor_api.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.magic.investor_api.API.CardTraderAPI;
+import com.magic.investor_api.dao.CardMappingDAO;
+import com.magic.investor_api.dao.CardtraderDAO;
 import com.magic.investor_api.dao.ExpansionDAO;
 import com.magic.investor_api.model.CardtraderCard;
 import com.magic.investor_api.repository.CardtraderRepository;
@@ -17,6 +19,8 @@ public class CardTraderService {
     private final CardTraderAPI cardTraderAPI;
     private final CardtraderRepository cardtraderRepository;
     private final ExpansionDAO expansionDAO;
+    private final CardtraderDAO cardtraderDAO;
+    private final CardMappingDAO cardMappingDAO;
 
 
     // Obtiene lista de expansiones de la API cardtrader
@@ -28,9 +32,7 @@ public class CardTraderService {
     // Obtiene todas las cartas de las expansiones
     public void cardsByExpansion() {
         List<CardtraderCard> batch = new ArrayList<>();
-        // CheckPoint de la última expansión procesada
-        Long lastExpansionProcessed = expansionDAO.getLastExpansionId();
-        // Lista con ids de card_trader_expansion
+        // Lista de id de expansiones de card_trader_expansion
         List<Long> expansionList = expansionDAO.getExpansionListId();
 
         for(Long e : expansionList){
@@ -44,12 +46,12 @@ public class CardTraderService {
                 // Iteración de cartas dentro de la expansión
                 for (JsonNode node : root) {
                     // Mapeo los datos obtenidos del JSON a objeto CardtraderCard
+                    System.out.println(node);
                     batch.add(mapNodeToCardtraderCard(node)); // Agrego la carta al batch
                 }
                 // Vuelco el batch a la tabla cardtrader_card
                 if (!batch.isEmpty()) {
                     cardtraderRepository.saveAll(batch);
-                    System.out.println("Expansión: " + e + " Añadida. Cartas: " + batch.size());
                     batch.clear();
                     expansionDAO.updateLastExpansionId(e);
                 }
@@ -59,26 +61,25 @@ public class CardTraderService {
         }
     }
 
-    // Mapea JSON a CardtraderCard
+    // Mapea JSON de cartas a CardtraderCard
     private CardtraderCard mapNodeToCardtraderCard(JsonNode node){
-        System.out.println("Mapeando carta: " + node.path("name").asText());
         CardtraderCard card = new CardtraderCard();
         // IDENTIFICADORES PRINCIPALES
-        card.setCardtraderId(node.path("id").asLong());
+        card.setScryfallId(node.path("scryfall_id").asText());
         JsonNode cm = node.path("card_market_ids");
         Long cardmarketId = (cm.isArray() && cm.size() > 0)
                 ? cm.get(0).asLong()
                 : null;
         card.setCardmarketId(cardmarketId);
-        card.setScryfallId(node.path("scryfall_id").asText());
+        card.setCardtraderId(node.path("id").asLong());
 
-        card.setExpansionId(node.path("expansion_id").asLong());
         card.setName(node.path("name").asText());
-        card.setImageUrl(node.path("image_url").asText());
         card.setRarity(node.path("fixed_properties").path("mtg_rarity").asText());
+        card.setExpansionId(node.path("expansion_id").asLong());
         card.setCollectorNumber(node.path("fixed_properties").path("collector_number").asText());
-        card.setVersion(node.path("version").asText());
 
+        // El nombre y código de la edición lo añadiré desde un JOIN en la BD
+        // Ya que no vienen en la respuesta de la API
         return card;
     }
 }

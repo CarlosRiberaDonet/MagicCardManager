@@ -25,21 +25,21 @@ public class CardtraderCard {
     @Column(name = "scryfall_id")
     private String scryfallId;
 
-    @Column(name = "expansion_id")
-    private Long expansionId;
-
     @Column(name = "name")
     private String name;
-
-    @Column(name = "image_url")
-    private String imageUrl;
 
     @Column(name = "rarity")
     private String rarity;
 
+    @Column(name = "expansion_id")
+    private Long expansionId;
+
+    @Column(name = "set_name")
+    private String setName;
+
+    @Column(name = "set_code")
+    private String setCode;
+
     @Column(name = "collector_number")
     private String collectorNumber;
-
-    @Column(name = "version")
-    private String version;
 }
