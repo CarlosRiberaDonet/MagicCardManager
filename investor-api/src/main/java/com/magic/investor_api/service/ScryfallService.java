@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.magic.investor_api.API.ScryfallAPI;
 import com.magic.investor_api.dao.ExpansionDAO;
 import com.magic.investor_api.dao.ScryfallCardDAO;
-import com.magic.investor_api.model.ScryfallExpansion;
+import com.magic.investor_api.model.ScryfallSet;
 import com.magic.investor_api.model.ScryfallCard;
 import com.magic.investor_api.repository.ScryfallRepository;
 import lombok.RequiredArgsConstructor;
@@ -55,11 +55,11 @@ public class ScryfallService {
         String EDITIONS = path + "/src/main/resources/editions.json";
         try{
             InputStream input = new FileInputStream(EDITIONS);
-            List<ScryfallExpansion> scryfallExpansionList = new ArrayList<>();
+            List<ScryfallSet> scryfallExpansionList = new ArrayList<>();
             JsonNode root = objectMapper.readTree(input);
             JsonNode data = root.get("data");
             for(JsonNode node : data){
-                ScryfallExpansion edition = mapNodeToScryfallSet(node);
+                ScryfallSet edition = mapNodeToScryfallSet(node);
                 scryfallExpansionList.add(edition);
             }
             // Insertar lista de expansiones en la BD
@@ -117,10 +117,10 @@ public class ScryfallService {
         }
     }
 
-    private ScryfallExpansion mapNodeToScryfallSet(JsonNode node){
-        ScryfallExpansion set = new ScryfallExpansion();
-        set.setId(node.path("id").asLong());
-        set.setCode(node.path("code").asText());
+    private ScryfallSet mapNodeToScryfallSet(JsonNode node){
+        ScryfallSet set = new ScryfallSet();
+
+        set.setSetCode(node.path("code").asText());
         set.setName(node.path("name").asText());
         set.setIconSvgUri(node.path("icon_svg_uri").asText());
         String releasedAtStr = node.path("released_at").asText();

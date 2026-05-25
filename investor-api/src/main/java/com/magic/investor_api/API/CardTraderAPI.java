@@ -3,8 +3,7 @@ package com.magic.investor_api.API;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.magic.investor_api.model.CardtraderExpansion;
-import com.magic.investor_api.model.ScryfallExpansion;
+import com.magic.investor_api.model.CardtraderSet;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -31,7 +30,7 @@ public class CardTraderAPI {
             "Uu51Wc-ku3TePnhGJ2u1_qcS5R2Rw-NKxWdtS9lTELhxxEVxkfe85Zji5VFiWISTZlNcWIIOPU-Wqdh8nS4q8mAdJzN6wKzTy2jVtbVw";
 
     // Obtener lista de expansiones de CardTrader
-    public List<CardtraderExpansion> getExpansions() {
+    public List<CardtraderSet> getExpansions() {
 
         String url = "https://api.cardtrader.com/api/v2/expansions";
 
@@ -53,7 +52,7 @@ public class CardTraderAPI {
 
             return mapper.readValue(
                     response.getBody(),
-                    new TypeReference<List<CardtraderExpansion>>() {}
+                    new TypeReference<List<CardtraderSet>>() {}
             );
 
         } catch (Exception e) {
