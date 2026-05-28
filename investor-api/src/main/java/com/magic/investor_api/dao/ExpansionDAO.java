@@ -40,7 +40,7 @@ public class ExpansionDAO {
     // Inserta las expansiones en la tabla cardtrader_set
     public void insertCardtraderExpansion(List<CardtraderSet> cardtraderExpansions){
 
-        String query = "INSERT INTO cardtrader_set (id, code, name) " +
+        String query = "INSERT INTO cardtrader_set(id, code, name) " +
                 "VALUES (?, ?, ?)";
 
         try (Connection conn = dataSource.getConnection();
@@ -65,7 +65,7 @@ public class ExpansionDAO {
     // Obtiene los nombres de las expansiones de la tabla scryfall_set
     public List<ScryfallSet> selectScryfallExpansionList(){
 
-        String SELECT_EXPANSION = "SELECT code, name FROM scryfall_set ORDER BY name ASC";
+        String SELECT_EXPANSION = "SELECT set_code, name FROM scryfall_set ORDER BY name ASC";
 
         List<ScryfallSet> scryfallExpansionList = new ArrayList<>();
 
@@ -74,7 +74,7 @@ public class ExpansionDAO {
             ResultSet rs = stmt.executeQuery();
             while(rs.next()){
                 ScryfallSet e = new ScryfallSet();
-                e.setSetCode(rs.getString("code"));
+                e.setSetCode(rs.getString("set_code"));
                 e.setName(rs.getString("name"));
                 scryfallExpansionList.add(e);
             }

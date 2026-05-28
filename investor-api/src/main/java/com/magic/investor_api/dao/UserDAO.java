@@ -296,7 +296,7 @@ public class UserDAO {
                 "s.icon_svg_uri " +
                 "FROM user_collection uc " +
                 "JOIN scryfall_card sc ON uc.card_id = sc.id " +
-                "JOIN scryfall_set s ON sc.set_code = s.code " +
+                "JOIN scryfall_set s ON sc.set_code = s.set_code " +
                 "JOIN card_price cp ON cp.cardmarket_id = sc.cardmarket_id " +
                 "WHERE user_id = ?";
 

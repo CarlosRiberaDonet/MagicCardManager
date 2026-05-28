@@ -32,47 +32,48 @@ public class SchedulerTask {
     public void updateBBDD() throws IOException {
 
         //1. Inserta en la BBD las ediciones de scryfall
-        /*scryfallService.importScryfallEditionsToDB();
+        //scryfallService.importScryfallEditionsToDB();
 
         //2. Inserta en la BBD el JSON de cartas de scryfall
-        scryfallService.importScryfallCardsToBD();
+        //scryfallService.importScryfallCardsToBD();
 
         //3. Descargar ediciones de cardtrader
-        cardTraderService.downloadCardtraderExpansion();
+        //cardTraderService.downloadCardtraderExpansion();
 
         //4. Descargar cartas de cardtrader por número de edición
-        cardTraderService.cardsByExpansion();
+        //cardTraderService.cardsByExpansion();
 
         //5. Mapear campos set_name/set_code a cardtrader_card
-        cardMappingService.mapCardtraderSets();
+        //cardMappingService.mapCardtraderSets();
 
-        //6. Mapear cardtrader_card desde scryfall_card
-        cardMappingService.updateCardmarketIdOnCardtraderCard()
+        ////////////////////////////////////////////////////////////////////
+        // ** Comienza entity resolution por propagación iterativa de IDs **
+        ////////////////////////////////////////////////////////////////////
+        //6. Mapear scryfall_card desde cardtrader_card
+        // cardMappingService.mapScryfallCard();
 
-        //7. Mapear scryfall_card desde cardtrader_card
-        cardMappingService.mapScryfallCard();
+        //7. Mapear cardmarket_id desde scryfall_card
+        // cardMappingService.mapCardtraderCard();
 
-        //8. Insertar scryfall_id en card_mapping
-        cardMappingService.insertScryfallId();
+        //8. Inserto scryfall_id en card_mapping
+        // cardMappingService.insertScryfallId();
 
-        //9. Mapeo cardmarket_id desde scryfall_card
-        cardMappingService.mapCards();
+        //9. Relaciono scryfall_card con cardtrader_card mediante cardmarket_id en card_mapping
+        // cardMappingService.mapCardmarketIdFromScryfallToCardMapping();
 
-        //10. Mapeo cardmarket_id desde cardtrader
-        cardMappingService.mapCardmarketCards
+        //10. Relaciono cardtrader_card con scryfall_card mediante cardmarket_id en card_mapping
+        // cardMappingService.mapCardmarketIdFromCardtraderCardToCardMapping();
 
-        //11. cierre por CardMarket puente
-        cardMappingService.
-        //13. Descargar JSON con guia de precios de cardmarket
+        //11. Cierre por CardMarket puente (grafo de identidades con propagación bidireccional)
+        // cardMappingService.lastJoin();
+
+        //12. Descargar JSON con guia de precios de cardmarket
         cardmarketDownloader.downloadGuidePrice();
 
-        //14. Importa precios de JSON cardmarket a BD
+        //13. Importa precios de JSON cardmarket a BD
         cardmarketService.importGuidePricesToBD();
 
-        //15. scryfallCardDAO.updateScryfallPrices();*/
-
-        // Comienza entity resolution por propagación iterativa de IDs
-        //16. cierre por CardMarket puente (grafo de identidades con propagación bidireccional)
-        cardMappingService.lastJoin();
+        //14. Actualizo precios en scryfall_card desde card_price
+        scryfallService.updateScryfallPrices();
     }
 }

@@ -73,15 +73,12 @@ public class ScryfallService {
     public void importScryfallCardsToBD() throws IOException {
 
         // Descargar cartas de scryfall
-        scryfallDownloader.downloadCards();
+        // scryfallDownloader.downloadCards();
         String CARDS = path + "/src/main/resources/cards.json";
 
         InputStream input = new FileInputStream(CARDS);
-
         JsonFactory factory = new JsonFactory();
 
-        // Borro datos de la tabla scryfall_card
-        scryfallCardDAO.truncateScryfallCard();
         try (JsonParser parser = factory.createParser(input)) {
 
             if (parser.nextToken() != JsonToken.START_ARRAY) {

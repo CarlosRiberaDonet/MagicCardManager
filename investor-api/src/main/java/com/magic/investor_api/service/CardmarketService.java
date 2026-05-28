@@ -90,6 +90,4 @@ public class CardmarketService {
             cardPriceRepository.saveAll(batch);
         }
     }
-
-
 }

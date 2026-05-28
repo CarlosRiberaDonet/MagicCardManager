@@ -40,7 +40,7 @@ public class CardTraderService {
                 // Obtiene todas las cartas de cada expansión
                 JsonNode root = cardTraderAPI.getCardtraderCards(e);
 
-                if (root == null || root.isMissingNode() || !root.isArray()) {
+                if (root == null || root.isEmpty() || root.isMissingNode() || !root.isArray())  {
                     continue;
                 }
                 // Iteración de cartas dentro de la expansión
