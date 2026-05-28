@@ -1,13 +1,19 @@
 package com.magic.investor_api.controller;
 
 
+import com.magic.investor_api.dao.ExpansionDAO;
+import com.magic.investor_api.model.ScryfallSet;
 import com.magic.investor_api.service.ScryfallService;
+import com.magic.investor_api.service.SetService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 
 @RestController
@@ -16,8 +22,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class ScryfallController {
 
     private final ScryfallService scryfallImportService;
+    private final SetService setService;
 
     // Descargar ediciones desde scryfall
+    @PostMapping("/editions")
     public ResponseEntity<String> editions(){
         try{
             System.out.println("Proceso de descarga iniciado...");
@@ -42,8 +50,15 @@ public class ScryfallController {
         }
     }
 
-    @PostMapping("update-prices")
+    // Actualizar precios de la tabla scryfall_card
+    @PostMapping("/update-prices")
     public void updatePrices(){
         scryfallImportService.updateScryfallPrices();
+    }
+
+    // Obtiene expansiones de scryfall_set
+    @GetMapping("/sets")
+    public List<ScryfallSet> getSetsList(){
+        return setService.getSets();
     }
 }

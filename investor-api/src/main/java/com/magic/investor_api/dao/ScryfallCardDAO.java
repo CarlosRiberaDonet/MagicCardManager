@@ -31,7 +31,7 @@ public class ScryfallCardDAO {
                         "sc.image_url, sc.rarity, sc.set_name, " +
                         "sc.collector_number, sc.cardmarket_url, sc.price, s.icon_svg_uri " +
                         "FROM scryfall_card sc " +
-                        "JOIN scryfall_set s ON sc.set_code = s.code " +
+                        "JOIN scryfall_set s ON sc.set_code = s.set_code " +
                         "WHERE 1=1"
         );
 
@@ -45,13 +45,13 @@ public class ScryfallCardDAO {
         // Filtros de precio
         if (minPrice != null) query.append(" AND (price >= ? OR price = 0 OR price IS NULL)");
         if (maxPrice != null) query.append(" AND (price <= ? OR price = 0 OR price IS NULL)");
+        if (hideNA) query.append(" AND price IS NOT NULL AND price > 0"); // ← antes del ORDER BY
 
         // Ordenación
         if ("price_asc".equals(orderBy))  query.append(" ORDER BY sc.price ASC");
         if ("price_desc".equals(orderBy)) query.append(" ORDER BY sc.price DESC");
         if ("name_asc".equals(orderBy))   query.append(" ORDER BY sc.name ASC");
         if ("name_desc".equals(orderBy))  query.append(" ORDER BY sc.name DESC");
-        if (hideNA) query.append("AND price IS NOT NULL AND price > 0 ");
 
         // Paginación
         query.append(" LIMIT ? OFFSET ?");
