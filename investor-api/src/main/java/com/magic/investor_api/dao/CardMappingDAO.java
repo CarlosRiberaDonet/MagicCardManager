@@ -14,7 +14,7 @@ public class CardMappingDAO {
     private DataSource dataSource;
 
     // Inserto scryfall_id de scryfall_card en card_mapping
-    public void updateScryfallIdOnCardTraderCard(){
+    public void initializeCardMapping(){
         String query = "INSERT INTO card_mapping (scryfall_id) " +
                 "SELECT scryfall_id FROM scryfall_card";
         try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)){
@@ -110,7 +110,7 @@ public class CardMappingDAO {
                 "JOIN scryfall_card sc " +
                 "ON ct.cardmarket_id = sc.cardmarket_id " +
                 "SET ct.scryfall_id = COALESCE(ct.scryfall_id, sc.scryfall_id) " +
-                "WHERE ct.cardmarket_id IS NOT NULL;";
+                "WHERE ct.cardmarket_id IS NOT NULL AND ct.scryfall_id IS NULL";
         try (Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
 
             int filasAfectadas = stmt.executeUpdate();
@@ -128,7 +128,7 @@ public class CardMappingDAO {
                 "JOIN cardtrader_card ct " +
                 "ON ct.cardmarket_id = sc.cardmarket_id " +
                 "SET sc.scryfall_id = COALESCE(sc.scryfall_id, ct.scryfall_id) " +
-                "WHERE sc.cardmarket_id IS NOT NULL;";
+                "WHERE sc.cardmarket_id IS NOT NULL AND sc.scryfall_id IS NULL";
         try (Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
 
             int filasAfectadas = stmt.executeUpdate();
@@ -139,5 +139,4 @@ public class CardMappingDAO {
             throw new RuntimeException(e);
         }
     }
-
 }

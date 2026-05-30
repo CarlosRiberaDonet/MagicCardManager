@@ -17,6 +17,7 @@ public class CardService {
         this.scryfallCardDAO = cardDAO;
     }
 
+    // Obtiene lista de cartas filtradas
     // Obtiene lista de cartas mediante su nombre
     public CardPageDTO searchCards(String name, String setCode, String rarity, String lang,
                                    String typeLine, String orderBy, Double minPrice, Double maxPrice,
@@ -25,7 +26,7 @@ public class CardService {
         // Calcula la fila de inicio según la página — ej: página 2 con 20 resultados empieza en la fila 20
         int offset = (page - 1) * size;
         // Total de cartas que coinciden con la búsqueda
-        int totalCards = scryfallCardDAO.countCardsByName(name, setCode, rarity, lang, typeLine, minPrice, maxPrice, hideNA);
+        int totalCards = scryfallCardDAO.countCardsByFilter(name, setCode, rarity, lang, typeLine, minPrice, maxPrice, hideNA);
         // Busco la carta mediante su nombre
         List<ScryfallCardDTO> cardListDTO = scryfallCardDAO.selectFiltersCard(name, setCode, rarity,
                 lang, typeLine, orderBy, minPrice, maxPrice, size, offset, hideNA);

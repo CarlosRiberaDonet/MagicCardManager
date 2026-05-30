@@ -21,12 +21,12 @@ public class CardPageDTO {
 
     // GETTERS Y  SETTERS
 
-    public List<ScryfallCardDTO> getCardDTOList() {
-        return cardDTOList;
+    public int getTotalCards() {
+        return totalCards;
     }
 
-    public void setCardDTOList(List<ScryfallCardDTO> cardDTOList) {
-        this.cardDTOList = cardDTOList;
+    public void setTotalCards(int totalCards) {
+        this.totalCards = totalCards;
     }
 
     public int getPage() {
@@ -37,11 +37,11 @@ public class CardPageDTO {
         this.page = page;
     }
 
-    public int getTotalCards() {
-        return totalCards;
+    public List<ScryfallCardDTO> getCardDTOList() {
+        return cardDTOList;
     }
 
-    public void setTotalCards(int totalCards) {
-        this.totalCards = totalCards;
+    public void setCardDTOList(List<ScryfallCardDTO> cardDTOList) {
+        this.cardDTOList = cardDTOList;
     }
 }

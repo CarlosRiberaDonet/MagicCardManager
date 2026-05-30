@@ -30,7 +30,7 @@ public class CardMappingService {
 
     // Inserto scryfall_id de scryfall_card en card_mapping
     public void insertScryfallId(){
-        cardMappingDAO.updateScryfallIdOnCardTraderCard();
+        cardMappingDAO.initializeCardMapping();
     }
 
     // Relaciono scryfall_card con cardtrader_card mediante cardmarket_id en card_mapping

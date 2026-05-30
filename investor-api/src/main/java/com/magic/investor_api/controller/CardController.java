@@ -16,7 +16,7 @@ public class CardController {
         this.cardService = cardService;
     }
 
-    // Buscar carta por nombre
+    // Buscar carta por añadiendo filtros
     @GetMapping("/search")
     public CardPageDTO searchCards(
             @RequestParam(required = false) String name,
@@ -27,10 +27,11 @@ public class CardController {
             @RequestParam(required = false) Double minPrice, // Precio mínimo
             @RequestParam(required = false) Double maxPrice, // Precio máximo
             @RequestParam(required = false) String orderBy,   // "price_asc" o "price_desc"
-            @RequestParam(required = false) boolean hideNA, // false -> muestra cartas con precio N/A, true oculta
+            @RequestParam(required = false, defaultValue = "false") boolean hideNA, // false -> muestra cartas con precio N/A, true oculta
             @RequestParam int page,
             @RequestParam int size
-    ) {
+    )
+    {
         return cardService.searchCards(name, setCode, rarity, lang, typeLine, orderBy,
                 minPrice, maxPrice, page, size, hideNA);
     }

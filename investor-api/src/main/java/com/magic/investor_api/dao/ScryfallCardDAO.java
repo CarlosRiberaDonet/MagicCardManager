@@ -20,6 +20,8 @@ public class ScryfallCardDAO {
 
     // Busca cartas aplicando filtros opcionales: nombre, set, rareza, idioma, tipo y precio.
     // Todos los parámetros son opcionales excepto size y offset.
+    // Busca cartas aplicando filtros opcionales: nombre, set, rareza, idioma, tipo y precio.
+    // Todos los parámetros son opcionales excepto size y offset.
     public List<ScryfallCardDTO> selectFiltersCard(String name, String setCode, String rarity,
                                                    String lang, String typeLine, String orderBy,
                                                    Double minPrice, Double maxPrice,
@@ -128,8 +130,8 @@ public class ScryfallCardDAO {
     // Cuenta el total de cartas que coinciden con los filtros opcionales.
     // Se usa para calcular el número de páginas en la paginación.
     // NOTA: orderBy no se incluye aquí porque ORDER BY no afecta al COUNT
-    public int countCardsByName(String name, String setCode, String rarity, String lang,
-                                String typeLine, Double minPrice, Double maxPrice, boolean hideNA) {
+    public int countCardsByFilter(String name, String setCode, String rarity, String lang,
+                                  String typeLine, Double minPrice, Double maxPrice, boolean hideNA) {
 
         // Construimos la query dinámicamente según los filtros recibidos
         StringBuilder query = new StringBuilder(
