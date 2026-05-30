@@ -2,15 +2,14 @@ package com.magic.investor_api.dto;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.magic.investor_api.model.CardPrice;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 @JsonPropertyOrder({
         "id",
         "cardmarketId",
+        "scryfall_id",
         "name",
         "lang",
         "imageUrl",
@@ -33,6 +32,8 @@ import java.time.LocalDate;
 })
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class ScryfallCardDTO {
 
     private Long id;
