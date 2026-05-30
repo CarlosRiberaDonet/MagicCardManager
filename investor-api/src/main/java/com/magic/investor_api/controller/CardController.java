@@ -39,7 +39,6 @@ public class CardController {
     // Buscar carta por id
     @GetMapping("id")
     public ScryfallCardDTO searchCardById(@RequestParam Long cardId){
-
         return cardService.getCardById(cardId);
     }
 }

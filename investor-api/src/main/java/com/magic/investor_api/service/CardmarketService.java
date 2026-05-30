@@ -82,7 +82,6 @@ public class CardmarketService {
                 // Guardamos los últimos elementos que queden en batch
                 if (!batch.isEmpty()) {
                     cardPriceRepository.saveAll(batch);
-                    System.out.println("📦 Cartas en BD (resto final)");
                 }
             }
         }

@@ -344,10 +344,6 @@ public class UserDAO {
             e.printStackTrace();
         }
 
-        for(UserCollectionDTO u : userCollectionDTO){
-            System.out.println("MI COLECCION: " + u.toString());
-        }
-
         return userCollectionDTO;
     }
 }

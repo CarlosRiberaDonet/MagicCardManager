@@ -29,7 +29,7 @@ public class ScryfallCardDAO {
 
         List<ScryfallCardDTO> cardListDTO = new ArrayList<>();
         StringBuilder query = new StringBuilder(
-                "SELECT DISTINCT sc.id, sc.name, sc.printed_name, sc.lang, " +
+                "SELECT DISTINCT sc.id, sc.scryfall_id, sc.name, sc.printed_name, sc.lang, " +
                         "sc.image_url, sc.rarity, sc.set_name, " +
                         "sc.collector_number, sc.cardmarket_url, sc.price, s.icon_svg_uri " +
                         "FROM scryfall_card sc " +
@@ -88,6 +88,7 @@ public class ScryfallCardDAO {
             while (rs.next()) {
                 ScryfallCardDTO cardDTO = new ScryfallCardDTO();
                 cardDTO.setId(rs.getLong("id"));
+                cardDTO.setScryfallId(rs.getString("scryfall_id"));
                 cardDTO.setName(rs.getString("name"));
                 cardDTO.setPrintedName(rs.getString("printed_name"));
                 cardDTO.setLang(rs.getString("lang"));
