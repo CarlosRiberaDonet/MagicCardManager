@@ -6,7 +6,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.magic.investor_api.API.ScryfallAPI;
+import com.magic.investor_api.api.ScryfallAPI;
 import com.magic.investor_api.dao.ExpansionDAO;
 import com.magic.investor_api.dao.ScryfallCardDAO;
 import com.magic.investor_api.model.ScryfallSet;

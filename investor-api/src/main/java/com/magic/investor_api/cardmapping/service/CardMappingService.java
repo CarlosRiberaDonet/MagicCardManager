@@ -1,7 +1,8 @@
-package com.magic.investor_api.service;
+package com.magic.investor_api.cardmapping.service;
 
-import com.magic.investor_api.dao.CardMappingDAO;
-import com.magic.investor_api.dao.CardtraderDAO;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.magic.investor_api.cardmapping.dao.CardMappingDAO;
+import com.magic.investor_api.cardtrader.dao.CardtraderDAO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -11,12 +12,6 @@ public class CardMappingService {
 
     private final CardMappingDAO cardMappingDAO;
     private final CardtraderDAO cardtraderDAO;
-
-
-    // Inserta set_code y set_name en cardtrader_card
-    public void mapCardtraderSets(){
-        cardtraderDAO.mappingCardtraderSets();
-    }
 
     // Mapear scryfall_card desde cardtrader_card
     public void mapScryfallCard(){
@@ -46,5 +41,12 @@ public class CardMappingService {
     public void lastJoin(){
         cardMappingDAO.lastJoin1();
         cardMappingDAO.lastJoin2();
+    }
+
+    public void readCardtraderJsonNode(Long cardId, JsonNode node){
+
+        Long cardtraderId = node.path("blueprint_id").asLong();
+        String listingUrl =  "https://www.cardtrader.com/cards/" + cardtraderId;
+
     }
 }

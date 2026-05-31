@@ -1,6 +1,6 @@
 package com.magic.investor_api.dao;
 
-import com.magic.investor_api.model.CardtraderSet;
+import com.magic.investor_api.cardtrader.model.CardtraderSet;
 import com.magic.investor_api.model.ScryfallSet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;

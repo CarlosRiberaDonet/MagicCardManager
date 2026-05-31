@@ -2,6 +2,7 @@ package com.magic.investor_api.controller;
 
 
 import com.magic.investor_api.dao.ExpansionDAO;
+import com.magic.investor_api.model.CardPrice;
 import com.magic.investor_api.model.ScryfallSet;
 import com.magic.investor_api.service.ScryfallService;
 import com.magic.investor_api.service.SetService;
@@ -56,7 +57,7 @@ public class ScryfallController {
         scryfallImportService.updateScryfallPrices();
     }
 
-    // Obtiene expansiones de scryfall_set
+    // Obtiene y devuelve lista de expansiones de scryfall_set
     @GetMapping("/sets")
     public List<ScryfallSet> getSetsList(){
         return setService.getSets();

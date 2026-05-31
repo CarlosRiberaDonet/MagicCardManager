@@ -1,15 +1,16 @@
-package com.magic.investor_api.API;
+package com.magic.investor_api.cardtrader.ports;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.magic.investor_api.model.CardtraderSet;
+import com.magic.investor_api.cardtrader.model.CardtraderSet;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
+import java.util.Map;
 
 
 @Service
@@ -88,24 +89,24 @@ public class CardTraderAPI {
     }
 
     // Obtener cartas mediante id de cardtrader (blueprint)
-    public String fetchCardProducts(String blueprintId, int page) {
+    public JsonNode fetchCardProducts(Long cardtraderId) {
+
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(MediaType.parseMediaTypes("application/json"));
         headers.setBearerAuth(apiToken);
 
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
-        // Construye la URL con parámetros
         String url = UriComponentsBuilder.fromUriString(BASE_URL)
-                .queryParam("blueprint_id", blueprintId)
-                .queryParam("page", page)
+                .queryParam("blueprint_id", cardtraderId)
+                .queryParam("page", 1)
                 .toUriString();
 
-        ResponseEntity<String> response = restTemplate.exchange(
+        ResponseEntity<JsonNode> response = restTemplate.exchange(
                 url,
                 HttpMethod.GET,
                 entity,
-                String.class
+                JsonNode.class
         );
 
         return response.getBody();

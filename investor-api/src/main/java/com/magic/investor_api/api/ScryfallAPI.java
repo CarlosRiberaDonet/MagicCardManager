@@ -1,4 +1,4 @@
-package com.magic.investor_api.API;
+package com.magic.investor_api.api;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

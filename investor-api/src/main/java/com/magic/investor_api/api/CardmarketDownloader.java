@@ -1,4 +1,4 @@
-package com.magic.investor_api.API;
+package com.magic.investor_api.api;
 
 import org.springframework.stereotype.Component;
 import java.io.FileOutputStream;

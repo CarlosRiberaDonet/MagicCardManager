@@ -1,13 +1,9 @@
-package com.magic.investor_api.Scheduler;
+package com.magic.investor_api.scheduler;
 
-import com.magic.investor_api.API.CardTraderAPI;
-import com.magic.investor_api.API.CardmarketDownloader;
-import com.magic.investor_api.API.ScryfallAPI;
-import com.magic.investor_api.controller.CardTraderController;
-import com.magic.investor_api.dao.CardMappingDAO;
-import com.magic.investor_api.dao.ScryfallCardDAO;
-import com.magic.investor_api.service.CardMappingService;
-import com.magic.investor_api.service.CardTraderService;
+import com.magic.investor_api.cardtrader.ports.CardTraderAPI;
+import com.magic.investor_api.api.CardmarketDownloader;
+import com.magic.investor_api.cardmapping.service.CardMappingService;
+import com.magic.investor_api.cardtrader.service.CardTraderService;
 import com.magic.investor_api.service.CardmarketService;
 import com.magic.investor_api.service.ScryfallService;
 import lombok.RequiredArgsConstructor;

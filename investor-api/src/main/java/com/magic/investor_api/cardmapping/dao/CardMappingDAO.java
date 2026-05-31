@@ -1,4 +1,4 @@
-package com.magic.investor_api.dao;
+package com.magic.investor_api.cardmapping.dao;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;

@@ -1,10 +1,11 @@
-package com.magic.investor_api.dao;
+package com.magic.investor_api.cardtrader.dao;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 @Repository
@@ -28,5 +29,28 @@ public class CardtraderDAO {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    // Obtiene cardtrader_id mapeando scryfall_id
+    public Long getCardtraderIdByScryfallId(String scryfallId){
+
+        String query = "SELECT cardtrader_id FROM card_mapping WHERE scryfall_id = ?";
+
+        try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)){
+
+            stmt.setString(1, scryfallId);
+
+            ResultSet rs = stmt.executeQuery();
+            if(rs.next()){
+                Long cardtraderId = rs.getLong("cardtrader_id");
+                if(rs.wasNull()){
+                    return null;
+                }
+                return cardtraderId;
+            }
+        }catch (SQLException e){
+            throw new RuntimeException(e);
+        }
+        return null;
     }
 }
