@@ -6,9 +6,8 @@ import com.magic.investor_api.cardtrader.dao.CardtraderDAO;
 import com.magic.investor_api.cardtrader.model.CardtraderCard;
 import com.magic.investor_api.cardtrader.ports.CardTraderAPI;
 import com.magic.investor_api.cardtrader.repository.CardtraderRepository;
-import com.magic.investor_api.cardmapping.dao.CardMappingDAO;
+import com.magic.investor_api.cardtrader_price_cache.service.CardtraderListingService;
 import com.magic.investor_api.dao.ExpansionDAO;
-import com.magic.investor_api.model.CardPrice;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
@@ -22,8 +21,6 @@ public class CardTraderService {
     private final CardtraderRepository cardtraderRepository;
     private final ExpansionDAO expansionDAO;
     private final CardtraderDAO cardtraderDAO;
-    private final CardMappingService cardMappingService;
-
 
     // Obtiene lista de expansiones de la API cardtrader
     public void downloadCardtraderExpansion(){
@@ -90,19 +87,7 @@ public class CardTraderService {
     }
 
     // Obtener cardtrader_id mapeando scryfall_id
-    public Long gerCardtraderId(String scryfallId){
+    public Long getCardtraderId(String scryfallId){
         return cardtraderDAO.getCardtraderIdByScryfallId(scryfallId);
-    }
-
-    //  Obtener y mapear JsonNode de mercado de cartas cardtrader
-    public CardPrice mapNodeToCardtraderListing(Long cardId, String scryfallId){
-
-        Long cardtraderId = gerCardtraderId(scryfallId);
-
-        JsonNode node = cardTraderAPI.fetchCardProducts(cardtraderId);
-
-        cardMappingService.readCardtraderJsonNode(cardId, node);
-
-        return null;
     }
 }

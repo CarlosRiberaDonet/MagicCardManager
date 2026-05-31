@@ -22,7 +22,7 @@ public class CardtraderPriceCache {
     @Column(name = "card_id")
     private Long cardId;
 
-    @Column(name = "lan")
+    @Column(name = "lang")
     private String lang;
 
     @Column(name = "is_foil")
