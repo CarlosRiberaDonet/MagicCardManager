@@ -1,9 +1,13 @@
-package com.magic.investor_api.controller;
+package com.magic.investor_api.cardtrader.controller;
 
-import com.magic.investor_api.API.CardTraderAPI;
-import com.magic.investor_api.service.CardTraderService;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.magic.investor_api.cardtrader.ports.CardTraderAPI;
+import com.magic.investor_api.cardtrader.service.CardTraderService;
+import com.magic.investor_api.model.CardPrice;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/cardtrader")
@@ -25,12 +29,19 @@ public class CardTraderController {
         cardTraderService.cardsByExpansion();
     }
 
+    // Obtener precios actualizados
+    @GetMapping("scryfallId")
+    public CardPrice updateCardtraderPrice(@RequestParam Long cardId, @RequestParam String scryfallId){// Obtengo el cardtraderId
+
+        return cardTraderService.mapNodeToCardtraderListing(cardId, scryfallId); // Obtengo lista de cartas mediante cardtrader_id
+    }
+
     // Obtener carta mediante bluteprint
-    @GetMapping("/card")
+    /*@GetMapping("/card")
     public String getProducts(
-            @RequestParam String blueprintId,
+            @RequestParam Long blueprintId,
             @RequestParam(defaultValue = "1") int page
     ) {
-        return cardTraderApi.fetchCardProducts(blueprintId, page);
-    }
+        return cardTraderApi.fetchCardProducts(blueprintId);
+    }*/
 }

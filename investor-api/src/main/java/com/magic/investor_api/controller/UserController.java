@@ -1,7 +1,6 @@
 package com.magic.investor_api.controller;
 
-import com.magic.investor_api.Auth.JwtService;
-import com.magic.investor_api.dto.ScryfallCardDTO;
+import com.magic.investor_api.auth.JwtService;
 import com.magic.investor_api.dto.UserCollectionDTO;
 import com.magic.investor_api.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;

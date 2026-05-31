@@ -8,11 +8,11 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/cards")
 
-public class CardController {
+public class CardSearchController {
 
     private final CardService cardService;
 
-    public CardController(CardService cardService){
+    public CardSearchController(CardService cardService){
         this.cardService = cardService;
     }
 

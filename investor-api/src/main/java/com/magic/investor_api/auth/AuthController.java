@@ -1,4 +1,4 @@
-package com.magic.investor_api.Auth;
+package com.magic.investor_api.auth;
 
 import com.magic.investor_api.dto.UserDTO;
 import com.magic.investor_api.service.UserService;

@@ -1,6 +1,5 @@
-package com.magic.investor_api.Auth;
+package com.magic.investor_api.auth;
 
-import io.jsonwebtoken.Jwts;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

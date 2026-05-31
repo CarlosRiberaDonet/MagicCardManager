@@ -1,12 +1,14 @@
-package com.magic.investor_api.service;
+package com.magic.investor_api.cardtrader.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.magic.investor_api.API.CardTraderAPI;
-import com.magic.investor_api.dao.CardMappingDAO;
-import com.magic.investor_api.dao.CardtraderDAO;
+import com.magic.investor_api.cardmapping.service.CardMappingService;
+import com.magic.investor_api.cardtrader.dao.CardtraderDAO;
+import com.magic.investor_api.cardtrader.model.CardtraderCard;
+import com.magic.investor_api.cardtrader.ports.CardTraderAPI;
+import com.magic.investor_api.cardtrader.repository.CardtraderRepository;
+import com.magic.investor_api.cardmapping.dao.CardMappingDAO;
 import com.magic.investor_api.dao.ExpansionDAO;
-import com.magic.investor_api.model.CardtraderCard;
-import com.magic.investor_api.repository.CardtraderRepository;
+import com.magic.investor_api.model.CardPrice;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
@@ -20,7 +22,7 @@ public class CardTraderService {
     private final CardtraderRepository cardtraderRepository;
     private final ExpansionDAO expansionDAO;
     private final CardtraderDAO cardtraderDAO;
-    private final CardMappingDAO cardMappingDAO;
+    private final CardMappingService cardMappingService;
 
 
     // Obtiene lista de expansiones de la API cardtrader
@@ -46,7 +48,6 @@ public class CardTraderService {
                 // Iteración de cartas dentro de la expansión
                 for (JsonNode node : root) {
                     // Mapeo los datos obtenidos del JSON a objeto CardtraderCard
-                    System.out.println(node);
                     batch.add(mapNodeToCardtraderCard(node)); // Agrego la carta al batch
                 }
                 // Vuelco el batch a la tabla cardtrader_card
@@ -66,9 +67,9 @@ public class CardTraderService {
         CardtraderCard card = new CardtraderCard();
         // IDENTIFICADORES PRINCIPALES
         card.setScryfallId(node.path("scryfall_id").asText());
-        JsonNode cm = node.path("card_market_ids");
-        Long cardmarketId = (cm.isArray() && cm.size() > 0)
-                ? cm.get(0).asLong()
+        JsonNode carmarketId = node.path("card_market_ids");
+        Long cardmarketId = (carmarketId.isArray() && carmarketId.size() > 0)
+                ? carmarketId.get(0).asLong()
                 : null;
         card.setCardmarketId(cardmarketId);
         card.setCardtraderId(node.path("id").asLong());
@@ -81,5 +82,27 @@ public class CardTraderService {
         // El nombre y código de la edición lo añadiré desde un JOIN en la BD
         // Ya que no vienen en la respuesta de la API
         return card;
+    }
+
+    // Inserta set_code y set_name en cardtrader_card
+    public void mapCardtraderSets(){
+        cardtraderDAO.mappingCardtraderSets();
+    }
+
+    // Obtener cardtrader_id mapeando scryfall_id
+    public Long gerCardtraderId(String scryfallId){
+        return cardtraderDAO.getCardtraderIdByScryfallId(scryfallId);
+    }
+
+    //  Obtener y mapear JsonNode de mercado de cartas cardtrader
+    public CardPrice mapNodeToCardtraderListing(Long cardId, String scryfallId){
+
+        Long cardtraderId = gerCardtraderId(scryfallId);
+
+        JsonNode node = cardTraderAPI.fetchCardProducts(cardtraderId);
+
+        cardMappingService.readCardtraderJsonNode(cardId, node);
+
+        return null;
     }
 }

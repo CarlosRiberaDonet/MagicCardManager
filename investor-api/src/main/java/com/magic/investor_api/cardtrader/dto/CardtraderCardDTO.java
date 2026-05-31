@@ -1,4 +1,4 @@
-package com.magic.investor_api.dto;
+package com.magic.investor_api.cardtrader.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

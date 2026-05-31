@@ -1,9 +1,7 @@
 package com.magic.investor_api.service;
 
-import com.magic.investor_api.Auth.JwtService;
+import com.magic.investor_api.auth.JwtService;
 import com.magic.investor_api.dao.UserDAO;
-import com.magic.investor_api.dto.CardPageDTO;
-import com.magic.investor_api.dto.ScryfallCardDTO;
 import com.magic.investor_api.dto.UserCollectionDTO;
 import com.magic.investor_api.dto.UserDTO;
 import com.magic.investor_api.model.User;
