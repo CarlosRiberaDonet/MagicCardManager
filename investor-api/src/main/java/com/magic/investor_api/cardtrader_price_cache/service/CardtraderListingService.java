@@ -3,7 +3,7 @@ package com.magic.investor_api.cardtrader_price_cache.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.magic.investor_api.cardtrader.ports.CardTraderAPI;
 import com.magic.investor_api.cardtrader.service.CardTraderService;
-import com.magic.investor_api.cardtrader_price_cache.CardtraderListingRepository;
+import com.magic.investor_api.cardtrader_price_cache.repository.CardtraderListingRepository;
 import com.magic.investor_api.cardtrader_price_cache.model.CardtraderListing;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -70,4 +70,6 @@ public class CardtraderListingService {
         }
         repository.saveAll(batch);
     }
+
+
 }

@@ -1,6 +1,5 @@
-package com.magic.investor_api.controller;
+package com.magic.investor_api.admin;
 
-import com.magic.investor_api.scheduler.SchedulerTask;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

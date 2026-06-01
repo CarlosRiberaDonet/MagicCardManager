@@ -1,4 +1,4 @@
-package com.magic.investor_api.cardtrader_price_cache;
+package com.magic.investor_api.cardtrader_price_cache.controller;
 
 import com.magic.investor_api.cardtrader_price_cache.service.CardtraderListingService;
 import lombok.RequiredArgsConstructor;
