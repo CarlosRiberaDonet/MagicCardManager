@@ -1,9 +1,10 @@
-package com.magic.investor_api.scheduler;
+package com.magic.investor_api.admin;
 
 import com.magic.investor_api.cardtrader.ports.CardTraderAPI;
 import com.magic.investor_api.api.CardmarketDownloader;
 import com.magic.investor_api.cardmapping.service.CardMappingService;
 import com.magic.investor_api.cardtrader.service.CardTraderService;
+import com.magic.investor_api.cardtrader_price_cache.service.CardtraderPriceCacheService;
 import com.magic.investor_api.service.CardmarketService;
 import com.magic.investor_api.service.ScryfallService;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ public class SchedulerTask {
     private final CardmarketDownloader cardmarketDownloader;
     private final CardmarketService cardmarketService;
     private final CardMappingService cardMappingService;
+    private final CardtraderPriceCacheService cardtraderPriceCacheService;
 
     private final CardTraderAPI cardTraderAPI;
 
@@ -64,12 +66,13 @@ public class SchedulerTask {
         // cardMappingService.lastJoin();
 
         //12. Descargar JSON con guia de precios de cardmarket
-        cardmarketDownloader.downloadGuidePrice();
+        // cardmarketDownloader.downloadGuidePrice();
 
         //13. Importa precios de JSON cardmarket a BD
-        cardmarketService.importGuidePricesToBD();
+        // cardmarketService.importGuidePricesToBD();
 
         //14. Actualizo precios en scryfall_card desde card_price
-        scryfallService.updateScryfallPrices();
+        // scryfallService.updateScryfallPrices();
+        cardtraderPriceCacheService.converCardtraderListingToPriceCache();
     }
 }

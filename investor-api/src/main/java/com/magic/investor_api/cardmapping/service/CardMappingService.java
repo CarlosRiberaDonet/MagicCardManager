@@ -1,20 +1,9 @@
 package com.magic.investor_api.cardmapping.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.magic.investor_api.cardmapping.dao.CardMappingDAO;
 import com.magic.investor_api.cardtrader.dao.CardtraderDAO;
-import com.magic.investor_api.cardtrader_price_cache.CardtraderListingRepository;
-import com.magic.investor_api.cardtrader_price_cache.model.CardtraderListing;
-import com.magic.investor_api.cardtrader_price_cache.model.CardtraderPriceCache;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor

@@ -1,4 +1,4 @@
-package com.magic.investor_api.cardtrader_price_cache;
+package com.magic.investor_api.cardtrader_price_cache.repository;
 
 import com.magic.investor_api.cardtrader_price_cache.model.CardtraderListing;
 import org.springframework.data.jpa.repository.JpaRepository;

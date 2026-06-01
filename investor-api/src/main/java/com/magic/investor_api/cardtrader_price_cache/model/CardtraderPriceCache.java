@@ -25,11 +25,11 @@ public class CardtraderPriceCache {
     @Column(name = "lang")
     private String lang;
 
-    @Column(name = "is_foil")
-    private boolean isFoil;
-
     @Column(name ="card_condition")
     private String condition;
+
+    @Column(name = "is_foil")
+    private boolean isFoil;
 
     @Column(name = "avg", precision = 10, scale = 2)
     private BigDecimal avg;
