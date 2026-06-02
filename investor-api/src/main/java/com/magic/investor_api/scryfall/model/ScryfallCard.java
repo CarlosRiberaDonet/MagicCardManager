@@ -1,4 +1,4 @@
-package com.magic.investor_api.model;
+package com.magic.investor_api.scryfall.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

@@ -1,6 +1,6 @@
-package com.magic.investor_api.repository;
+package com.magic.investor_api.scryfall.repository;
 
-import com.magic.investor_api.model.ScryfallCard;
+import com.magic.investor_api.scryfall.model.ScryfallCard;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

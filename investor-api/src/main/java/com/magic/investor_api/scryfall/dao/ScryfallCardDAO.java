@@ -1,7 +1,7 @@
-package com.magic.investor_api.dao;
+package com.magic.investor_api.scryfall.dao;
 
-import com.magic.investor_api.dto.ScryfallCardDTO;
 import com.magic.investor_api.model.CardPrice;
+import com.magic.investor_api.scryfall.dto.ScryfallCardDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -18,8 +18,6 @@ public class ScryfallCardDAO {
     @Autowired
     private DataSource dataSource;
 
-    // Busca cartas aplicando filtros opcionales: nombre, set, rareza, idioma, tipo y precio.
-    // Todos los parámetros son opcionales excepto size y offset.
     // Busca cartas aplicando filtros opcionales: nombre, set, rareza, idioma, tipo y precio.
     // Todos los parámetros son opcionales excepto size y offset.
     public List<ScryfallCardDTO> selectFiltersCard(String name, String setCode, String rarity,

@@ -31,6 +31,7 @@ public class SecurityConfig {
         return source;
     }
 
+    // Hashear password
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -45,7 +46,7 @@ public class SecurityConfig {
                         .requestMatchers("/scryfall/sets").permitAll()
                         .requestMatchers("/cards/**").permitAll()
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/user/**").authenticated()
+                        .requestMatchers("/pricecache/**").permitAll()
                         .requestMatchers("/prices/**").hasRole("ADMIN")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()

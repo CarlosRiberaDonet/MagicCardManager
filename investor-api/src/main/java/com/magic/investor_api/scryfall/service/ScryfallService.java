@@ -1,4 +1,4 @@
-package com.magic.investor_api.service;
+package com.magic.investor_api.scryfall.service;
 
 
 import com.fasterxml.jackson.core.JsonFactory;
@@ -8,10 +8,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.magic.investor_api.api.ScryfallAPI;
 import com.magic.investor_api.dao.ExpansionDAO;
-import com.magic.investor_api.dao.ScryfallCardDAO;
 import com.magic.investor_api.model.ScryfallSet;
-import com.magic.investor_api.model.ScryfallCard;
-import com.magic.investor_api.repository.ScryfallRepository;
+import com.magic.investor_api.scryfall.model.ScryfallCard;
+import com.magic.investor_api.scryfall.repository.ScryfallRepository;
+import com.magic.investor_api.scryfall.dao.ScryfallCardDAO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
