@@ -88,30 +88,6 @@ public class CardTraderAPI {
         }
     }
 
-    // Obtener cartas mediante id de cardtrader (blueprint)
-    /*public JsonNode fetchCardProducts(Long cardtraderId) {
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(MediaType.parseMediaTypes("application/json"));
-        headers.setBearerAuth(apiToken);
-
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-
-        String url = UriComponentsBuilder.fromUriString(BASE_URL)
-                .queryParam("blueprint_id", cardtraderId)
-                .queryParam("page", 1)
-                .toUriString();
-
-        ResponseEntity<JsonNode> response = restTemplate.exchange(
-                url,
-                HttpMethod.GET,
-                entity,
-                JsonNode.class
-        );
-
-        return response.getBody();
-    }*/
-
     public JsonNode fetchCardProducts(Long cardtraderId) {
 
         HttpHeaders headers = new HttpHeaders();

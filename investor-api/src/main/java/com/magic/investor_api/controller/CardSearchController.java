@@ -1,6 +1,6 @@
 package com.magic.investor_api.controller;
 
-import com.magic.investor_api.dto.ScryfallCardDTO;
+import com.magic.investor_api.scryfall.dto.ScryfallCardDTO;
 import com.magic.investor_api.dto.CardPageDTO;
 import com.magic.investor_api.service.CardService;
 import org.springframework.web.bind.annotation.*;

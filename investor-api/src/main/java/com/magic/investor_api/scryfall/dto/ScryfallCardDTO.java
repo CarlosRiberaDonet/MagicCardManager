@@ -1,4 +1,4 @@
-package com.magic.investor_api.dto;
+package com.magic.investor_api.scryfall.dto;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.magic.investor_api.model.CardPrice;

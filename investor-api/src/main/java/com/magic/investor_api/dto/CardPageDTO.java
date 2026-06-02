@@ -1,5 +1,6 @@
 package com.magic.investor_api.dto;
 
+import com.magic.investor_api.scryfall.dto.ScryfallCardDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -1,6 +1,6 @@
 package com.magic.investor_api.dto;
 
-import com.magic.investor_api.model.ScryfallCard;
+import com.magic.investor_api.scryfall.dto.ScryfallCardDTO;
 
 import java.time.LocalDate;
 

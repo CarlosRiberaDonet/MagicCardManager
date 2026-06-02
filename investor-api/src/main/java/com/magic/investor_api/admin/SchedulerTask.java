@@ -6,7 +6,7 @@ import com.magic.investor_api.cardmapping.service.CardMappingService;
 import com.magic.investor_api.cardtrader.service.CardTraderService;
 import com.magic.investor_api.cardtrader_price_cache.service.CardtraderPriceCacheService;
 import com.magic.investor_api.service.CardmarketService;
-import com.magic.investor_api.service.ScryfallService;
+import com.magic.investor_api.scryfall.service.ScryfallService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -73,6 +73,6 @@ public class SchedulerTask {
 
         //14. Actualizo precios en scryfall_card desde card_price
         // scryfallService.updateScryfallPrices();
-        cardtraderPriceCacheService.converCardtraderListingToPriceCache();
+        cardtraderPriceCacheService.convertCardtraderListingToPriceCache();
     }
 }

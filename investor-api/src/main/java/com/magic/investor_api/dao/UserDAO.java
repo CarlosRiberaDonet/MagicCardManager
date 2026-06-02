@@ -1,11 +1,9 @@
 package com.magic.investor_api.dao;
 
-import com.magic.investor_api.dto.CardPageDTO;
-import com.magic.investor_api.dto.ScryfallCardDTO;
+import com.magic.investor_api.scryfall.dto.ScryfallCardDTO;
 import com.magic.investor_api.dto.UserCollectionDTO;
 import com.magic.investor_api.dto.UserDTO;
 import com.magic.investor_api.model.CardPrice;
-import com.magic.investor_api.model.ScryfallCard;
 import com.magic.investor_api.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;

@@ -1,10 +1,7 @@
-package com.magic.investor_api.controller;
+package com.magic.investor_api.scryfall.controller;
 
-
-import com.magic.investor_api.dao.ExpansionDAO;
-import com.magic.investor_api.model.CardPrice;
 import com.magic.investor_api.model.ScryfallSet;
-import com.magic.investor_api.service.ScryfallService;
+import com.magic.investor_api.scryfall.service.ScryfallService;
 import com.magic.investor_api.service.SetService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
