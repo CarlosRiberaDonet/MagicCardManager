@@ -1,7 +1,7 @@
 package com.magic.investor_api.scryfall.dto;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.magic.investor_api.model.CardPrice;
+import com.magic.investor_api.cardmarketPrice.model.CardmarketPrice;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -58,5 +58,5 @@ public class ScryfallCardDTO {
     private boolean isFoil;
     private boolean isReprint;
     private LocalDate releasedAt;
-    private CardPrice cardPrice;
+    private CardmarketPrice cardmarketPrice;
 }

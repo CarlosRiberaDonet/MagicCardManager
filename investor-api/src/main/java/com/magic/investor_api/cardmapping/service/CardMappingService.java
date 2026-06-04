@@ -12,33 +12,26 @@ public class CardMappingService {
     private final CardMappingDAO cardMappingDAO;
     private final CardtraderDAO cardtraderDAO;
 
-    // Mapear scryfall_card desde cardtrader_card
-    public void mapScryfallCard(){
-        cardMappingDAO.updateCardmarketIdOnScryfallCard();
+    // Inserto cardtrader_id desde cardtrader_card
+    public void insertCardtraderIdOnCardMapping(){
+        cardMappingDAO.insertCardmarketIdAndCardtraderIdOnCardMapping();
     }
 
-    // Mapear cardtrader_card desde scryfall_card
-    public void mapCardtraderCard(){
-        cardMappingDAO.updateCardmarketIdOnCardtraderCard();
+    // Mapeo scryfall_id de cardtrader_card en card_mapping
+    public void mapScryfallIdOnCardMapping(){
+        cardMappingDAO.updateScryfallIdOnCardMapping();
     }
 
-    // Inserto scryfall_id de scryfall_card en card_mapping
-    public void insertScryfallId(){
-        cardMappingDAO.initializeCardMapping();
+    // Mapeo cardmarket_id de cardtrader_card en card_mapping
+    public void mapCardmarketIdOnCardMapping(){
+        cardMappingDAO.updateCardmarketIdOnCardMapping();
     }
 
-    // Relaciono scryfall_card con cardtrader_card mediante cardmarket_id en card_mapping
-    public void mapCardmarketIdFromScryfallToCardMapping(){
-        cardMappingDAO.mappingCardmarketIdToCardMappingFromScryfallCard();
-    }
+    // Obtener cardmarketId a través de scryfallId
+    public Long[] getIds(){
 
-    // Relaciono cardtrader_card con scryfall_card mediante cardmarket_id en card_mapping
-    public void mapCardmarketIdFromCardtraderCardToCardMapping(){
-        cardMappingDAO.mappingCardmarketIdToCardMappingFromCardtraderCard();
-    }
-
-    public void lastJoin(){
-        cardMappingDAO.lastJoin1();
-        cardMappingDAO.lastJoin2();
+        Long[] ids = new Long[2];
+       // ids[0] =
+        return null;
     }
 }

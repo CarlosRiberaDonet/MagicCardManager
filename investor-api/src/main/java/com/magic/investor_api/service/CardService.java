@@ -1,8 +1,10 @@
 package com.magic.investor_api.service;
 
+import com.magic.investor_api.cardmarketPrice.service.CardmarketPriceService;
+import com.magic.investor_api.cardtraderPrice.service.CardtraderPriceService;
 import com.magic.investor_api.scryfall.dao.ScryfallCardDAO;
 import com.magic.investor_api.scryfall.dto.ScryfallCardDTO;
-import com.magic.investor_api.dto.CardPageDTO;
+import com.magic.investor_api.CardPageDTO;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,6 +13,8 @@ import java.util.List;
 public class CardService {
 
     private final ScryfallCardDAO scryfallCardDAO;
+    private CardmarketPriceService cardmarketPriceService;
+    private CardtraderPriceService cardtraderPriceService;
     private CardPageDTO cardPageDTO;
 
     public CardService(ScryfallCardDAO cardDAO){
@@ -18,7 +22,6 @@ public class CardService {
     }
 
     // Obtiene lista de cartas filtradas
-    // Obtiene lista de cartas mediante su nombre
     public CardPageDTO searchCards(String name, String setCode, String rarity, String lang,
                                    String typeLine, String orderBy, Double minPrice, Double maxPrice,
                                    int page, int size, boolean hideNA) {
@@ -37,9 +40,5 @@ public class CardService {
         return cardPageDTO;
     }
 
-    // Obtiene carta con datos completos mediante su id
-    public ScryfallCardDTO getCardById(Long cardId){
-        return scryfallCardDAO.getScryfallCardById(cardId);
-    }
 
 }

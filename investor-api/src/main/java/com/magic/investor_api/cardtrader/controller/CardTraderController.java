@@ -1,15 +1,8 @@
 package com.magic.investor_api.cardtrader.controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.magic.investor_api.cardtrader.ports.CardTraderAPI;
 import com.magic.investor_api.cardtrader.service.CardTraderService;
-import com.magic.investor_api.cardtrader_price_cache.service.CardtraderListingService;
-import com.magic.investor_api.model.CardPrice;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.jackson.autoconfigure.JacksonProperties;
 import org.springframework.web.bind.annotation.*;
-
-import java.net.URL;
 
 @RestController
 @RequestMapping("/cardtrader")
