@@ -1,6 +1,6 @@
 package com.magic.investor_api.scryfall.dao;
 
-import com.magic.investor_api.model.CardPrice;
+import com.magic.investor_api.cardmarketPrice.model.CardmarketPrice;
 import com.magic.investor_api.scryfall.dto.ScryfallCardDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -27,7 +27,7 @@ public class ScryfallCardDAO {
 
         List<ScryfallCardDTO> cardListDTO = new ArrayList<>();
         StringBuilder query = new StringBuilder(
-                "SELECT DISTINCT sc.id, sc.scryfall_id, sc.name, sc.printed_name, sc.lang, " +
+                "SELECT DISTINCT sc.id, sc.scryfall_id, sc.cardmarket_id, sc.name, sc.printed_name, sc.lang, " +
                         "sc.image_url, sc.rarity, sc.set_name, " +
                         "sc.collector_number, sc.cardmarket_url, sc.price, s.icon_svg_uri " +
                         "FROM scryfall_card sc " +
@@ -110,7 +110,7 @@ public class ScryfallCardDAO {
     // mapear precios card_price a scryfall_card
     public void updateScryfallPrices(){
         String query = "UPDATE scryfall_card sc " +
-                "JOIN card_price cp ON cp.cardmarket_id = sc.cardmarket_id " +
+                "JOIN cardmarket_price cp ON cp.cardmarket_id = sc.cardmarket_id " +
                 "SET sc.price = COALESCE(cp.low, cp.avg), " +
                 "sc.price_foil = COALESCE(cp.low_foil, cp.avg_foil)";
 
@@ -181,6 +181,9 @@ public class ScryfallCardDAO {
         return 0;
     }
 
+    // Obtiene cardmarket_id y cardtrader_id usando scryfall_id
+    public 
+
     // Obtener detalles de carta mediante id de scryfall_card
     public ScryfallCardDTO getScryfallCardById(Long cardId){
 
@@ -217,21 +220,21 @@ public class ScryfallCardDAO {
                 card.setReprint(rs.getBoolean("is_reprint"));
                 card.setReleasedAt(rs.getDate("released_at") != null ? rs.getDate("released_at").toLocalDate() : null);
 
-                CardPrice cardPrice = new CardPrice();
-                cardPrice.setLow(rs.getBigDecimal("low"));
-                cardPrice.setTrend(rs.getBigDecimal("trend"));
-                cardPrice.setAvg1(rs.getBigDecimal("avg1"));
-                cardPrice.setAvg7(rs.getBigDecimal("avg7"));
-                cardPrice.setAvg30(rs.getBigDecimal("avg30"));
-                cardPrice.setLowFoil(rs.getBigDecimal("low_foil"));
-                cardPrice.setTrendFoil(rs.getBigDecimal("trend_foil"));
-                cardPrice.setAvg1Foil(rs.getBigDecimal("avg1_foil"));
-                cardPrice.setAvg7Foil(rs.getBigDecimal("avg7_foil"));
-                cardPrice.setAvg30Foil(rs.getBigDecimal("avg30_foil"));
+                CardmarketPrice cardmarketPrice = new CardmarketPrice();
+                cardmarketPrice.setLow(rs.getBigDecimal("low"));
+                cardmarketPrice.setTrend(rs.getBigDecimal("trend"));
+                cardmarketPrice.setAvg1(rs.getBigDecimal("avg1"));
+                cardmarketPrice.setAvg7(rs.getBigDecimal("avg7"));
+                cardmarketPrice.setAvg30(rs.getBigDecimal("avg30"));
+                cardmarketPrice.setLowFoil(rs.getBigDecimal("low_foil"));
+                cardmarketPrice.setTrendFoil(rs.getBigDecimal("trend_foil"));
+                cardmarketPrice.setAvg1Foil(rs.getBigDecimal("avg1_foil"));
+                cardmarketPrice.setAvg7Foil(rs.getBigDecimal("avg7_foil"));
+                cardmarketPrice.setAvg30Foil(rs.getBigDecimal("avg30_foil"));
                 if (rs.getTimestamp("updated_at") != null)
-                    cardPrice.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
+                    cardmarketPrice.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
 
-                card.setCardPrice(cardPrice);
+                card.setCardmarketPrice(cardmarketPrice);
 
                 return card;
             }

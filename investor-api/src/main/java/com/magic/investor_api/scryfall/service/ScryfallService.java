@@ -6,9 +6,13 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.magic.investor_api.CardPageDTO;
 import com.magic.investor_api.api.ScryfallAPI;
-import com.magic.investor_api.dao.ExpansionDAO;
-import com.magic.investor_api.model.ScryfallSet;
+import com.magic.investor_api.cardmarketPrice.model.CardmarketPrice;
+import com.magic.investor_api.cardmarketPrice.service.CardmarketPriceService;
+import com.magic.investor_api.expansion.dao.ExpansionDAO;
+import com.magic.investor_api.expansion.ScryfallSet;
+import com.magic.investor_api.scryfall.dto.ScryfallCardDTO;
 import com.magic.investor_api.scryfall.model.ScryfallCard;
 import com.magic.investor_api.scryfall.repository.ScryfallRepository;
 import com.magic.investor_api.scryfall.dao.ScryfallCardDAO;
@@ -27,12 +31,15 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ScryfallService {
 
+    private static final String path= System.getProperty("user.dir");
+    private ObjectMapper objectMapper = new ObjectMapper();
     private final ScryfallAPI scryfallDownloader;
     private final ScryfallRepository ScryfallCardRepository;
     private final ExpansionDAO expansionDAO;
     private final ScryfallCardDAO scryfallCardDAO;
-    private static final String path= System.getProperty("user.dir");
-    private ObjectMapper objectMapper = new ObjectMapper(); // Spring ya lo tiene configurado
+    private final CardmarketPriceService cardmarketPriceService;
+    private CardPageDTO cardPageDTO;
+
 
     private static final Map<String, String> LANGUAGE_MAP = Map.ofEntries(
             Map.entry("en", "language=1"),
@@ -219,5 +226,40 @@ public class ScryfallService {
     // Actualizar precios de la tabla scryfall_card a través de tabla card_price(cardmarket)
     public void updateScryfallPrices(){
         scryfallCardDAO.updateScryfallPrices();
+    }
+
+    // Obtiene lista de cartas filtradas
+    public CardPageDTO searchCards(String name, String setCode, String rarity, String lang,
+                                   String typeLine, String orderBy, Double minPrice, Double maxPrice,
+                                   int page, int size, boolean hideNA) {
+
+        // Calcula la fila de inicio según la página — ej: página 2 con 20 resultados empieza en la fila 20
+        int offset = (page - 1) * size;
+
+        // Total de cartas que coinciden con la búsqueda
+        int totalCards = scryfallCardDAO.countCardsByFilter(name, setCode, rarity, lang, typeLine, minPrice, maxPrice, hideNA);
+
+        // Busco la carta mediante su nombre
+        List<ScryfallCardDTO> cardListDTO = scryfallCardDAO.selectFiltersCard(name, setCode, rarity,
+                lang, typeLine, orderBy, minPrice, maxPrice, size, offset, hideNA);
+        cardPageDTO = new CardPageDTO(totalCards, page, cardListDTO);
+
+        return cardPageDTO;
+    }
+
+    // Obtiene carta con datos completos mediante su id
+    public ScryfallCardDTO getCardByscryfallId(String scryfallId){
+
+        // Intento obtener cardmarketId y cardtraderId desde scryfall_card
+
+        // Trato de obtener precios de card_price
+        CardmarketPrice cardPrice = cardmarketPriceService.getCardPrice(scryfallId);
+
+        if(cardPrice == null){
+            // Trato de obtener precios de tradercard_price_cache
+            cardtraderPriceCacheService.getCardtraderPrice();
+        }
+
+        return null;
     }
 }

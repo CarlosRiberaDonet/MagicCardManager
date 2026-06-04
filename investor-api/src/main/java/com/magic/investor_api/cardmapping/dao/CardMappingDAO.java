@@ -13,10 +13,11 @@ public class CardMappingDAO {
     @Autowired
     private DataSource dataSource;
 
-    // Inserto scryfall_id de scryfall_card en card_mapping
-    public void initializeCardMapping(){
-        String query = "INSERT INTO card_mapping (scryfall_id) " +
-                "SELECT scryfall_id FROM scryfall_card";
+    // Inserto cardtraderId, cardmarket_id y scryfall_id de cardtrader_card en card_mapping
+    public void insertCardmarketIdAndCardtraderIdOnCardMapping(){
+        String query = "INSERT INTO card_mapping (cardtrader_id) " +
+                "SELECT cardtrader_id " +
+                "FROM cardtrader_card";
         try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)){
 
             int filasAfectadas = stmt.executeUpdate();
@@ -28,115 +29,50 @@ public class CardMappingDAO {
         }
     }
 
-    // Enriquecer scryfall_card desde cardtrader_card
-    public void updateCardmarketIdOnScryfallCard(){
-
-        String query = "UPDATE scryfall_card sc " +
-                "JOIN cardtrader_card ct " +
-                "ON ct.scryfall_id = sc.scryfall_id " +
-                "SET sc.cardtrader_id = COALESCE(sc.cardtrader_id, ct.cardtrader_id), " +
-                "sc.cardmarket_id = COALESCE(sc.cardmarket_id, ct.cardmarket_id);";
-
-        try (Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
+    // Mapeo scryfall_id cardtrader_card en card_mapping
+    public void updateScryfallIdOnCardMapping(){
+        String query =
+                "UPDATE card_mapping cm " +
+                        "JOIN cardtrader_card ct " +
+                        "ON cm.cardtrader_id = ct.cardtrader_id " +
+                        "SET cm.scryfall_id = ct.scryfall_id " +
+                        "WHERE ct.scryfall_id IS NOT NULL ";
+        try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)){
 
             int filasAfectadas = stmt.executeUpdate();
-            if (filasAfectadas > 0) {
+            if(filasAfectadas > 0){
                 System.out.println("Entradas añadidas: " + filasAfectadas);
             }
-        } catch (SQLException e) {
+        }catch (SQLException e){
             throw new RuntimeException(e);
         }
     }
 
-    // Enriquecer cardtrader_card desde scryfall_card
-    public void updateCardmarketIdOnCardtraderCard(){
-
-        String query = "UPDATE cardtrader_card ct " +
-                "JOIN scryfall_card sc " +
-                "ON sc.scryfall_id = ct.scryfall_id " +
-                "SET ct.cardmarket_id = COALESCE(ct.cardmarket_id, sc.cardmarket_id), " +
-                "ct.cardtrader_id = COALESCE(ct.cardtrader_id, sc.cardtrader_id);";
-
-        try (Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
+    // Mapeo scryfall_id cardtrader_card en card_mapping
+    public void updateCardmarketIdOnCardMapping(){
+        String query =
+                "UPDATE card_mapping cm " +
+                        "JOIN cardtrader_card ct " +
+                        "ON cm.cardtrader_id = ct.cardtrader_id " +
+                        "SET cm.cardmarket_id = ct.cardmarket_id " +
+                        "WHERE ct.cardmarket_id IS NOT NULL";
+        try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)){
 
             int filasAfectadas = stmt.executeUpdate();
-            if (filasAfectadas > 0) {
+            if(filasAfectadas > 0){
                 System.out.println("Entradas añadidas: " + filasAfectadas);
             }
-        } catch (SQLException e) {
+        }catch (SQLException e){
             throw new RuntimeException(e);
         }
     }
 
-    // Relaciono e inserto cardmarket_id de scryfall_card en card_mapping
-    public void mappingCardmarketIdToCardMappingFromScryfallCard() {
-        String query = "UPDATE card_mapping cm " +
-                "JOIN scryfall_card sc " +
-                "ON sc.scryfall_id = cm.scryfall_id " +
-                "SET cm.cardmarket_id = COALESCE(cm.cardmarket_id, sc.cardmarket_id), " +
-                "cm.cardtrader_id = COALESCE(cm.cardtrader_id, sc.cardtrader_id);";
-        try (Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
 
-            int filasAfectadas = stmt.executeUpdate();
-            if (filasAfectadas > 0) {
-                System.out.println("Entradas añadidas: " + filasAfectadas);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
+    // Obtengo cardmarketId y cardtraderId
+   /* public Long[] getIds(){
 
-    // Relaciono e inserto cardmarket_id de cardtrader_card en card_mapping
-    public void mappingCardmarketIdToCardMappingFromCardtraderCard() {
-        String query = "UPDATE card_mapping cm " +
-                "JOIN cardtrader_card ct " +
-                "ON ct.scryfall_id = cm.scryfall_id " +
-                "SET cm.cardmarket_id = COALESCE(cm.cardmarket_id, ct.cardmarket_id), " +
-                "cm.cardtrader_id = COALESCE(cm.cardtrader_id, ct.cardtrader_id);";
-        try (Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
+        Long[] ids = new Long[2];
 
-            int filasAfectadas = stmt.executeUpdate();
-            if (filasAfectadas > 0) {
-                System.out.println("Entradas añadidas: " + filasAfectadas);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    // cierre por CardMarket puente (CRÍTICO)
-    public void lastJoin1() {
-        String query = "UPDATE cardtrader_card ct " +
-                "JOIN scryfall_card sc " +
-                "ON ct.cardmarket_id = sc.cardmarket_id " +
-                "SET ct.scryfall_id = COALESCE(ct.scryfall_id, sc.scryfall_id) " +
-                "WHERE ct.cardmarket_id IS NOT NULL AND ct.scryfall_id IS NULL";
-        try (Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
-
-            int filasAfectadas = stmt.executeUpdate();
-            if (filasAfectadas > 0) {
-                System.out.println("Entradas añadidas: " + filasAfectadas);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    // cierre por CardMarket puente (CRÍTICO)
-    public void lastJoin2() {
-        String query = "UPDATE scryfall_card sc " +
-                "JOIN cardtrader_card ct " +
-                "ON ct.cardmarket_id = sc.cardmarket_id " +
-                "SET sc.scryfall_id = COALESCE(sc.scryfall_id, ct.scryfall_id) " +
-                "WHERE sc.cardmarket_id IS NOT NULL AND sc.scryfall_id IS NULL";
-        try (Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
-
-            int filasAfectadas = stmt.executeUpdate();
-            if (filasAfectadas > 0) {
-                System.out.println("Entradas añadidas: " + filasAfectadas);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
+        String query = "SELECT cardmarket_id, cardtrader_id FROM card_mapping WHERE scryfall_id = ?";
+    }*/
 }

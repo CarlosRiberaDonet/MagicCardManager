@@ -1,6 +1,6 @@
 package com.magic.investor_api.auth;
 
-import com.magic.investor_api.model.User;
+import com.magic.investor_api.user.model.User;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;

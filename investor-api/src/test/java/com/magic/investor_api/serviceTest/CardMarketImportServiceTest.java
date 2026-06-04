@@ -1,7 +1,7 @@
 package com.magic.investor_api.serviceTest;
 
 
-import com.magic.investor_api.mapper.CardPriceMapper;
+import com.magic.investor_api.cardmapping.CardPriceMapper;
 import org.junit.jupiter.api.Test;
 
 

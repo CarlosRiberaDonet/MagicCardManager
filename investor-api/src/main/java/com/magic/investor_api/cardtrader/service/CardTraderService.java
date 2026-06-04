@@ -1,13 +1,11 @@
 package com.magic.investor_api.cardtrader.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.magic.investor_api.cardmapping.service.CardMappingService;
 import com.magic.investor_api.cardtrader.dao.CardtraderDAO;
 import com.magic.investor_api.cardtrader.model.CardtraderCard;
 import com.magic.investor_api.cardtrader.ports.CardTraderAPI;
 import com.magic.investor_api.cardtrader.repository.CardtraderRepository;
-import com.magic.investor_api.cardtrader_price_cache.service.CardtraderListingService;
-import com.magic.investor_api.dao.ExpansionDAO;
+import com.magic.investor_api.expansion.dao.ExpansionDAO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
@@ -51,7 +49,6 @@ public class CardTraderService {
                 if (!batch.isEmpty()) {
                     cardtraderRepository.saveAll(batch);
                     batch.clear();
-                    expansionDAO.updateLastExpansionId(e);
                 }
             }catch (Exception ex){
                 ex.printStackTrace();
@@ -62,7 +59,7 @@ public class CardTraderService {
     // Mapea JSON de cartas a CardtraderCard
     private CardtraderCard mapNodeToCardtraderCard(JsonNode node){
         CardtraderCard card = new CardtraderCard();
-        // IDENTIFICADORES PRINCIPALES
+
         card.setScryfallId(node.path("scryfall_id").asText());
         JsonNode carmarketId = node.path("card_market_ids");
         Long cardmarketId = (carmarketId.isArray() && carmarketId.size() > 0)
@@ -70,7 +67,6 @@ public class CardTraderService {
                 : null;
         card.setCardmarketId(cardmarketId);
         card.setCardtraderId(node.path("id").asLong());
-
         card.setName(node.path("name").asText());
         card.setRarity(node.path("fixed_properties").path("mtg_rarity").asText());
         card.setExpansionId(node.path("expansion_id").asLong());
