@@ -19,8 +19,8 @@ public class CardtraderPrice {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "card_id")
-    private Long cardId;
+    @Column(name = "cardtrader_id")
+    private Long cardtraderId;
 
     @Column(name = "lang")
     private String lang;

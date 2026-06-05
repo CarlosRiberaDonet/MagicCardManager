@@ -44,7 +44,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/scryfall/sets").permitAll()
-                        .requestMatchers("/scryfall/search").permitAll()
+                        .requestMatchers("/scryfall/search/**").permitAll()
+                        .requestMatchers("/scryfall/scryfallId/**").permitAll()
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/pricecache/**").permitAll()
                         .requestMatchers("/prices/**").hasRole("ADMIN")

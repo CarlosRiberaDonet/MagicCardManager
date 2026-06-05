@@ -31,7 +31,8 @@ public class CardmarketPriceDAO {
     public CardmarketPrice checkCardPrice(Long cardmarketId){
 
         CardmarketPrice cardmarketPrice = new CardmarketPrice();
-        String query = "SELECT cardmarket_id, avg, low, trend, avg1, avg7, avg30 " +
+        String query = "SELECT id, cardmarket_id, avg, low, trend, avg1, avg7, avg30, " +
+                "avg_foil, low_foil, trend_foil, avg1_foil, avg7_foil, avg30_foil, updated_at " +
                 "FROM cardmarket_price " +
                 "WHERE cardmarket_id = ?";
 
@@ -40,6 +41,7 @@ public class CardmarketPriceDAO {
             stmt.setLong(1, cardmarketId);
             ResultSet rs = stmt.executeQuery();
             while(rs.next()){
+                cardmarketPrice.setId(rs.getLong("id"));
                 cardmarketPrice.setCardmarketId(rs.getLong("cardmarket_id"));
                 cardmarketPrice.setAvg(rs.getBigDecimal("avg"));
                 cardmarketPrice.setLow(rs.getBigDecimal("low"));
@@ -47,6 +49,15 @@ public class CardmarketPriceDAO {
                 cardmarketPrice.setAvg1(rs.getBigDecimal("avg1"));
                 cardmarketPrice.setAvg7(rs.getBigDecimal("avg7"));
                 cardmarketPrice.setAvg30(rs.getBigDecimal("avg30"));
+
+                cardmarketPrice.setAvgFoil(rs.getBigDecimal("avg_foil"));
+                cardmarketPrice.setLowFoil(rs.getBigDecimal("low_foil"));
+                cardmarketPrice.setTrendFoil(rs.getBigDecimal("trend_foil"));
+                cardmarketPrice.setAvg1Foil(rs.getBigDecimal("avg1_foil"));
+                cardmarketPrice.setAvg7Foil(rs.getBigDecimal("avg7_foil"));
+                cardmarketPrice.setAvg30Foil(rs.getBigDecimal("avg30_foil"));
+
+                cardmarketPrice.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
 
                 return cardmarketPrice;
             }

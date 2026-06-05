@@ -29,12 +29,6 @@ public class CardtraderPriceService {
         repository.saveAll(cardPriceList);
     }
 
-    // Compruebo si la carta tiene precios en cardtrader_price_cache
-    public CardmarketPrice getCardtraderPrice(Long cardmarketId){
-
-        return null;
-    }
-
     // Consulta en cardtrader_price_cache
     public CardtraderPriceDTO getCardtraderPriceCacheDTO(Long cardId, String lang){
 

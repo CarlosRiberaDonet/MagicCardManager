@@ -19,8 +19,8 @@ public class CardtraderListing {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "card_id")
-    private Long cardId;
+    @Column(name = "card_mapping_id")
+    private Long cardMappingId;
 
     @Column(name ="cardtrader_id")
     private Long cardtraderId;

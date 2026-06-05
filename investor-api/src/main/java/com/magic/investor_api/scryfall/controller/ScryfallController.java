@@ -47,12 +47,6 @@ public class ScryfallController {
         }
     }
 
-    // Actualizar precios de la tabla scryfall_card
-    @PostMapping("/update-prices")
-    public void updatePrices(){
-        scryfallService.updateScryfallPrices();
-    }
-
     // Obtiene y devuelve lista de expansiones de scryfall_set
     @GetMapping("/sets")
     public List<ScryfallSet> getSetsList(){
@@ -81,8 +75,9 @@ public class ScryfallController {
 
 
     // Buscar carta por id
-    @GetMapping("scryfallId")
-    public ScryfallCardDTO searchCardById(@RequestParam String scryfallId){
+    @GetMapping("/scryfallId/{scryfallId}")
+    public ScryfallCardDTO searchCardById(@PathVariable  String scryfallId){
+        System.out.println(scryfallId);
         return scryfallService.getCardByscryfallId(scryfallId);
     }
 }
