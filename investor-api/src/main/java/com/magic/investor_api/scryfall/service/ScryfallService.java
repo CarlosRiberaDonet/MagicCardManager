@@ -144,7 +144,7 @@ public class ScryfallService {
 
         // Campos de identidad
         card.setScryfallId(node.path("id").asText("")); // scryfall UUID
-        card.setCardmarketId(node.path("cardmarket_id").asLong(0L));
+        card.setCardmarketId(node.path("cardmarket_id").asLong());
 
         card.setName(node.path("name").asText(""));
         card.setPrintedName(node.path("printed_name").asText(""));
@@ -251,13 +251,19 @@ public class ScryfallService {
     // Obtiene carta con datos completos mediante su id
     public ScryfallCardDTO getCardByscryfallId(String scryfallId){
 
-        // Intento obtener cardmarketId y cardtraderId asociado scryfall_card
-        Long[] cardIds = cardMappingService.getIds(scryfallId);
+        Long[] cardIds = new Long[2];
+
+        ScryfallCardDTO card = scryfallCardDAO.getScryfallCardById(scryfallId);
+        if(card.getCardmarketId() == null){
+            // Intento obtener cardmarketId y cardtraderId asociado scryfall_card
+            cardIds = cardMappingService.getIds(scryfallId);
+        }
+
         Long cardmarketId = cardIds[0];
         Long cartraderId = cardIds[1];
 
-        // Obtengo resto de datos de la carta
-        ScryfallCardDTO card = scryfallCardDAO.getScryfallCardById(scryfallId);
+        // Obtengo datos de la carta
+
         System.out.println(card.toString());
 
         // Si existe cardmarketId
