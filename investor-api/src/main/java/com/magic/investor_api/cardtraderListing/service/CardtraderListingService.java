@@ -3,6 +3,7 @@ package com.magic.investor_api.cardtraderListing.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.magic.investor_api.cardtrader.ports.CardTraderAPI;
 import com.magic.investor_api.cardtrader.service.CardTraderService;
+import com.magic.investor_api.cardtraderListing.dao.CardtraderListingDAO;
 import com.magic.investor_api.cardtraderPrice.dto.CardtraderPriceDTO;
 import com.magic.investor_api.cardtraderListing.repository.CardtraderListingRepository;
 import com.magic.investor_api.cardtraderListing.model.CardtraderListing;
@@ -24,7 +25,13 @@ public class CardtraderListingService {
     private final CardtraderListingRepository repository;
     private final CardTraderService cardTraderService;
     private final CardTraderAPI cardTraderAPI;
+    private final CardtraderListingDAO cardtraderListingDAO;
     private final CardtraderPriceService cardtraderPriceService;
+
+    // Compruebo si este cardtraderId ya existe en cardtrader_listing
+    public CardtraderListing checkCardtraderId(Long cartraderId){
+        return cardtraderListingDAO.checkCardtraderIdOnCardtraderListing(cartraderId);
+    }
 
     //  Obtener y mapear JsonNode del mercado de cartas cardtrader
     public CardtraderPriceDTO updateCardPrices(String scryfallId, String lang){
@@ -77,7 +84,7 @@ public class CardtraderListingService {
 
                 for (JsonNode item : arrayNode) {
                     CardtraderListing listing = new CardtraderListing();
-                    listing.setCardId(cardId);
+                    listing.setCardMappingId(cardId);
                     listing.setCardtraderId(item.path("blueprint_id").asLong());
                     listing.setPrice(BigDecimal.valueOf(item.path("price_cents").asLong()).movePointLeft(2));
                     listing.setCondition(item.path("properties_hash").path("condition").asText());
@@ -94,6 +101,4 @@ public class CardtraderListingService {
         }
         repository.saveAll(batch);
     }
-
-
 }

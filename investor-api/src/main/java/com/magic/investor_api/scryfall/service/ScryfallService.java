@@ -8,8 +8,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.magic.investor_api.CardPageDTO;
 import com.magic.investor_api.api.ScryfallAPI;
+import com.magic.investor_api.cardmapping.service.CardMappingService;
 import com.magic.investor_api.cardmarketPrice.model.CardmarketPrice;
 import com.magic.investor_api.cardmarketPrice.service.CardmarketPriceService;
+import com.magic.investor_api.cardtrader.dto.CardtraderCardDTO;
+import com.magic.investor_api.cardtrader.service.CardTraderService;
+import com.magic.investor_api.cardtraderListing.service.CardtraderListingService;
 import com.magic.investor_api.expansion.dao.ExpansionDAO;
 import com.magic.investor_api.expansion.ScryfallSet;
 import com.magic.investor_api.scryfall.dto.ScryfallCardDTO;
@@ -38,6 +42,8 @@ public class ScryfallService {
     private final ExpansionDAO expansionDAO;
     private final ScryfallCardDAO scryfallCardDAO;
     private final CardmarketPriceService cardmarketPriceService;
+    private final CardMappingService cardMappingService;
+    private final CardtraderListingService cardtraderListingService;
     private CardPageDTO cardPageDTO;
 
 
@@ -223,11 +229,6 @@ public class ScryfallService {
         return url;
     }
 
-    // Actualizar precios de la tabla scryfall_card a través de tabla card_price(cardmarket)
-    public void updateScryfallPrices(){
-        scryfallCardDAO.updateScryfallPrices();
-    }
-
     // Obtiene lista de cartas filtradas
     public CardPageDTO searchCards(String name, String setCode, String rarity, String lang,
                                    String typeLine, String orderBy, Double minPrice, Double maxPrice,
@@ -250,15 +251,39 @@ public class ScryfallService {
     // Obtiene carta con datos completos mediante su id
     public ScryfallCardDTO getCardByscryfallId(String scryfallId){
 
-        // Intento obtener cardmarketId y cardtraderId desde scryfall_card
+        // Intento obtener cardmarketId y cardtraderId asociado scryfall_card
+        Long[] cardIds = cardMappingService.getIds(scryfallId);
+        Long cardmarketId = cardIds[0];
+        Long cartraderId = cardIds[1];
+
+        // Obtengo resto de datos de la carta
+        ScryfallCardDTO card = scryfallCardDAO.getScryfallCardById(scryfallId);
+        System.out.println(card.toString());
+
+        // Si existe cardmarketId
+        if(cardmarketId != null){
+            // Trato de obtener los precios de carmarket_price
+            CardmarketPrice cardmarketPrice = cardmarketPriceService.getCardmarketPrice(cardmarketId);
+
+            // Si cardmarket_price tiene precios para la carta
+            if(cardmarketPrice != null){
+                card.setCardmarketPrice(cardmarketPrice);  // Le asigno los precios obtenidos
+            }
+            return card;
+
+        } else if(cartraderId != null){
+            cardtraderListingService.checkCardtraderId(cartraderId);
+        }
+        System.out.println("CARMARKET_ID: " + cardIds[0]);
+        System.out.println("CARDTRADER_ID: " + cardIds[1]);
 
         // Trato de obtener precios de card_price
-        CardmarketPrice cardPrice = cardmarketPriceService.getCardPrice(scryfallId);
+        // CardmarketPrice cardPrice = cardmarketPriceService.getCardPrice(scryfallId);
 
-        if(cardPrice == null){
+        /*if(cardPrice == null){
             // Trato de obtener precios de tradercard_price_cache
             cardtraderPriceCacheService.getCardtraderPrice();
-        }
+        }*/
 
         return null;
     }

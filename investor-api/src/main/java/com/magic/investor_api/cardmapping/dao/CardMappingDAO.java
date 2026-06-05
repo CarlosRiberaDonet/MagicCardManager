@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 @Repository
@@ -67,12 +68,26 @@ public class CardMappingDAO {
         }
     }
 
+    // Obtiene cardmarket_id y cardtrader_id asociado a scryfall_id
+    public Long[] getCardmarketAndCardtraderId(String scryfallId){
 
-    // Obtengo cardmarketId y cardtraderId
-   /* public Long[] getIds(){
+        Long[] cardIds = new Long[2];
+        String query = "SELECT cardmarket_id, cardtrader_id " +
+                "FROM card_mapping " +
+                "WHERE scryfall_id = ?";
 
-        Long[] ids = new Long[2];
+        try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)){
+            stmt.setString(1, scryfallId);
 
-        String query = "SELECT cardmarket_id, cardtrader_id FROM card_mapping WHERE scryfall_id = ?";
-    }*/
+            ResultSet rs = stmt.executeQuery();
+            if(rs.next()){
+
+                cardIds[0] = rs.getLong("cardmarket_id");
+                cardIds[1] = rs.getLong("cardtrader_id");
+            }
+        }catch (SQLException e){
+            throw new RuntimeException(e);
+        }
+        return cardIds;
+    }
 }

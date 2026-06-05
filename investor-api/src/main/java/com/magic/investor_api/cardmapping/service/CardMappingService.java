@@ -27,11 +27,8 @@ public class CardMappingService {
         cardMappingDAO.updateCardmarketIdOnCardMapping();
     }
 
-    // Obtener cardmarketId a través de scryfallId
-    public Long[] getIds(){
-
-        Long[] ids = new Long[2];
-       // ids[0] =
-        return null;
+    // Obtener cardmarketId a través de scryfallId en card_mapping
+    public Long[] getIds(String scryfallId){
+        return cardMappingDAO.getCardmarketAndCardtraderId(scryfallId);
     }
 }

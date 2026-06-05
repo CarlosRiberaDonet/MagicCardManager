@@ -91,7 +91,7 @@ public class CardmarketPriceService {
     }
 
     // Obtengo precios de card_price
-    public CardmarketPrice getCardPrice(Long cardmarketId){
+    public CardmarketPrice getCardmarketPrice(Long cardmarketId){
         return cardmarketPriceDAO.checkCardPrice(cardmarketId);
     }
 }

@@ -1,10 +1,8 @@
 package com.magic.investor_api.scryfall.dao;
 
-import com.magic.investor_api.cardmarketPrice.model.CardmarketPrice;
 import com.magic.investor_api.scryfall.dto.ScryfallCardDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -107,24 +105,6 @@ public class ScryfallCardDAO {
         return cardListDTO;
     }
 
-    // mapear precios card_price a scryfall_card
-    public void updateScryfallPrices(){
-        String query = "UPDATE scryfall_card sc " +
-                "JOIN cardmarket_price cp ON cp.cardmarket_id = sc.cardmarket_id " +
-                "SET sc.price = COALESCE(cp.low, cp.avg), " +
-                "sc.price_foil = COALESCE(cp.low_foil, cp.avg_foil)";
-
-        try(Connection conn = dataSource.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(query)){
-
-            System.out.println("Actualizando precios...");
-            int filasAfectadas = stmt.executeUpdate();
-            System.out.println("Precios actualizados: " + filasAfectadas);
-
-        }catch(SQLException e){
-            throw new RuntimeException(e);
-        }
-    }
 
     // Cuenta el total de cartas que coinciden con los filtros opcionales.
     // Se usa para calcular el número de páginas en la paginación.
@@ -181,60 +161,48 @@ public class ScryfallCardDAO {
         return 0;
     }
 
-    // Obtiene cardmarket_id y cardtrader_id usando scryfall_id
-    public 
 
-    // Obtener detalles de carta mediante id de scryfall_card
-    public ScryfallCardDTO getScryfallCardById(Long cardId){
+    // Obtener detalles de carta mediante id de scryfall_id
+    public ScryfallCardDTO getScryfallCardById(String scryfallId){
 
-        String query = "SELECT sc.scryfall_id, sc.cardmarket_id, sc.cardtrader_id, sc.name, sc.printed_name, " +
-                "sc.lang, sc.image_url, sc.rarity, sc.set_name, sc.collector_number, sc.cardmarket_url, sc.type_line, " +
+        String query = "SELECT sc.id, sc.scryfall_id, sc.cardmarket_id, sc.name, sc.printed_name, " +
+                "sc.lang, sc.image_url, sc.rarity, sc.set_code, sc.set_name, sc.collector_number, sc.cardmarket_url, " +
+                "sc.price, sc.price_foil, sc.type_line, " +
                 "sc.border_color, sc.frame, sc.is_reprint, sc.released_at, " +
-                "cp.low, cp.trend, cp.avg1, cp.avg7, cp.avg30, cp.low_foil, cp.trend_foil, cp.avg1_foil, " +
-                "cp.avg7_foil, cp.avg30_foil, cp.updated_at " +
+                "ss.set_code, ss.icon_svg_uri " +
                 "FROM scryfall_card sc " +
-                "LEFT JOIN  card_price cp ON cp.cardmarket_id = sc.cardmarket_id " +
-                "WHERE sc.id = ?";
+                "JOIN scryfall_set ss ON sc.set_code = ss.set_code " +
+                "WHERE scryfall_id = ?";
 
         try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)){
 
-            stmt.setLong(1, cardId);
+            stmt.setString(1, scryfallId);
+
             ResultSet rs = stmt.executeQuery();
             if(rs.next()){
                 ScryfallCardDTO card = new ScryfallCardDTO();
-                card.setId(cardId);
-                card.setScryfallId(rs.getString("scryfall_id"));
-                card.setCardmarketId(rs.getLong("cardmarket_id"));
-                card.setCardtraderId(rs.getLong("cardtrader_id"));
-                card.setName(rs.getString("name"));
-                card.setPrintedName(rs.getString("printed_name"));
-                card.setLang(rs.getString("lang"));
-                card.setImageUrl(rs.getString("image_url"));
-                card.setRarity(rs.getString("rarity"));
-                card.setSetName(rs.getString("set_name"));
-                card.setCollectorNumber(rs.getString("collector_number"));
-                card.setCardmarketURL(rs.getString("cardmarket_url"));
-                card.setTypeLine(rs.getString("type_line"));
-                card.setBorderColor(rs.getString("border_color"));
-                card.setFrame(rs.getString("frame"));
-                card.setReprint(rs.getBoolean("is_reprint"));
+                card.setId(rs.getLong("id"));
+                card.setScryfallId(rs.getString("sc.scryfall_id"));
+                card.setCardmarketId(rs.getLong("sc.cardmarket_id"));
+                card.setName(rs.getString("sc.name"));
+                card.setPrintedName(rs.getString("sc.printed_name"));
+                card.setLang(rs.getString("sc.lang"));
+                card.setImageUrl(rs.getString("sc.image_url"));
+                card.setRarity(rs.getString("sc.rarity"));
+                card.setSetCode(rs.getString("set_code"));
+                card.setSetName(rs.getString("sc.set_name"));
+                card.setCollectorNumber(rs.getString("sc.collector_number"));
+                card.setCardmarketURL(rs.getString("sc.cardmarket_url"));
+                card.setPrice(rs.getBigDecimal("sc.price"));
+                card.setPriceFoil(rs.getBigDecimal("sc.price_foil"));
+                card.setTypeLine(rs.getString("sc.type_line"));
+                card.setBorderColor(rs.getString("sc.border_color"));
+                card.setFrame(rs.getString("sc.frame"));
+                card.setReprint(rs.getBoolean("sc.is_reprint"));
+                card.setSetCode(rs.getString("ss.set_code"));
+                card.setIconSvgUri(rs.getString("ss.icon_svg_uri"));
+
                 card.setReleasedAt(rs.getDate("released_at") != null ? rs.getDate("released_at").toLocalDate() : null);
-
-                CardmarketPrice cardmarketPrice = new CardmarketPrice();
-                cardmarketPrice.setLow(rs.getBigDecimal("low"));
-                cardmarketPrice.setTrend(rs.getBigDecimal("trend"));
-                cardmarketPrice.setAvg1(rs.getBigDecimal("avg1"));
-                cardmarketPrice.setAvg7(rs.getBigDecimal("avg7"));
-                cardmarketPrice.setAvg30(rs.getBigDecimal("avg30"));
-                cardmarketPrice.setLowFoil(rs.getBigDecimal("low_foil"));
-                cardmarketPrice.setTrendFoil(rs.getBigDecimal("trend_foil"));
-                cardmarketPrice.setAvg1Foil(rs.getBigDecimal("avg1_foil"));
-                cardmarketPrice.setAvg7Foil(rs.getBigDecimal("avg7_foil"));
-                cardmarketPrice.setAvg30Foil(rs.getBigDecimal("avg30_foil"));
-                if (rs.getTimestamp("updated_at") != null)
-                    cardmarketPrice.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
-
-                card.setCardmarketPrice(cardmarketPrice);
 
                 return card;
             }
