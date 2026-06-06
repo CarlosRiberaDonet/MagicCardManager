@@ -11,9 +11,9 @@ import com.magic.investor_api.api.ScryfallAPI;
 import com.magic.investor_api.cardmapping.service.CardMappingService;
 import com.magic.investor_api.cardmarketPrice.model.CardmarketPrice;
 import com.magic.investor_api.cardmarketPrice.service.CardmarketPriceService;
-import com.magic.investor_api.cardtrader.dto.CardtraderCardDTO;
-import com.magic.investor_api.cardtrader.service.CardTraderService;
 import com.magic.investor_api.cardtraderListing.service.CardtraderListingService;
+import com.magic.investor_api.cardtraderPrice.dto.CardtraderPriceDTO;
+import com.magic.investor_api.cardtraderPrice.service.CardtraderPriceService;
 import com.magic.investor_api.expansion.dao.ExpansionDAO;
 import com.magic.investor_api.expansion.ScryfallSet;
 import com.magic.investor_api.scryfall.dto.ScryfallCardDTO;
@@ -43,6 +43,7 @@ public class ScryfallService {
     private final ScryfallCardDAO scryfallCardDAO;
     private final CardmarketPriceService cardmarketPriceService;
     private final CardMappingService cardMappingService;
+    private final CardtraderPriceService cardtraderPriceService;
     private final CardtraderListingService cardtraderListingService;
     private CardPageDTO cardPageDTO;
 
@@ -251,46 +252,31 @@ public class ScryfallService {
     // Obtiene carta con datos completos mediante su id
     public ScryfallCardDTO getCardByscryfallId(String scryfallId){
 
-        Long[] cardIds = new Long[2];
-
-        ScryfallCardDTO card = scryfallCardDAO.getScryfallCardById(scryfallId);
-        if(card.getCardmarketId() == null){
-            // Intento obtener cardmarketId y cardtraderId asociado scryfall_card
-            cardIds = cardMappingService.getIds(scryfallId);
-        }
-
-        Long cardmarketId = cardIds[0];
-        Long cartraderId = cardIds[1];
-
         // Obtengo datos de la carta
-
-        System.out.println(card.toString());
+        ScryfallCardDTO card = scryfallCardDAO.getScryfallCardById(scryfallId);
 
         // Si existe cardmarketId
-        if(cardmarketId != null){
+        if(card.getCardmarketId() != null){
             // Trato de obtener los precios de carmarket_price
-            CardmarketPrice cardmarketPrice = cardmarketPriceService.getCardmarketPrice(cardmarketId);
+            CardmarketPrice cardmarketPrice = cardmarketPriceService.getCardmarketPrice(card.getCardmarketId());
 
             // Si cardmarket_price tiene precios para la carta
             if(cardmarketPrice != null){
-                card.setCardmarketPrice(cardmarketPrice);  // Le asigno los precios obtenidos
+                card.setCardPrice(cardmarketPrice);  // Le asigno los precios obtenidos
             }
-            return card;
-
-        } else if(cartraderId != null){
-            cardtraderListingService.checkCardtraderId(cartraderId);
         }
-        System.out.println("CARMARKET_ID: " + cardIds[0]);
-        System.out.println("CARDTRADER_ID: " + cardIds[1]);
+        // Trato de obtener cardtrader_id
+        else{
+           long cardTraderId = cardMappingService.getCardtraderId(scryfallId);
+           if(cardTraderId > 0){
+               // Trato de obtener precios de cardtrader_price
+               CardtraderPriceDTO cardPrice = cardtraderPriceService.getCardtraderPriceCacheDTO(cardTraderId, card.getLang());
+               if(cardPrice != null){
+                   card.setCardPrice(cardPrice);
+               }
+           }
+        }
 
-        // Trato de obtener precios de card_price
-        // CardmarketPrice cardPrice = cardmarketPriceService.getCardPrice(scryfallId);
-
-        /*if(cardPrice == null){
-            // Trato de obtener precios de tradercard_price_cache
-            cardtraderPriceCacheService.getCardtraderPrice();
-        }*/
-
-        return null;
+        return card;
     }
 }

@@ -325,7 +325,7 @@ public class UserDAO {
                 scryfallCardDTO.setFrame(rs.getString("frame"));
                 scryfallCardDTO.setReprint(rs.getBoolean("is_reprint"));
                 scryfallCardDTO.setReleasedAt(rs.getDate("released_at") != null ? rs.getDate("released_at").toLocalDate() : null);
-                scryfallCardDTO.setCardmarketPrice(cardmarketPrice);
+                scryfallCardDTO.setCardPrice(cardmarketPrice);
                 scryfallCardDTO.setIconSvgUri(rs.getString("icon_svg_uri"));
 
                 UserCollectionDTO collectionDTO = new UserCollectionDTO();

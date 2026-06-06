@@ -74,7 +74,7 @@ public class ScryfallController {
     }
 
 
-    // Buscar carta por id
+    // Obtener detalles de carta por scryfall_id
     @GetMapping("/scryfallId/{scryfallId}")
     public ScryfallCardDTO searchCardById(@PathVariable  String scryfallId){
         System.out.println(scryfallId);
