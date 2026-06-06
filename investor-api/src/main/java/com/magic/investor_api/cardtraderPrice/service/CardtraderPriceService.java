@@ -29,7 +29,7 @@ public class CardtraderPriceService {
         repository.saveAll(cardPriceList);
     }
 
-    // Consulta en cardtrader_price_cache
+    // Consulta en cardtrader_price
     public CardtraderPriceDTO getCardtraderPriceCacheDTO(Long cardId, String lang){
 
         return cardtraderPriceDAO.selectFromCardtraderPriceCache(cardId, lang);
