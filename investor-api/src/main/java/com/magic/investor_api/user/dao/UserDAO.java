@@ -179,8 +179,6 @@ public class UserDAO {
             stmt.setLong(1, dto.getUserId());
             stmt.setLong(2, dto.getCardId());
 
-
-
             ResultSet rs = stmt.executeQuery();
             while(rs.next()){
                 total += rs.getInt("quantity");
@@ -295,7 +293,7 @@ public class UserDAO {
                 "FROM user_collection uc " +
                 "JOIN scryfall_card sc ON uc.card_id = sc.id " +
                 "JOIN scryfall_set s ON sc.set_code = s.set_code " +
-                "JOIN card_price cp ON cp.cardmarket_id = sc.cardmarket_id " +
+                "JOIN cardmarket_price cp ON cp.cardmarket_id = sc.cardmarket_id " +
                 "WHERE user_id = ?";
 
         try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)){

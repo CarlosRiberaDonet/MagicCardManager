@@ -48,6 +48,7 @@ public class SecurityConfig {
                         .requestMatchers("/scryfall/scryfallId/**").permitAll()
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/pricecache/**").permitAll()
+                        .requestMatchers("/user/**").authenticated()
                         .requestMatchers("/prices/**").hasRole("ADMIN")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
