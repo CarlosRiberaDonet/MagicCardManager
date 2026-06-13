@@ -8,9 +8,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.magic.investor_api.CardPageDTO;
 import com.magic.investor_api.api.ScryfallAPI;
-import com.magic.investor_api.cardmapping.service.CardMappingService;
 import com.magic.investor_api.cardmarketPrice.model.CardmarketPrice;
 import com.magic.investor_api.cardmarketPrice.service.CardmarketPriceService;
+import com.magic.investor_api.cardtrader.service.CardTraderService;
 import com.magic.investor_api.cardtraderListing.service.CardtraderListingService;
 import com.magic.investor_api.cardtraderPrice.dto.CardtraderPriceDTO;
 import com.magic.investor_api.cardtraderPrice.service.CardtraderPriceService;
@@ -22,7 +22,6 @@ import com.magic.investor_api.scryfall.repository.ScryfallRepository;
 import com.magic.investor_api.scryfall.dao.ScryfallCardDAO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,8 +40,8 @@ public class ScryfallService {
     private final ScryfallRepository ScryfallCardRepository;
     private final ExpansionDAO expansionDAO;
     private final ScryfallCardDAO scryfallCardDAO;
+    private final CardTraderService cardTraderService;
     private final CardmarketPriceService cardmarketPriceService;
-    private final CardMappingService cardMappingService;
     private final CardtraderPriceService cardtraderPriceService;
     private final CardtraderListingService cardtraderListingService;
     private CardPageDTO cardPageDTO;
@@ -250,7 +249,7 @@ public class ScryfallService {
     }
 
     // Obtiene carta con datos completos mediante su id
-    public ScryfallCardDTO getCardByscryfallId(String scryfallId){
+    public ScryfallCardDTO getCardByscryfallId(String scryfallId, String lang, String condition, boolean isFoil){
 
         // Obtengo datos de la carta
         ScryfallCardDTO card = scryfallCardDAO.getScryfallCardById(scryfallId);
@@ -265,14 +264,15 @@ public class ScryfallService {
                 card.setCardPrice(cardmarketPrice);  // Le asigno los precios obtenidos
             }
         }
-        // Trato de obtener cardtrader_id
+        // Si no hay precios en cardmarket, trato de obtenerlos de cardtrader_price
         else{
-           long cardTraderId = cardMappingService.getCardtraderId(scryfallId);
-           if(cardTraderId > 0){
+           long cardTraderId = cardTraderService.getCardtraderIdByScryfallId(scryfallId);
+           if(cardTraderId > 0) {
                // Trato de obtener precios de cardtrader_price
-               CardtraderPriceDTO cardPrice = cardtraderPriceService.getCardtraderPriceCacheDTO(cardTraderId, card.getLang());
-               if(cardPrice != null){
-                   card.setCardPrice(cardPrice);
+               CardtraderPriceDTO cardPrice = cardtraderPriceService.getCardtraderPrice(cardTraderId, lang, condition, isFoil);
+               // Si cardtrader_price tiene precios para la carta
+               if (cardPrice == null) {
+                   card.setCardPrice(cardPrice); // Le asigno los precios obtenidos
                }
            }
         }

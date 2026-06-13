@@ -76,8 +76,11 @@ public class ScryfallController {
 
     // Obtener detalles de carta por scryfall_id
     @GetMapping("/scryfallId/{scryfallId}")
-    public ScryfallCardDTO searchCardById(@PathVariable  String scryfallId){
-        System.out.println(scryfallId);
-        return scryfallService.getCardByscryfallId(scryfallId);
+    public ScryfallCardDTO searchCardById(@PathVariable  String scryfallId,
+                                          @RequestParam(required = false) String lang,
+                                          @RequestParam(required = false) String condition,
+                                          @RequestParam(required = false, defaultValue = "false") boolean isFoil
+    ){
+        return scryfallService.getCardByscryfallId(scryfallId, lang, condition, isFoil);
     }
 }

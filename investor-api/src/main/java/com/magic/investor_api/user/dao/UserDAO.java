@@ -81,12 +81,15 @@ public class UserDAO {
 
         // Compruebo si la carta ya está en la colección del usuario
         if (selectCollectionCardQuantity(dto) > 0) {
+            System.out.println("La carta ya está en la colección " );
             // Compruebo si el precio de compra es el mismo
             if(selectCollectionCardPrice(dto.getUserId(), dto.getCardId()) == dto.getPurchasePrice().doubleValue()){
+                System.out.println("El precio de compra es el mismo");
                 return updateQuantityCollection(dto.getUserId(), dto.getCardId(), +1); // Sumo +1 a la cantidad de la carta
             }
         }
 
+        System.out.println("Insertando carta");
         String query = "INSERT INTO user_collection (user_id, card_id, purchase_price, quantity) " +
                 "VALUES(?, ?, ?, ?)";
 

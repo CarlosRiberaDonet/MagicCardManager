@@ -36,26 +36,22 @@ public class CardtraderDAO {
         }
     }
 
-    // Obtiene cardtrader_id mapeando scryfall_id
-    public Long getCardtraderIdByScryfallId(String scryfallId){
+    // Obtener cardtrader_id de la tabla cardtrader_card
+    public long selectCardTraderId(String cscryfallId){
 
-        String query = "SELECT cardtrader_id FROM card_mapping WHERE scryfall_id = ?";
+        String query = "SELECT cardtrader_id" +
+                        "FROM cardtrader_card " +
+                        "WHERE scryfall_id = ? ";
 
-        try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)){
-
-            stmt.setString(1, scryfallId);
+        try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
 
             ResultSet rs = stmt.executeQuery();
             if(rs.next()){
-                Long cardtraderId = rs.getLong("cardtrader_id");
-                if(rs.wasNull()){
-                    return null;
-                }
-                return cardtraderId;
+                return rs.getLong("cardtrader_id");
             }
         }catch (SQLException e){
             throw new RuntimeException(e);
         }
-        return null;
+        return -1;
     }
 }

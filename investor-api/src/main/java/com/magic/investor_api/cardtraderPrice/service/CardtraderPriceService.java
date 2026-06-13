@@ -5,7 +5,6 @@ import com.magic.investor_api.cardtraderListing.dao.CardtraderListingDAO;
 import com.magic.investor_api.cardtraderPrice.dao.CardtraderPriceDAO;
 import com.magic.investor_api.cardtraderPrice.model.CardtraderPrice;
 import com.magic.investor_api.cardtraderPrice.repository.CardtraderPriceRepository;
-import com.magic.investor_api.cardmarketPrice.model.CardmarketPrice;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -29,9 +28,8 @@ public class CardtraderPriceService {
         repository.saveAll(cardPriceList);
     }
 
-    // Consulta en cardtrader_price
-    public CardtraderPriceDTO getCardtraderPriceCacheDTO(Long cardId, String lang){
-
-        return cardtraderPriceDAO.selectFromCardtraderPriceCache(cardId, lang);
+    // Consulta de precios de la carta en cardtrader
+    public CardtraderPriceDTO getCardtraderPrice(Long cardTraderId, String lang, String condition, boolean isFoil){
+        return cardtraderPriceDAO.selectFromCardtraderPriceCache(cardTraderId, lang, condition, isFoil);
     }
 }

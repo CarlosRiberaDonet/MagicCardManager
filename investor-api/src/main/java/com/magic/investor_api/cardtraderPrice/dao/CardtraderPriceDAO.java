@@ -16,17 +16,19 @@ public class CardtraderPriceDAO {
     @Autowired
     private DataSource dataSource;
 
-    // Buscar carta mediante filtros en cardtrader_price_cache
-    public CardtraderPriceDTO selectFromCardtraderPriceCache(Long cardId, String lang){
+    // Buscar carta mediante filtros en cardtrader_price
+    public CardtraderPriceDTO selectFromCardtraderPriceCache(Long cardTraderId, String lang, String condition, boolean isFoil){
 
-        String query = "SELECT * FROM cardtrader_price_cache " +
-                "WHERE card_id = ? " +
-                "AND lang = ?";
+        String query = "SELECT avg, low, trend, avg1, avg7, avg30, fetched_at " +
+                "FROM cardtrader_price " +
+                "WHERE card_id = ? AND lang = ? AND condition = ? AND is_foil = ?";
 
         try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)){
 
-            stmt.setLong(1, cardId);
+            stmt.setLong(1, cardTraderId);
             stmt.setString(2, lang);
+            stmt.setString(3, condition);
+            stmt.setBoolean(4, isFoil);
 
             ResultSet rs = stmt.executeQuery();
             if(rs.next()){

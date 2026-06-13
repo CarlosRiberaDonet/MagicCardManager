@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.magic.investor_api.scryfall.dao.ScryfallCardDAO;
 import com.magic.investor_api.cardmarketPrice.dao.CardmarketPriceDAO;
-import com.magic.investor_api.cardmapping.CardPriceMapper;
 import com.magic.investor_api.cardmarketPrice.model.CardmarketPrice;
 import com.magic.investor_api.cardmarketPrice.repository.CardmarketPriceRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +35,6 @@ public class CardmarketPriceService {
     // Importar precios de JSON carmarket a card_price
     public void importGuidePricesToBD() throws IOException {
 
-        CardPriceMapper cardPriceMapper = new CardPriceMapper();
         // Limpiar precios anteriores antes de insertar los nuevos
         cardmarketPriceDAO.truncateCardPrice();
 
@@ -48,16 +47,18 @@ public class CardmarketPriceService {
         // Abro el parser sobre el fichero
         try (JsonParser parser = factory.createParser(new File(GUIDE_PRICES_JSON_PATH))) {
 
-            // Primer token del JSON: debe ser un objeto raíz {...}
-            if (parser.nextToken() != JsonToken.START_OBJECT) {
-                throw new IOException("Formato JSON inválido, se esperaba un objeto al inicio");
-            }
+
 
             // Itero sobre cada campo del objeto raíz
             while (parser.nextToken() != JsonToken.END_OBJECT) {
 
-                // Avanzo al valor del campo
+                String fieldName = parser.getCurrentName();
                 parser.nextToken();
+
+                if(!"priceGuides".equals(fieldName)){
+                    parser.skipChildren();
+                    continue;
+                }
 
                 // Convierto todo el array en memoria
                 JsonNode priceGuidesArray = objectMapper.readTree(parser);
@@ -65,8 +66,8 @@ public class CardmarketPriceService {
                 // Recorro cada elemento dentro del array
                 for (JsonNode guide : priceGuidesArray) {
 
-                    List<CardmarketPrice> newPrices = cardPriceMapper.mapNodeToCardPrice(guide);
-                    batch.addAll(newPrices);
+                    CardmarketPrice price = mapNodeToCardmarketPrice(guide);
+                    batch.add(price);
 
                     // Guardo cada 1000 elementos
                     if (batch.size() >= 1000) {
@@ -74,10 +75,6 @@ public class CardmarketPriceService {
                         batch.clear();
                         System.out.println(" Cartas volcadas a la BD:");
                     }
-                    /*else {
-                        // Si el campo no te interesa, lo ignoras completamente
-                        parser.skipChildren();
-                    }*/
                 }
                 // Guardamos los últimos elementos que queden en batch
                 if (!batch.isEmpty()) {
@@ -90,7 +87,35 @@ public class CardmarketPriceService {
         }
     }
 
-    // Obtengo precios de card_price
+    public CardmarketPrice mapNodeToCardmarketPrice(JsonNode node){
+        CardmarketPrice price = new CardmarketPrice();
+
+        price.setCardmarketId(node.get("idProduct").asLong());
+        price.setAvg(getDecimal(node, "avg"));
+        price.setLow(getDecimal(node,"low"));
+        price.setTrend(getDecimal(node, "trend"));
+        price.setAvg1(getDecimal(node, "avg1"));
+        price.setAvg7(getDecimal(node,"avg7"));
+        price.setAvg30(getDecimal(node, "avg30"));
+        price.setAvgFoil(getDecimal(node, "avg-foil"));
+        price.setLowFoil(getDecimal(node,"low-foil"));
+        price.setTrendFoil(getDecimal(node,"trend-foil"));
+        price.setAvg1Foil(getDecimal(node,"avg1-foil"));
+        price.setAvg7Foil(getDecimal(node, "avg7-foil"));
+        price.setAvg30Foil(getDecimal(node,"avg30-foil"));
+
+        return price;
+    }
+
+    // Comprobador de campos decimales
+    private BigDecimal getDecimal(JsonNode node, String field) {
+        JsonNode value = node.get(field);
+        return (value == null || value.isNull())
+                ? null
+                : value.decimalValue();
+    }
+
+    // Obtengo precios de cardmarket_price
     public CardmarketPrice getCardmarketPrice(Long cardmarketId){
         return cardmarketPriceDAO.checkCardPrice(cardmarketId);
     }

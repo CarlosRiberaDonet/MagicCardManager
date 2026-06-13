@@ -34,35 +34,18 @@ public class CardtraderListingService {
     }
 
     //  Obtener y mapear JsonNode del mercado de cartas cardtrader
-    public CardtraderPriceDTO updateCardPrices(String scryfallId, String lang){
+    public boolean updateCardPrice(Long cardtraderId){
 
-        // Obtengo el cardtrader_id que corresponde a ese scryfall_id
-        Long cardtraderId = cardTraderService.getCardtraderId(scryfallId);
-        if(cardtraderId == null || cardtraderId <= 0){
-            System.out.println("No existe cardtraderId asociado a scryfallId: " + scryfallId);
-            return null;
-        }
+        // Obtengo lista de cartas a través del cardtraderId
+        JsonNode node = cardTraderAPI.fetchCardProducts(cardtraderId);
 
-        // Creo objeto DTO con los resultados de la consulta
-        CardtraderPriceDTO dto = cardtraderPriceService.getCardtraderPriceCacheDTO(cardtraderId, lang);
+        // Leo la respuesta JSON y convierto a objeto de tipo CardtraderListing e inserto en cardtrader_listing
+        readCardtraderJsonNode(cardtraderId, node);
 
-        // Compruebo si la carta ya existe en cardtrader_price_cache
-        if(dto == null){
-            // Obtengo lista de cartas a través del cardtraderId
-            JsonNode node = cardTraderAPI.fetchCardProducts(cardtraderId);
+        // Insertar lista filtrada en cardtrader_price_cache
+        cardtraderPriceService.convertCardtraderListingToPriceCache();
 
-            // Leo la respuesta JSON y convierto a objeto de tipo CardtraderListing e inserto en cardtrader_listing
-            readCardtraderJsonNode(cardtraderId, node);
-
-            // Insertar lista filtrada en cardtrader_price_cache
-            cardtraderPriceService.convertCardtraderListingToPriceCache();
-
-            // Creo objeto DTO con los resultados de la consulta
-            dto = cardtraderPriceService.getCardtraderPriceCacheDTO(cardtraderId, lang);
-        }
-
-        // Consulta precios de la carta elegida por el usuario
-        return dto;
+        return true;
     }
 
     // Leer JSON de cartas y mapearlas a Lista<CardTraderListing>
