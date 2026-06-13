@@ -82,8 +82,9 @@ public class CardTraderService {
         cardtraderDAO.mappingCardtraderSets();
     }
 
-    // Obtener cardtrader_id mapeando scryfall_id
-    public Long getCardtraderId(String scryfallId){
-        return cardtraderDAO.getCardtraderIdByScryfallId(scryfallId);
+
+    // Obtener cardtrader_id a través del scryfall_id
+    public Long getCardtraderIdByScryfallId(String scryfallId){
+        return cardtraderDAO.selectCardTraderId(scryfallId);
     }
 }

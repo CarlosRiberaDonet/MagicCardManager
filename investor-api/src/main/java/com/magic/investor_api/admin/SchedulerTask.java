@@ -3,7 +3,6 @@ package com.magic.investor_api.admin;
 import com.magic.investor_api.cardtrader.dao.CardtraderDAO;
 import com.magic.investor_api.cardtrader.ports.CardTraderAPI;
 import com.magic.investor_api.api.CardmarketDownloader;
-import com.magic.investor_api.cardmapping.service.CardMappingService;
 import com.magic.investor_api.cardtrader.service.CardTraderService;
 import com.magic.investor_api.cardtraderPrice.service.CardtraderPriceService;
 import com.magic.investor_api.cardmarketPrice.service.CardmarketPriceService;
@@ -23,7 +22,6 @@ public class SchedulerTask {
     private final CardtraderDAO cardtraderDAO;
     private final CardmarketDownloader cardmarketDownloader;
     private final CardmarketPriceService cardmarketPriceService;
-    private final CardMappingService cardMappingService;
     private final CardtraderPriceService cardtraderPriceService;
 
     private final CardTraderAPI cardTraderAPI;

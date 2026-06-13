@@ -21,7 +21,7 @@ public class UserController {
         this.jwtService = jwtService;
     }
 
-    // Recibe userId y cardId para comprobar si el usuario tiene añadida esa carta en user_watchlist
+    // Recibe userId y cardId para comprobar si el usuario tiene añadida la carta en user_collection
     @GetMapping("/collection/contains")
     public ResponseEntity<Integer> collectionQuantity(HttpServletRequest httpRequest, @RequestParam Long cardId) {
         String token = httpRequest.getHeader("Authorization").substring(7);
@@ -30,7 +30,7 @@ public class UserController {
         return ResponseEntity.ok(quantity); // 0 si no tiene la carta, > 0 si la tiene
     }
 
-    // Recibe userId y cardId para comprobar si el usuario tiene añadida esa carta
+    // Recibe userId y cardId para comprobar si el usuario tiene añadida la carta user_watchlist
     @GetMapping("/watchlist/contains")
     public ResponseEntity<Boolean>  getCardWatchlistById(HttpServletRequest httpRequest, @RequestParam Long cardId){
         String token = httpRequest.getHeader("Authorization").substring(7);
@@ -73,11 +73,12 @@ public class UserController {
     // Eliminar carta en user_watchlist mediante card_id
     @DeleteMapping("/watchlist/del")
     public ResponseEntity<String> delFromWatchlist(@RequestBody UserCollectionDTO request, HttpServletRequest httpRequest){
+        System.out.println("DELETE WATCHLIST");
         String token = httpRequest.getHeader("Authorization").substring(7);
         Long userId = jwtService.extractUserId(token);
         boolean result = userService.delFromWatchlist(userId, request);
-        if(result) return ResponseEntity.ok("Carta añadida correctamente");
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al añadir carta");
+        if(result) return ResponseEntity.ok("Carta eliminada correctamente");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al eliminar carta");
     }
 
     // Obtener colección de cartas del usuario
