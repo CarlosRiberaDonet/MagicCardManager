@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -86,7 +87,7 @@ public class ScryfallService {
     public void importScryfallCardsToBD() throws IOException {
 
         // Descargar cartas de scryfall
-        // scryfallDownloader.downloadCards();
+        //scryfallDownloader.downloadCards();
         String CARDS = path + "/src/main/resources/cards.json";
 
         InputStream input = new FileInputStream(CARDS);
@@ -151,7 +152,6 @@ public class ScryfallService {
 
         card.setLang(node.path("lang").asText("en"));
 
-        // Métodos para extraer la url de la carta
         card.setImageUrl(extractImageUrl(node));
         card.setRarity(node.path("rarity").asText("common"));
         card.setSetName(node.path("set_name").asText(""));
@@ -161,8 +161,13 @@ public class ScryfallService {
 
         // Obtener precios de la carta
         JsonNode prices = node.path("prices");
-        card.setPrice(prices.path("eur").isNull() ? null : prices.path("eur").decimalValue());
-        card.setPriceFoil(prices.path("eur_foil").isNull() ? null : prices.path("eur_foil").decimalValue());
+        JsonNode eurNode = prices.get("eur");
+        card.setPrice(
+                (eurNode == null || eurNode.isNull() || eurNode.asText().isBlank())
+                        ? null
+                        : new BigDecimal(eurNode.asText())
+        );
+
         card.setTypeLine(node.path("type_line").asText(""));
         card.setBorderColor(node.path("border_color").asText(""));
         card.setFrame(node.path("frame").asText());
@@ -243,6 +248,9 @@ public class ScryfallService {
         // Busco la carta mediante su nombre
         List<ScryfallCardDTO> cardListDTO = scryfallCardDAO.selectFiltersCard(name, setCode, rarity,
                 lang, typeLine, orderBy, minPrice, maxPrice, size, offset, hideNA);
+
+        // Obtengo el low price de carmarket_price
+
         cardPageDTO = new CardPageDTO(totalCards, page, cardListDTO);
 
         return cardPageDTO;

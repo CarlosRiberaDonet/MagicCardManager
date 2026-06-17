@@ -289,7 +289,7 @@ public class UserDAO {
         List<UserCollectionDTO> userCollectionDTO = new ArrayList<>();
 
         String query = "SELECT uc.user_id, uc.card_id, uc.purchase_price, uc.quantity, uc.card_condition, uc.added_at, " +
-                "sc.name, sc.printed_name, sc.lang, sc.image_url, sc.rarity, sc.set_name, " +
+                "sc.scryfall_id, sc.name, sc.printed_name, sc.lang, sc.image_url, sc.rarity, sc.set_name, " +
                 "sc.collector_number, sc.type_line, sc.border_color, sc.frame, sc.is_reprint, " +
                 "sc.released_at, cp.low, cp.trend, cp.low_foil, cp.trend_foil, cp.updated_at, " +
                 "s.icon_svg_uri " +
@@ -313,7 +313,7 @@ public class UserDAO {
                 cardmarketPrice.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
 
                 ScryfallCardDTO scryfallCardDTO = new ScryfallCardDTO();
-                scryfallCardDTO.setId(rs.getLong("card_id"));
+                scryfallCardDTO.setScryfallId(rs.getString("scryfall_id"));
                 scryfallCardDTO.setName(rs.getString("name"));
                 scryfallCardDTO.setPrintedName(rs.getString("printed_name"));
                 scryfallCardDTO.setLang(rs.getString("lang"));
