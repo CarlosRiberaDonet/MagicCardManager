@@ -16,8 +16,7 @@ public class ScryfallCardDAO {
     @Autowired
     private DataSource dataSource;
 
-    // Busca cartas aplicando filtros opcionales: nombre, set, rareza, idioma, tipo y precio.
-    // Todos los parámetros son opcionales excepto size y offset.
+    // Busca cartas aplicando filtros opcionales. Todos los parámetros son opcionales excepto size y offset.
     public List<ScryfallCardDTO> selectFiltersCard(String name, String setCode, String rarity,
                                                    String lang, String typeLine, String orderBy,
                                                    Double minPrice, Double maxPrice,
@@ -193,8 +192,6 @@ public class ScryfallCardDAO {
                 card.setSetName(rs.getString("sc.set_name"));
                 card.setCollectorNumber(rs.getString("sc.collector_number"));
                 card.setCardmarketURL(rs.getString("sc.cardmarket_url"));
-                card.setPrice(rs.getBigDecimal("sc.price"));
-                card.setPriceFoil(rs.getBigDecimal("sc.price_foil"));
                 card.setTypeLine(rs.getString("sc.type_line"));
                 card.setBorderColor(rs.getString("sc.border_color"));
                 card.setFrame(rs.getString("sc.frame"));
@@ -212,7 +209,7 @@ public class ScryfallCardDAO {
         return null;
     }
 
-    // Obtiene carta mediante cardId
+    // Obtiene URL de cardmarket
     public String getUrlCard(Long cardId){
 
         String query = "SELECT url FROM scryfall_card WHERE id = ? ";
@@ -259,4 +256,21 @@ public class ScryfallCardDAO {
         return scryfallIdList;
     }
 
+    // Actualiza el campo price
+    public void updateScryfallPrice(){
+        String query = "UPDATE scryfall_card sc " +
+                "JOIN cardmarket_price cp ON sc.cardmarket_id = cp.cardmarket_id " +
+                "SET sc.price = cp.low " +
+                "WHERE cp.low IS NOT NULL";
+
+        try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)){
+
+           int filasAfectadas = stmt.executeUpdate();
+           if(filasAfectadas > 0){
+               System.out.println("Total precios actualizados" + filasAfectadas);
+            }
+        }catch (SQLException e){
+            throw new RuntimeException(e);
+        }
+    }
 }
