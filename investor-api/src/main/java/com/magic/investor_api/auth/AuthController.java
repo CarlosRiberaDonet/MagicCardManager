@@ -1,31 +1,38 @@
 package com.magic.investor_api.auth;
 
+import com.magic.investor_api.user.dto.ChangeEmailRequest;
 import com.magic.investor_api.user.dto.UserDTO;
 import com.magic.investor_api.user.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("auth")
 public class AuthController {
 
-
     private final UserService userService;
 
     public AuthController(UserService userService){
-
         this.userService = userService;
     }
 
-    // Crear endpoint para registrarme en la BD
+    // Registrar user en la BD
     @PostMapping("/register")
-    public boolean  register(@RequestBody UserDTO request){
+    public ResponseEntity<Void> register(@RequestBody UserDTO request) {
 
-        return userService.regUser(request);
+        // Comprobar si el usuario ya existe en la BD
+        if(userService.checkEmail(request.getEmail())){
+            return ResponseEntity
+                    .status(HttpStatus.CONFLICT)
+                    .build();
+        }
+
+        userService.regUser(request);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .build();
     }
 
     @PostMapping("/login")

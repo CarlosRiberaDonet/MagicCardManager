@@ -14,23 +14,26 @@ public class UserCollectionDTO {
     private LocalDate addedAt;
     private ScryfallCardDTO card;
 
-    // CONSTRUTOR
-    public UserCollectionDTO() {
-    }
+    public UserCollectionDTO() {}
 
     public UserCollectionDTO(Long userId, Long cardId){
         this.userId = userId;
         this.cardId = cardId;
     }
 
-    // GETTERS Y SETTERS
-    public Long getCardId() {
-        return cardId;
+    public UserCollectionDTO(Long userId, Long cardId, Double purchasePrice,
+                             int quantity, String cardCondition,
+                             LocalDate addedAt) {
+        this.userId = userId;
+        this.cardId = cardId;
+        this.purchasePrice = purchasePrice;
+        this.quantity = quantity;
+        this.cardCondition = cardCondition;
+        this.addedAt = addedAt;
+        this.card = card;
     }
 
-    public void setCardId(Long cardId) {
-        this.cardId = cardId;
-    }
+    // getters/setters únicos
 
     public Long getUserId() {
         return userId;
@@ -38,6 +41,14 @@ public class UserCollectionDTO {
 
     public void setUserId(Long userId) {
         this.userId = userId;
+    }
+
+    public Long getCardId() {
+        return cardId;
+    }
+
+    public void setCardId(Long cardId) {
+        this.cardId = cardId;
     }
 
     public Double getPurchasePrice() {
@@ -64,14 +75,6 @@ public class UserCollectionDTO {
         this.cardCondition = cardCondition;
     }
 
-    public ScryfallCardDTO getCard() {
-        return card;
-    }
-
-    public void setCard(ScryfallCardDTO card) {
-        this.card = card;
-    }
-
     public LocalDate getAddedAt() {
         return addedAt;
     }
@@ -80,23 +83,11 @@ public class UserCollectionDTO {
         this.addedAt = addedAt;
     }
 
-    public ScryfallCardDTO getScryfallCard() {
+    public ScryfallCardDTO getCard() {
         return card;
     }
 
-    public void setScryfallCard(ScryfallCardDTO card) {
+    public void setCard(ScryfallCardDTO card) {
         this.card = card;
-    }
-
-    @Override
-    public String toString() {
-        return "UserCollectionDTO{" +
-                "userId=" + userId +
-                ", cardId=" + cardId +
-                ", purchasePrice=" + purchasePrice +
-                ", quantity=" + quantity +
-                ", addedAt=" + addedAt +
-                ", card=" + card +
-                '}';
     }
 }

@@ -1,5 +1,6 @@
 package com.magic.investor_api.auth;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,44 +19,79 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
 
+    // Inyección por constructor (buena práctica)
     public JwtAuthFilter(JwtService jwtService) {
         this.jwtService = jwtService;
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain
+    ) throws ServletException, IOException {
 
-        // 1. Leer el header Authorization
+        // ===========================
+        // 1. LEER HEADER AUTHORIZATION
+        // ===========================
         String authHeader = request.getHeader("Authorization");
 
-        // 2. Si no hay token o no empieza por "Bearer ", dejamos pasar
+        // Si no hay token o no es Bearer, se continúa sin autenticar
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // 3. Extraer el token quitando "Bearer "
+        // ===========================
+        // 2. EXTRAER TOKEN
+        // ===========================
         String token = authHeader.substring(7);
 
-        // 4. Validar el token y autenticar al usuario
         try {
+            // ===========================
+            // 3. VALIDAR TOKEN (firma + expiración)
+            // ===========================
             String email = jwtService.extractEmail(token);
             String role = jwtService.extractRole(token);
 
-            UsernamePasswordAuthenticationToken auth =
+            // ===========================
+            // 4. CREAR AUTENTICACIÓN
+            // ===========================
+            UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(
-                            email,
+                            email, // principal (usuario autenticado)
                             null,
                             List.of(new SimpleGrantedAuthority("ROLE_" + role))
                     );
 
-            SecurityContextHolder.getContext().setAuthentication(auth);
-        } catch (Exception e) {
-            System.out.println("Token inválido: " + e.getMessage());
-        }
+            // ===========================
+            // 5. GUARDAR EN CONTEXTO DE SEGURIDAD
+            // ===========================
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        filterChain.doFilter(request, response);
+            // Continuar filtro normal
+            filterChain.doFilter(request, response);
+            return;
+
+        } catch (ExpiredJwtException e) {
+
+            // ===========================
+            // TOKEN EXPIRADO
+            // ===========================
+            SecurityContextHolder.clearContext();
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Token expirado");
+            return;
+
+        } catch (Exception e) {
+
+            // ===========================
+            // TOKEN INVÁLIDO (firma, formato, etc)
+            // ===========================
+            SecurityContextHolder.clearContext();
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Token inválido");
+            return;
+        }
     }
 }

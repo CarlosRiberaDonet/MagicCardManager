@@ -1,67 +1,96 @@
 package com.magic.investor_api.auth;
 
 import com.magic.investor_api.user.model.User;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Service;
-
 import javax.crypto.SecretKey;
-import java.util.Base64;
 import java.util.Date;
 
 @Service
 public class JwtService {
 
-    // Clave secreta para firmar el token — en producción iría en application.properties
-    private final String SECRET_KEY = "clave_secreta_muy_larga_para_que_sea_segura_1234567890";
+    // ===========================
+    // CLAVE SECRETA JWT
+    // ===========================
+    // IMPORTANTE:
+    // - Debe ser suficientemente larga
+    // - En producción debe ir en application.properties o vault
+    private static final String SECRET_KEY =
+            "clave_secreta_muy_larga_para_que_sea_segura_1234567890";
 
-    // Genera un token JWT para un usuario
+    // ===========================
+    // KEY FIRMA JWT (ÚNICA Y FIJA)
+    // ===========================
+    // Se crea una sola vez para evitar inconsistencias entre firma y verificación
+    private final SecretKey key =
+            Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
+
+    // ===========================
+    // GENERAR TOKEN JWT
+    // ===========================
     public String generateToken(User user) {
+
         return Jwts.builder()
+
+                // ID del usuario dentro del token
                 .claim("userId", user.getId())
+
+                // Email como subject estándar JWT
                 .subject(user.getEmail())
+
+                // Rol del usuario
                 .claim("role", user.getRole())
+
+                // Fecha de creación
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24)) // 24 horas
-                .signWith(getSigningKey())
+
+                // Expiración (24 horas)
+                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
+
+                // FIRMA DEL TOKEN (IMPORTANTE: HS256)
+                .signWith(key, Jwts.SIG.HS256)
+
                 .compact();
     }
 
-    // Convierte la clave secreta en un objeto Key
-    private SecretKey getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(
-                Base64.getEncoder().encodeToString(SECRET_KEY.getBytes())
-        );
-        return Keys.hmacShaKeyFor(keyBytes);
-    }
+    // ===========================
+    // PARSEAR TOKEN (VALIDAR FIRMA)
+    // ===========================
+    private Claims parseToken(String token) {
 
-    // Extraer id del user a través del token de sesión
-    public Long extractUserId(String token){
         return Jwts.parser()
-                .verifyWith(getSigningKey())
+                .verifyWith(key)
                 .build()
                 .parseSignedClaims(token)
-                .getPayload()
+                .getPayload();
+    }
+
+    // ===========================
+    // EXTRAER USER ID
+    // ===========================
+    public Long extractUserId(String token) {
+
+        return parseToken(token)
                 .get("userId", Long.class);
     }
 
-    // Extraer email del user a través del token de sesión
+    // ===========================
+    // EXTRAER EMAIL
+    // ===========================
     public String extractEmail(String token) {
-        return Jwts.parser()
-                .verifyWith(getSigningKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload()
+
+        return parseToken(token)
                 .getSubject();
     }
 
+    // ===========================
+    // EXTRAER ROLE
+    // ===========================
     public String extractRole(String token) {
-        return Jwts.parser()
-                .verifyWith(getSigningKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload()
+
+        return parseToken(token)
                 .get("role", String.class);
     }
 }

@@ -1,11 +1,14 @@
 package com.magic.investor_api.user.controller;
 
 import com.magic.investor_api.auth.JwtService;
+import com.magic.investor_api.user.dto.ChangeEmailRequest;
+import com.magic.investor_api.user.dto.UserDTO;
 import com.magic.investor_api.user.service.UserService;
 import com.magic.investor_api.user.dto.UserCollectionDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -73,7 +76,6 @@ public class UserController {
     // Eliminar carta en user_watchlist mediante card_id
     @DeleteMapping("/watchlist/del")
     public ResponseEntity<String> delFromWatchlist(@RequestBody UserCollectionDTO request, HttpServletRequest httpRequest){
-        System.out.println("DELETE WATCHLIST");
         String token = httpRequest.getHeader("Authorization").substring(7);
         Long userId = jwtService.extractUserId(token);
         boolean result = userService.delFromWatchlist(userId, request);
@@ -87,5 +89,26 @@ public class UserController {
         String token = httpRequest.getHeader("Authorization").substring(7);
         Long userId = jwtService.extractUserId(token);
         return userService.getMyCollection(userId);
+    }
+
+
+    // Obtener datos del user
+    @GetMapping("profile")
+    public UserDTO loadProfile(HttpServletRequest httpRequest){
+        String token = httpRequest.getHeader("Authorization").substring(7);
+        Long userId = jwtService.extractUserId(token);
+        return userService.getUser(userId);
+    }
+    // Cambiar email del usuario
+    @PostMapping("/email")
+    public ResponseEntity<?> changeEmail(@RequestBody ChangeEmailRequest request) {
+
+        String email = (String) SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getPrincipal();
+
+        userService.changeUserEmail(email, request);
+
+        return ResponseEntity.ok("Email actualizado");
     }
 }
