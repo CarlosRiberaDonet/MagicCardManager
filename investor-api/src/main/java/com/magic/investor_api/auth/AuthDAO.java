@@ -95,24 +95,4 @@ public class AuthDAO {
                 userId
         );
     }
-
-    // Obtener todas las cartas del usuario de user_watchlist
-    public List<UserCollectionDTO> selectCollectionCards(Long userId) {
-
-        String sql = "SELECT user_id, card_id, purchase_price, quantity, added_at " +
-                "FROM user_collection WHERE user_id = ?";
-
-        return jdbcTemplate.query(
-                sql,
-                (rs, rowNum) -> new UserCollectionDTO(
-                        rs.getLong("user_id"),
-                        rs.getLong("card_id"),
-                        rs.getDouble("purchase_price"),
-                        rs.getInt("quantity"),
-                        rs.getString("card_condition"),
-                        rs.getDate("added_at").toLocalDate()
-                ),
-                userId
-        );
-    }
 }

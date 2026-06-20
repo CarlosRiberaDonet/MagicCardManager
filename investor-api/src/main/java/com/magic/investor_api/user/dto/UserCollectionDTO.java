@@ -23,7 +23,7 @@ public class UserCollectionDTO {
 
     public UserCollectionDTO(Long userId, Long cardId, Double purchasePrice,
                              int quantity, String cardCondition,
-                             LocalDate addedAt) {
+                             LocalDate addedAt, ScryfallCardDTO card) {
         this.userId = userId;
         this.cardId = cardId;
         this.purchasePrice = purchasePrice;
