@@ -171,11 +171,59 @@ public class ScryfallCardDAO {
                 "ss.set_code, ss.icon_svg_uri " +
                 "FROM scryfall_card sc " +
                 "JOIN scryfall_set ss ON sc.set_code = ss.set_code " +
-                "WHERE scryfall_id = ?";
+                "WHERE id = ?";
 
         try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)){
 
             stmt.setString(1, scryfallId);
+
+            ResultSet rs = stmt.executeQuery();
+            if(rs.next()){
+                ScryfallCardDTO card = new ScryfallCardDTO();
+                card.setId(rs.getLong("id"));
+                card.setScryfallId(rs.getString("sc.scryfall_id"));
+                card.setCardmarketId(rs.getLong("sc.cardmarket_id"));
+                card.setName(rs.getString("sc.name"));
+                card.setPrintedName(rs.getString("sc.printed_name"));
+                card.setLang(rs.getString("sc.lang"));
+                card.setImageUrl(rs.getString("sc.image_url"));
+                card.setRarity(rs.getString("sc.rarity"));
+                card.setSetCode(rs.getString("set_code"));
+                card.setSetName(rs.getString("sc.set_name"));
+                card.setCollectorNumber(rs.getString("sc.collector_number"));
+                card.setCardmarketURL(rs.getString("sc.cardmarket_url"));
+                card.setTypeLine(rs.getString("sc.type_line"));
+                card.setBorderColor(rs.getString("sc.border_color"));
+                card.setFrame(rs.getString("sc.frame"));
+                card.setReprint(rs.getBoolean("sc.is_reprint"));
+                card.setSetCode(rs.getString("ss.set_code"));
+                card.setIconSvgUri(rs.getString("ss.icon_svg_uri"));
+
+                card.setReleasedAt(rs.getDate("released_at") != null ? rs.getDate("released_at").toLocalDate() : null);
+
+                return card;
+            }
+        }catch (SQLException e){
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
+
+    // Obtener detalles de carta
+    public ScryfallCardDTO getCardById(Long cardId){
+
+        String query = "SELECT sc.id, sc.scryfall_id, sc.cardmarket_id, sc.name, sc.printed_name, " +
+                "sc.lang, sc.image_url, sc.rarity, sc.set_code, sc.set_name, sc.collector_number, sc.cardmarket_url, " +
+                "sc.price, sc.price_foil, sc.type_line, " +
+                "sc.border_color, sc.frame, sc.is_reprint, sc.released_at, " +
+                "ss.set_code, ss.icon_svg_uri " +
+                "FROM scryfall_card sc " +
+                "JOIN scryfall_set ss ON sc.set_code = ss.set_code " +
+                "WHERE sc.id = ?";
+
+        try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)){
+
+            stmt.setLong(1, cardId);
 
             ResultSet rs = stmt.executeQuery();
             if(rs.next()){

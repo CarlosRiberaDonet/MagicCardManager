@@ -1,6 +1,7 @@
 package com.magic.investor_api.cardtrader.controller;
 
 import com.magic.investor_api.cardtrader.service.CardTraderService;
+import com.magic.investor_api.cardtraderPrice.model.CardtraderPrice;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,7 +26,7 @@ public class CardTraderController {
 
     // Obtener precios actualizados
     /*@GetMapping("/cardId/{cardId}/scryfallId{scryfallId}")
-    public CardPrice updateCardtraderPrice(@PathVariable Long cardId, @PathVariable String scryfallId){// Obtengo el cardtraderId
+    public CardtraderPrice updateCardtraderPrice(@PathVariable Long cardId, @PathVariable String scryfallId){
 
         return cardTraderService.mapNodeToCardtraderListing(cardId, scryfallId); // Obtengo lista de cartas mediante cardtrader_id
     }*/
