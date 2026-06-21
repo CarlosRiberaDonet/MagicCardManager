@@ -258,6 +258,7 @@ public class UserDAO {
                 cardmarketPrice.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
 
                 ScryfallCardDTO scryfallCardDTO = new ScryfallCardDTO();
+                scryfallCardDTO.setId(rs.getLong("card_id"));
                 scryfallCardDTO.setScryfallId(rs.getString("scryfall_id"));
                 scryfallCardDTO.setName(rs.getString("name"));
                 scryfallCardDTO.setPrintedName(rs.getString("printed_name"));

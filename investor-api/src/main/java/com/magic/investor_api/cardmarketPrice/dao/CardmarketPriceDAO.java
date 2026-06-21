@@ -9,8 +9,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 @Repository
 public class CardmarketPriceDAO {
@@ -30,7 +28,7 @@ public class CardmarketPriceDAO {
     }
 
     // Obtener precios de card_price
-    public CardmarketPrice checkCardPrice(Long cardmarketId){
+    public CardmarketPrice getCardmarketPrice(Long cardmarketId){
 
         CardmarketPrice cardmarketPrice = new CardmarketPrice();
         String query = "SELECT id, cardmarket_id, avg, low, trend, avg1, avg7, avg30, " +

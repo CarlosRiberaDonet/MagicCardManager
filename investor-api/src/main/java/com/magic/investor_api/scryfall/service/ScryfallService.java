@@ -249,7 +249,26 @@ public class ScryfallService {
         List<ScryfallCardDTO> cardListDTO = scryfallCardDAO.selectFiltersCard(name, setCode, rarity,
                 lang, typeLine, orderBy, minPrice, maxPrice, size, offset, hideNA);
 
-        // Obtengo el low price de carmarket_price
+        // trato de obtener precios
+       /* for(ScryfallCardDTO c : cardListDTO){
+
+            // Si la carta tiene cardmarketId
+            if(c.getCardmarketId() > 0){
+                // Crear objeto CardmarketPrice
+                CardmarketPrice cardmarketPrice = cardmarketPriceService.getCardPrice(c.getCardmarketId());
+                c.setCardPrice(cardmarketPrice);
+            }
+            // Si no cardmarket_price no tiene precios
+            else{
+                // Trato de obtenerlos desde cardtrader_price
+                long cardTraderId = cardTraderService.getCardtraderIdByScryfallId(c.getScryfallId()); // Obtengo cardtraderId
+                if(cardTraderId > 0){
+                    CardtraderPriceDTO cardPrice = cardtraderPriceService.getCardtraderPrice(
+                            cardTraderId, c.getLang(), "NM", false);
+                    c.setCardPrice(cardPrice);
+                }
+            }
+        }*/
 
         cardPageDTO = new CardPageDTO(totalCards, page, cardListDTO);
 
@@ -257,15 +276,14 @@ public class ScryfallService {
     }
 
     // Obtiene carta con datos completos mediante su id
-    public ScryfallCardDTO getCardByscryfallId(String scryfallId, String lang, String condition, boolean isFoil){
+    public ScryfallCardDTO getCardByscryfallId(Long cardId, String lang, String condition, boolean isFoil){
 
         // Obtengo datos de la carta
-        ScryfallCardDTO card = scryfallCardDAO.getScryfallCardById(scryfallId);
-
+        ScryfallCardDTO card = scryfallCardDAO.getCardById(cardId);
         // Si existe cardmarketId
-        if(card.getCardmarketId() != null){
+        if(card.getCardmarketId() > 0){
             // Trato de obtener los precios de carmarket_price
-            CardmarketPrice cardmarketPrice = cardmarketPriceService.getCardmarketPrice(card.getCardmarketId());
+            CardmarketPrice cardmarketPrice = cardmarketPriceService.getCardPrice(card.getCardmarketId());
 
             // Si cardmarket_price tiene precios para la carta
             if(cardmarketPrice != null){
@@ -274,17 +292,24 @@ public class ScryfallService {
         }
         // Si no hay precios en cardmarket, trato de obtenerlos de cardtrader_price
         else{
-           long cardTraderId = cardTraderService.getCardtraderIdByScryfallId(scryfallId);
+           long cardTraderId = cardTraderService.getCardtraderIdByScryfallId(card.getScryfallId());
            if(cardTraderId > 0) {
                // Trato de obtener precios de cardtrader_price
                CardtraderPriceDTO cardPrice = cardtraderPriceService.getCardtraderPrice(cardTraderId, lang, condition, isFoil);
                // Si cardtrader_price tiene precios para la carta
-               if (cardPrice == null) {
+               if (cardPrice != null) {
                    card.setCardPrice(cardPrice); // Le asigno los precios obtenidos
                }
            }
         }
 
         return card;
+    }
+
+
+    public CardmarketPrice buildCardmarketPrice(Long cardmarketId){
+        CardmarketPrice cardmarketPrice = cardmarketPriceService.getCardPrice(cardmarketId);
+
+        return cardmarketPrice;
     }
 }
