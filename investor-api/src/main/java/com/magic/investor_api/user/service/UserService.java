@@ -3,7 +3,7 @@ package com.magic.investor_api.user.service;
 import com.magic.investor_api.auth.JwtService;
 import com.magic.investor_api.user.dao.UserDAO;
 import com.magic.investor_api.auth.AuthDAO;
-import com.magic.investor_api.user.dto.ChangeEmailRequest;
+import com.magic.investor_api.user.dto.ModifyUserRequest;
 import com.magic.investor_api.user.dto.UserCollectionDTO;
 import com.magic.investor_api.user.dto.UserDTO;
 import com.magic.investor_api.user.model.User;
@@ -27,11 +27,6 @@ public class UserService {
         this.jwtService = jwtService;
     }
 
-    // Comprobar si el email ya está registrado
-    public boolean checkEmail(String email){
-        // Comprobar si el usuario ya existe en la BD
-        return authDAO.checkEmail(email);
-    }
     // Registrar nuevo usuario en la BD
     public void regUser(UserDTO userDTO){
 
@@ -44,6 +39,17 @@ public class UserService {
         }
     }
 
+    // Obtener datos del user
+    public UserDTO getUserDTO(Long userId){
+        return authDAO.getUserDTOData(userId);
+    }
+
+    // Comprobar si el email ya está registrado
+    public boolean checkEmail(String email){
+        // Comprobar si el usuario ya existe en la BD
+        return authDAO.checkEmail(email);
+    }
+
     // Autenticar usuario y contraseña
     public String authUser(UserDTO userDTO){
 
@@ -54,6 +60,39 @@ public class UserService {
         if (!passwordEncoder.matches(userDTO.getPassword(), user.getPassword())) return null;
 
         return jwtService.generateToken(user);
+    }
+
+    // Modificar email del user
+    public User changeUserEmail(String email, ModifyUserRequest request){
+        // Comprobar si el email existe en la BD
+        if(authDAO.checkEmail(email)){
+            // Cambiar el email del user
+            authDAO.changeUserEmail(email, request.getNewEmail());
+            // Obtener usuario
+            System.out.println("Obteniendo datos del user");
+            User user = authDAO.getUser(authDAO.findUserByEmail(request.getNewEmail()));
+            System.out.println(user);
+            return user;
+            // return authDAO.getUser(authDAO.findUserByEmail(email));
+        }
+        return null;
+    }
+
+    // Modificar contraseña del user
+    public User changePassword(Long userId, ModifyUserRequest request){
+        // Obtengo los datos del usuario
+        UserDTO userDTO =  authDAO.getUserDTOData(userId);
+        // Verificar si la contraseña antigua es correcta
+        if(!passwordEncoder.matches(request.getOldPassword(), userDTO.getPassword())) {
+            return null;
+        }
+        // Encripto la nueva contraseña
+        return authDAO.changeUserPassword(userId, passwordEncoder.encode(request.getNewPassword()));
+    }
+
+    // Eliminar cuenta de usuario de la BD
+    public boolean deleteUserAccount(Long userId){
+        return authDAO.deleteUser(userId);
     }
 
     //Obtener ids de user_collection mediante userId
@@ -99,20 +138,5 @@ public class UserService {
     // Obtener lista de cartas de la colección del usuario
     public List<UserCollectionDTO> getMyCollection(Long userId){
         return userDAO.selectMyCollection(userId);
-    }
-
-    // Modificar email del user
-    public void changeUserEmail(String email, ChangeEmailRequest request){
-
-        // Comprobar si el email existe en la BD
-        if(authDAO.checkEmail(email)){
-            authDAO.changeUserEmail(email, request.getNewEmail());
-        }
-    }
-
-    // Obtener datos del user
-    public UserDTO getUser(Long userId){
-
-        return authDAO.getUserData(userId);
     }
 }

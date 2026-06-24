@@ -1,11 +1,9 @@
 package com.magic.investor_api.auth;
 
-import com.magic.investor_api.user.dto.ChangeEmailRequest;
 import com.magic.investor_api.user.dto.UserDTO;
 import com.magic.investor_api.user.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
