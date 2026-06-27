@@ -37,14 +37,15 @@ public class CardtraderDAO {
     }
 
     // Obtener cardtrader_id de la tabla cardtrader_card
-    public long selectCardTraderId(String cscryfallId){
+    public long selectCardTraderId(String scryfallId){
 
-        String query = "SELECT cardtrader_id" +
+        String query = "SELECT cardtrader_id " +
                         "FROM cardtrader_card " +
                         "WHERE scryfall_id = ? ";
 
         try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
 
+            stmt.setString(1, scryfallId);
             ResultSet rs = stmt.executeQuery();
             if(rs.next()){
                 return rs.getLong("cardtrader_id");

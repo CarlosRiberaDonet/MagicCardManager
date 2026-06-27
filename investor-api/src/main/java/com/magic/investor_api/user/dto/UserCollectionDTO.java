@@ -10,7 +10,8 @@ public class UserCollectionDTO {
     private Long cardId;
     private Double purchasePrice;
     private int quantity;
-    private String cardCondition;
+    private String condition;
+    private boolean isFoil;
     private LocalDate addedAt;
     private ScryfallCardDTO card;
 
@@ -23,17 +24,16 @@ public class UserCollectionDTO {
 
     public UserCollectionDTO(Long userId, Long cardId, Double purchasePrice,
                              int quantity, String cardCondition,
-                             LocalDate addedAt, ScryfallCardDTO card) {
+                             LocalDate addedAt) {
         this.userId = userId;
         this.cardId = cardId;
         this.purchasePrice = purchasePrice;
         this.quantity = quantity;
-        this.cardCondition = cardCondition;
+        this.condition = cardCondition;
         this.addedAt = addedAt;
-        this.card = card;
     }
 
-    // getters/setters únicos
+    // getters/setters
 
     public Long getUserId() {
         return userId;
@@ -67,20 +67,20 @@ public class UserCollectionDTO {
         this.quantity = quantity;
     }
 
-    public String getCardCondition() {
-        return cardCondition;
+    public String getCondition() {
+        return condition;
     }
 
-    public void setCardCondition(String cardCondition) {
-        this.cardCondition = cardCondition;
+    public void setCondition(String condition) {
+        this.condition = condition;
     }
 
-    public LocalDate getAddedAt() {
-        return addedAt;
+    public boolean isFoil() {
+        return isFoil;
     }
 
-    public void setAddedAt(LocalDate addedAt) {
-        this.addedAt = addedAt;
+    public void setFoil(boolean foil) {
+        isFoil = foil;
     }
 
     public ScryfallCardDTO getCard() {
@@ -89,5 +89,13 @@ public class UserCollectionDTO {
 
     public void setCard(ScryfallCardDTO card) {
         this.card = card;
+    }
+
+    public LocalDate getAddedAt() {
+        return addedAt;
+    }
+
+    public void setAddedAt(LocalDate addedAt) {
+        this.addedAt = addedAt;
     }
 }
