@@ -143,30 +143,17 @@ public class ScryfallService {
     private ScryfallCard mapNodeToScryfallCard(JsonNode node) {
         ScryfallCard card = new ScryfallCard();
 
-        // Campos de identidad
         card.setScryfallId(node.path("id").asText("")); // scryfall UUID
         card.setCardmarketId(node.path("cardmarket_id").asLong());
-
         card.setName(node.path("name").asText(""));
         card.setPrintedName(node.path("printed_name").asText(""));
-
         card.setLang(node.path("lang").asText("en"));
-
         card.setImageUrl(extractImageUrl(node));
-        card.setRarity(node.path("rarity").asText("common"));
+        card.setRarity(node.path("rarity").asText(""));
         card.setSetName(node.path("set_name").asText(""));
         card.setSetCode(node.path("set").asText(""));
         card.setCollectorNumber(node.path("collector_number").asText(""));
         card.setCardmarketURL(buildCardmarketUrl(node));
-
-        // Obtener precios de la carta
-        JsonNode prices = node.path("prices");
-        JsonNode eurNode = prices.get("eur");
-        card.setPrice(
-                (eurNode == null || eurNode.isNull() || eurNode.asText().isBlank())
-                        ? null
-                        : new BigDecimal(eurNode.asText())
-        );
 
         card.setTypeLine(node.path("type_line").asText(""));
         card.setBorderColor(node.path("border_color").asText(""));
@@ -236,18 +223,17 @@ public class ScryfallService {
 
     // Obtiene lista de cartas filtradas
     public CardPageDTO searchCards(String name, String setCode, String rarity, String lang,
-                                   String typeLine, String orderBy, Double minPrice, Double maxPrice,
-                                   int page, int size, boolean hideNA) {
+                                   String typeLine, String orderBy, int page, int size) {
 
         // Calcula la fila de inicio según la página — ej: página 2 con 20 resultados empieza en la fila 20
         int offset = (page - 1) * size;
 
         // Total de cartas que coinciden con la búsqueda
-        int totalCards = scryfallCardDAO.countCardsByFilter(name, setCode, rarity, lang, typeLine, minPrice, maxPrice, hideNA);
+        int totalCards = scryfallCardDAO.countCardsByFilter(name, setCode, rarity, lang, typeLine);
 
         // Busco la carta mediante su nombre
         List<ScryfallCardDTO> cardListDTO = scryfallCardDAO.selectFiltersCard(name, setCode, rarity,
-                lang, typeLine, orderBy, minPrice, maxPrice, size, offset, hideNA);
+                lang, typeLine, orderBy, size, offset);
 
         // trato de obtener precios
        /* for(ScryfallCardDTO c : cardListDTO){
@@ -280,13 +266,15 @@ public class ScryfallService {
 
         // Obtengo datos de la carta
         ScryfallCardDTO card = scryfallCardDAO.getCardById(cardId);
-        // Si existe cardmarketId
-        if(card.getCardmarketId() > 0){
+
+        // Si existe cardmarketId y la condicion es NM
+        if(card.getCardmarketId() > 0 && condition.equals("NM")){
             // Trato de obtener los precios de carmarket_price
             CardmarketPrice cardmarketPrice = cardmarketPriceService.getCardPrice(card.getCardmarketId());
 
             // Si cardmarket_price tiene precios para la carta
             if(cardmarketPrice != null){
+                System.out.println("PRECIOS OBTENIDOS DE CARDMARKET: " + cardmarketPrice);
                 card.setCardPrice(cardmarketPrice);  // Le asigno los precios obtenidos
             }
         }
@@ -295,10 +283,12 @@ public class ScryfallService {
            long cardTraderId = cardTraderService.getCardtraderIdByScryfallId(card.getScryfallId());
            if(cardTraderId > 0) {
                // Trato de obtener precios de cardtrader_price
-               CardtraderPriceDTO cardPrice = cardtraderPriceService.getCardtraderPrice(cardTraderId, lang, condition, isFoil);
+               CardtraderPriceDTO cardtraderPrice = cardtraderPriceService.getCardtraderPrice(cardTraderId, lang, condition, isFoil);
                // Si cardtrader_price tiene precios para la carta
-               if (cardPrice != null) {
-                   card.setCardPrice(cardPrice); // Le asigno los precios obtenidos
+               if (cardtraderPrice != null) {
+                   System.out.println("PRECIOS OBTENIDOS DE CARDTRADER: " + cardtraderPrice);
+
+                   card.setCardPrice(cardtraderPrice); // Le asigno los precios obtenidos
                }
            }
         }

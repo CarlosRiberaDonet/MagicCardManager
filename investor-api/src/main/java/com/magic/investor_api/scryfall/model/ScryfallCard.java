@@ -53,12 +53,6 @@ public class ScryfallCard {
     @Column(name="cardmarket_url")
     private String cardmarketURL;
 
-    @Column(name="price")
-    private BigDecimal price;
-
-    @Column(name="price_foil")
-    private BigDecimal priceFoil;
-
     @Column(name = "type_line")
     private String typeLine;
 

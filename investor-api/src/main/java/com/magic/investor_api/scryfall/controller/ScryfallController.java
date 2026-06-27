@@ -61,24 +61,21 @@ public class ScryfallController {
             @RequestParam(required = false) String rarity,   // Rareza
             @RequestParam(required = false) String lang,     // Idioma
             @RequestParam(required = false) String typeLine, // Tipo de carta
-            @RequestParam(required = false) Double minPrice, // Precio mínimo
-            @RequestParam(required = false) Double maxPrice, // Precio máximo
             @RequestParam(required = false) String orderBy,   // "price_asc" o "price_desc"
-            @RequestParam(required = false, defaultValue = "false") boolean hideNA, // false -> muestra cartas con precio N/A, true oculta
             @RequestParam (defaultValue = "1") int page,
             @RequestParam (defaultValue = "30") int size
     )
     {
         return scryfallService.searchCards(name, setCode, rarity, lang, typeLine, orderBy,
-                minPrice, maxPrice, page, size, hideNA);
+                page, size);
     }
 
 
-    // Obtener detalles de carta por scryfall_id
+    // Obtener detalles de carta
     @GetMapping("/{cardId}")
     public ScryfallCardDTO searchCardById(@PathVariable Long cardId,
                                           @RequestParam(required = false) String lang,
-                                          @RequestParam(required = false) String condition,
+                                          @RequestParam(required = false, defaultValue = "NM") String condition,
                                           @RequestParam(required = false, defaultValue = "false") boolean isFoil
     ){
         System.out.println(cardId);

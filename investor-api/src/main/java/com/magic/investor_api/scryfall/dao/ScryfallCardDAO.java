@@ -1,5 +1,6 @@
 package com.magic.investor_api.scryfall.dao;
 
+import com.magic.investor_api.cardmarketPrice.model.CardmarketPrice;
 import com.magic.investor_api.scryfall.dto.ScryfallCardDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -17,84 +18,102 @@ public class ScryfallCardDAO {
     private DataSource dataSource;
 
     // Busca cartas aplicando filtros opcionales. Todos los parámetros son opcionales excepto size y offset.
-    public List<ScryfallCardDTO> selectFiltersCard(String name, String setCode, String rarity,
-                                                   String lang, String typeLine, String orderBy,
-                                                   Double minPrice, Double maxPrice,
-                                                   int size, int offset, boolean hideNA) {
+    public List<ScryfallCardDTO> selectFiltersCard(
+            String name,
+            String setCode,
+            String rarity,
+            String lang,
+            String typeLine,
+            String orderBy,
+            int size,
+            int offset
+    ) {
 
         List<ScryfallCardDTO> cardListDTO = new ArrayList<>();
+
         StringBuilder query = new StringBuilder(
-                "SELECT DISTINCT sc.id, sc.scryfall_id, sc.cardmarket_id, sc.name, sc.printed_name, sc.lang, " +
-                        "sc.image_url, sc.rarity, sc.set_name, " +
-                        "sc.collector_number, sc.cardmarket_url, sc.price, s.icon_svg_uri " +
+                "SELECT DISTINCT sc.id, sc.scryfall_id, sc.cardmarket_id, sc.name, sc.printed_name, " +
+                        "sc.lang, sc.image_url, sc.rarity, sc.set_name, " +
+                        "sc.collector_number, s.icon_svg_uri, " +
+                        "cp.avg, cp.low, cp.trend " +
                         "FROM scryfall_card sc " +
                         "JOIN scryfall_set s ON sc.set_code = s.set_code " +
+                        "LEFT JOIN cardmarket_price cp ON cp.cardmarket_id = sc.cardmarket_id " +
                         "WHERE 1=1"
         );
 
-        // Filtros
-        if (name != null && !name.isEmpty()) query.append(" AND (sc.name LIKE ? OR sc.printed_name LIKE ?)");
-        if (setCode  != null) query.append(" AND sc.set_code = ?");
-        if (rarity   != null) query.append(" AND sc.rarity = ?");
-        if (lang     != null) query.append(" AND sc.lang = ?");
-        if (typeLine != null) query.append(" AND sc.type_line LIKE ?");
+        if (name != null && !name.isEmpty())
+            query.append(" AND (sc.name LIKE ? OR sc.printed_name LIKE ?)");
 
-        // Filtros de precio
-        if (minPrice != null) query.append(" AND (price >= ? OR price = 0 OR price IS NULL)");
-        if (maxPrice != null) query.append(" AND (price <= ? OR price = 0 OR price IS NULL)");
-        if (hideNA) query.append(" AND price IS NOT NULL AND price > 0"); // ← antes del ORDER BY
+        if (setCode != null)
+            query.append(" AND sc.set_code = ?");
 
-        // Ordenación
-        if ("price_asc".equals(orderBy))  query.append(" ORDER BY sc.price ASC");
-        if ("price_desc".equals(orderBy)) query.append(" ORDER BY sc.price DESC");
-        if ("name_asc".equals(orderBy))   query.append(" ORDER BY sc.name ASC");
-        if ("name_desc".equals(orderBy))  query.append(" ORDER BY sc.name DESC");
+        if (rarity != null)
+            query.append(" AND sc.rarity = ?");
 
-        // Paginación
+        if (lang != null)
+            query.append(" AND sc.lang = ?");
+
+        if (typeLine != null)
+            query.append(" AND sc.type_line LIKE ?");
+
+        switch (orderBy == null ? "" : orderBy) {
+            case "name_desc":
+                query.append(" ORDER BY sc.name DESC");
+                break;
+            case "price_asc":
+                query.append(" ORDER BY COALESCE(cp.trend, cp.avg, cp.low) ASC");
+                break;
+            case "price_desc":
+                query.append(" ORDER BY COALESCE(cp.trend, cp.avg, cp.low) DESC");
+                break;
+            default:
+                query.append(" ORDER BY sc.name ASC");
+        }
+
         query.append(" LIMIT ? OFFSET ?");
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query.toString())) {
 
-            // ASIGNACIÓN DE PARÁMETROS
             int idx = 1;
 
-            // Parámetros de texto
             if (name != null && !name.isEmpty()) {
-                stmt.setString(idx++, name + "%");  // sc.name LIKE ?
-                stmt.setString(idx++, name + "%");  // sc.printed_name LIKE ?
+                stmt.setString(idx++, name + "%");
+                stmt.setString(idx++, name + "%");
             }
-            if (setCode  != null) stmt.setString(idx++, setCode);
-            if (rarity   != null) stmt.setString(idx++, rarity);
-            if (lang     != null) stmt.setString(idx++, lang);
+
+            if (setCode != null) stmt.setString(idx++, setCode);
+            if (rarity != null) stmt.setString(idx++, rarity);
+            if (lang != null) stmt.setString(idx++, lang);
             if (typeLine != null) stmt.setString(idx++, "%" + typeLine + "%");
 
-            // Parámetros de precio
-            if (minPrice != null) stmt.setDouble(idx++, minPrice);
-            if (maxPrice != null) stmt.setDouble(idx++, maxPrice);
-
-            // Paginación
-            stmt.setInt(idx++, size);   // LIMIT
-            stmt.setInt(idx,   offset); // OFFSET
+            stmt.setInt(idx++, size);
+            stmt.setInt(idx, offset);
 
             ResultSet rs = stmt.executeQuery();
 
-            // MAPEO EL RESULTADO A DTOs
             while (rs.next()) {
-                ScryfallCardDTO cardDTO = new ScryfallCardDTO();
-                cardDTO.setId(rs.getLong("id"));
-                cardDTO.setScryfallId(rs.getString("scryfall_id"));
-                cardDTO.setName(rs.getString("name"));
-                cardDTO.setPrintedName(rs.getString("printed_name"));
-                cardDTO.setLang(rs.getString("lang"));
-                cardDTO.setImageUrl(rs.getString("image_url"));
-                cardDTO.setRarity(rs.getString("rarity"));
-                cardDTO.setSetName(rs.getString("set_name"));
-                cardDTO.setIconSvgUri(rs.getString("icon_svg_uri"));
-                cardDTO.setCollectorNumber(rs.getString("collector_number"));
-                cardDTO.setCardmarketURL(rs.getString("cardmarket_url"));
-                cardDTO.setPrice(rs.getBigDecimal("price"));
-                cardListDTO.add(cardDTO);
+                CardmarketPrice price = new CardmarketPrice();
+                price.setAvg(rs.getBigDecimal("avg"));
+                price.setLow(rs.getBigDecimal("low"));
+                price.setTrend(rs.getBigDecimal("trend"));
+
+                ScryfallCardDTO dto = new ScryfallCardDTO();
+                dto.setId(rs.getLong("id"));
+                dto.setScryfallId(rs.getString("scryfall_id"));
+                dto.setCardmarketId(rs.getLong("cardmarket_id"));
+                dto.setName(rs.getString("name"));
+                dto.setPrintedName(rs.getString("printed_name"));
+                dto.setLang(rs.getString("lang"));
+                dto.setImageUrl(rs.getString("image_url"));
+                dto.setRarity(rs.getString("rarity"));
+                dto.setSetName(rs.getString("set_name"));
+                dto.setIconSvgUri(rs.getString("icon_svg_uri"));
+                dto.setCollectorNumber(rs.getString("collector_number"));
+                dto.setCardPrice(price);
+
+                cardListDTO.add(dto);
             }
 
         } catch (SQLException e) {
@@ -104,49 +123,65 @@ public class ScryfallCardDAO {
         return cardListDTO;
     }
 
+    // Cuenta el total de cartas que coinciden con los filtros opcionales
+    public int countCardsByFilter(
+            String name,
+            String setCode,
+            String rarity,
+            String lang,
+            String typeLine
+    ) {
 
-    // Cuenta el total de cartas que coinciden con los filtros opcionales.
-    // Se usa para calcular el número de páginas en la paginación.
-    // NOTA: orderBy no se incluye aquí porque ORDER BY no afecta al COUNT
-    public int countCardsByFilter(String name, String setCode, String rarity, String lang,
-                                  String typeLine, Double minPrice, Double maxPrice, boolean hideNA) {
-
-        // Construimos la query dinámicamente según los filtros recibidos
         StringBuilder query = new StringBuilder(
-                "SELECT COUNT(*) FROM scryfall_card WHERE 1=1"
+                "SELECT COUNT(*) FROM scryfall_card WHERE 1=1 "
         );
 
-        // Filtros de texto — solo si no son nulos ni vacíos
-        if (name != null && !name.isEmpty()) query.append(" AND (name LIKE ? OR printed_name LIKE ?)");
-        if (setCode  != null) query.append(" AND set_code = ?");
-        if (rarity   != null) query.append(" AND rarity = ?");
-        if (lang     != null) query.append(" AND lang = ?");
-        if (typeLine != null) query.append(" AND type_line LIKE ?");
+        // Filtros de texto
+        if (name != null && !name.isEmpty()) {
+            query.append(" AND (name LIKE ? OR printed_name LIKE ?) ");
+        }
 
-        // Filtros de precio
-        if (minPrice != null) query.append(" AND (price >= ? OR price = 0 OR price IS NULL)");
-        if (maxPrice != null) query.append(" AND (price <= ? OR price = 0 OR price IS NULL)");
-        if (hideNA) query.append("AND price IS NOT NULL AND price > 0 ");
+        if (setCode != null && !setCode.isEmpty()) {
+            query.append(" AND set_code = ? ");
+        }
+
+        if (rarity != null && !rarity.isEmpty()) {
+            query.append(" AND rarity = ? ");
+        }
+
+        if (lang != null && !lang.isEmpty()) {
+            query.append(" AND lang = ? ");
+        }
+
+        if (typeLine != null && !typeLine.isEmpty()) {
+            query.append(" AND type_line LIKE ? ");
+        }
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query.toString())) {
 
-            // Asignamos los parámetros en el mismo orden que aparecen los ? en la query
             int idx = 1;
 
-            // Parámetros de texto
             if (name != null && !name.isEmpty()) {
-                stmt.setString(idx++, name + "%");  // name LIKE ?
-                stmt.setString(idx++, name + "%");  // printed_name LIKE ?
+                stmt.setString(idx++, name + "%");
+                stmt.setString(idx++, name + "%");
             }
-            if (setCode  != null) stmt.setString(idx++, setCode);
-            if (rarity   != null) stmt.setString(idx++, rarity);
-            if (lang     != null) stmt.setString(idx++, lang);
-            if (typeLine != null) stmt.setString(idx++, "%" + typeLine + "%");
 
-            // Parámetros de precio
-            if (minPrice != null) stmt.setDouble(idx++, minPrice);
-            if (maxPrice != null) stmt.setDouble(idx++, maxPrice);
+            if (setCode != null && !setCode.isEmpty()) {
+                stmt.setString(idx++, setCode);
+            }
+
+            if (rarity != null && !rarity.isEmpty()) {
+                stmt.setString(idx++, rarity);
+            }
+
+            if (lang != null && !lang.isEmpty()) {
+                stmt.setString(idx++, lang);
+            }
+
+            if (typeLine != null && !typeLine.isEmpty()) {
+                stmt.setString(idx++, "%" + typeLine + "%");
+            }
 
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
@@ -213,10 +248,9 @@ public class ScryfallCardDAO {
     public ScryfallCardDTO getCardById(Long cardId){
 
         String query = "SELECT sc.id, sc.scryfall_id, sc.cardmarket_id, sc.name, sc.printed_name, " +
-                "sc.lang, sc.image_url, sc.rarity, sc.set_code, sc.set_name, sc.collector_number, sc.cardmarket_url, " +
-                "sc.price, sc.price_foil, sc.type_line, " +
-                "sc.border_color, sc.frame, sc.is_reprint, sc.released_at, " +
-                "ss.set_code, ss.icon_svg_uri " +
+                "sc.lang, sc.image_url, sc.rarity, sc.set_code, sc.set_name, sc.collector_number, " +
+                "sc.type_line, sc.cardmarket_url, sc.border_color, sc.frame, sc.is_reprint, " +
+                "sc.released_at, ss.set_code, ss.icon_svg_uri " +
                 "FROM scryfall_card sc " +
                 "JOIN scryfall_set ss ON sc.set_code = ss.set_code " +
                 "WHERE sc.id = ?";

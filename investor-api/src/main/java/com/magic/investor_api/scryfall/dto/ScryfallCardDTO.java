@@ -38,7 +38,6 @@ public class ScryfallCardDTO {
     private Long id;
     private String scryfallId;
     private Long cardmarketId;
-    private Long cardtraderId;
     private String name;
     private String printedName;
     private String lang;
@@ -49,14 +48,11 @@ public class ScryfallCardDTO {
     private String iconSvgUri;
     private String collectorNumber;
     private String cardmarketURL;
-    private BigDecimal price;
-    private BigDecimal priceFoil;
     private String typeLine;
     private String borderColor;
     private String frame;
     private boolean isFoil;
     private boolean isReprint;
     private LocalDate releasedAt;
-    private String condition;
     private Object cardPrice;
 }
