@@ -3,6 +3,7 @@ package com.magic.investor_api.user.dao;
 import com.magic.investor_api.scryfall.dto.ScryfallCardDTO;
 import com.magic.investor_api.cardmarketPrice.model.CardmarketPrice;
 import com.magic.investor_api.user.dto.UserCollectionDTO;
+import com.magic.investor_api.user.dto.UserWatchlistDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
@@ -27,11 +28,7 @@ public class UserDAO {
         // Compruebo si la carta ya está en la colección del usuario
         if (selectCollectionCardQuantity(dto) > 0) {
             System.out.println("La carta ya está en la colección " );
-            // Compruebo los campos purchase_price, condition y is_foil
-            if(selectCollectionCardPrice(dto)){
-                System.out.println("la carta ya existe en la colección");
-                return updateQuantityCollection(dto, +1); // Sumo +1 a la cantidad de la carta
-            }
+            return updateQuantityCollection(dto, +1); // Sumo +1 a la cantidad de la carta
         }
 
         String query = "INSERT INTO user_collection (user_id, card_id, purchase_price, " +
@@ -59,19 +56,23 @@ public class UserDAO {
 
     // Eliminar una carta de user_collection
     public boolean deleteCollectionCard(UserCollectionDTO dto){
-
         int quantity = selectCollectionCardQuantity(dto);
-        
         // Si quantity > 1
         if(quantity > 1){
-            updateQuantityCollection(dto.getUserId(), dto.getCardId(), -1); // resto -1 a quantity
+            updateQuantityCollection(dto, -1); // resto -1 a quantity
             return true;
         }
         else if(quantity == 1) { // Si quantity == 1, elimino la fila
-            String query = "DELETE FROM user_collection WHERE user_id = ? AND card_id = ?";
+            String query = "DELETE FROM user_collection WHERE user_id = ? AND card_id = ? AND purchase_price = ? " +
+                    "AND card_condition = ? AND is_foil = ?";
             try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
                 stmt.setLong(1, dto.getUserId());
                 stmt.setLong(2, dto.getCardId());
+                stmt.setDouble(3, dto.getPurchasePrice());
+                stmt.setInt(4, dto.getQuantity());
+                stmt.setString(5, dto.getCondition());
+                stmt.setBoolean(6, dto.isFoil());
+
                 int filasAfectadas = stmt.executeUpdate();
                 return filasAfectadas > 0;
             }catch (SQLException e){
@@ -82,14 +83,18 @@ public class UserDAO {
     }
 
     // Insertar carta en la tabla user_watchlist
-    public boolean insertWatchlistCard(UserCollectionDTO dto){
+    public boolean insertWatchlistCard(UserWatchlistDTO dto){
 
-        String query = "INSERT INTO user_watchlist (user_id, card_id) VALUES (?, ?)";
+        String query = "INSERT INTO user_watchlist (user_id, card_id, last_price, card_condition, is_foil) " +
+                " VALUES (?, ?, ?, ?, ?)";
 
         try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)){
 
             stmt.setLong(1, dto.getUserId());
             stmt.setLong(2, dto.getCardId());
+            stmt.setDouble(3, dto.getLastPrice());
+            stmt.setString(4, dto.getCondition());
+            stmt.setBoolean(5, dto.isFoil());
 
             int filasAfectadas = stmt.executeUpdate();
             if(filasAfectadas > 0){
@@ -102,65 +107,30 @@ public class UserDAO {
     }
 
     // Eliminar una carta de user_watchlist
-    public boolean deleteWatchlistCard(UserCollectionDTO dto){
+    public boolean deleteWatchlistCard(UserWatchlistDTO dto){
 
-        String query = "DELETE FROM user_watchlist WHERE user_id = ? AND card_id = ?";
+        String query = "DELETE FROM user_watchlist WHERE user_id = ? AND card_id = ? AND last_price = ? " +
+                "AND card_condition = ? AND is_foil = ?";
         try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setLong(1, dto.getUserId());
             stmt.setLong(2, dto.getCardId());
+            stmt.setDouble(3, dto.getLastPrice());
+            stmt.setString(4, dto.getCondition());
+            stmt.setBoolean(5, dto.isFoil());
+
             int filasAfectadas = stmt.executeUpdate();
             return filasAfectadas > 0;
         }catch (SQLException e){
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-
-    return false;
     }
 
-    // Obtener cantidad total de una carta en user_collection (sin diferenciar purchase_price)
+    // Obtener cantidad de una carta en user_collection
     public int selectCollectionCardQuantity(UserCollectionDTO dto){
-
         int total = 0;
+        String query = "SELECT quantity FROM user_collection WHERE user_id = ? AND card_id = ? " +
+                "AND purchase_price = ? AND card_condition = ? AND is_foil = ?";
 
-        String query = "SELECT quantity FROM user_collection WHERE user_id = ? AND card_id = ?";
-
-        try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)){
-            stmt.setLong(1, dto.getUserId());
-            stmt.setLong(2, dto.getCardId());
-
-            ResultSet rs = stmt.executeQuery();
-            while(rs.next()){
-                total += rs.getInt("quantity");
-            }
-        }catch (SQLException e){
-            e.printStackTrace();
-        }
-        return total;
-    }
-
-    // Obtener cantidad de una carta en user_collection diferenciando purchase_price
-    // Si la carta está en la colección, devuelve true, si no, false
-    public int selectCollectionCardPriceQuantity(UserCollectionDTO dto){
-        String query = "SELECT quantity FROM user_collection WHERE user_id = ? AND card_id = ? AND purchase_price = ?";
-        try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)){
-            stmt.setLong(1, dto.getUserId());
-            stmt.setLong(2, dto.getCardId());
-            stmt.setDouble(3, dto.getPurchasePrice());
-            ResultSet rs = stmt.executeQuery();
-            if(rs.next()){
-                return rs.getInt("quantity");
-            }
-        }catch (SQLException e){
-            e.printStackTrace();
-        }
-        return 0;
-    }
-
-    // Obtener precio de una carta en user_collection
-    public boolean selectCollectionCardPrice(UserCollectionDTO dto){
-        String query = "SELECT purchase_price, card_condition, is_foil " +
-                "FROM user_collection WHERE user_id = ? AND card_id = ? AND purchase_price = ? " +
-                "AND card_condition = ? AND is_foil = ?";
         try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)){
             stmt.setLong(1, dto.getUserId());
             stmt.setLong(2, dto.getCardId());
@@ -169,21 +139,51 @@ public class UserDAO {
             stmt.setBoolean(5, dto.isFoil());
 
             ResultSet rs = stmt.executeQuery();
-            if(rs.next()){
-                return true;
+            while(rs.next()){
+                total += rs.getInt("quantity");
             }
         }catch (SQLException e){
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-        return false;
+        return total;
+    }
+
+    // Obtener cantidad de una carta en user_collection (diferenciando is_foil)
+    public int selectCollectionCardTotal(UserCollectionDTO dto){
+        String query = "SELECT SUM(quantity) FROM user_collection WHERE user_id = ? AND card_id = ? " +
+                "AND card_condition = ? AND is_foil = ?";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setLong(1, dto.getUserId());
+            stmt.setLong(2, dto.getCardId());
+            stmt.setString(3, dto.getCondition());
+            stmt.setBoolean(4, dto.isFoil());
+
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                int total = rs.getInt(1);
+                return total;
+            }
+            return 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
     }
 
     // Comprobar si la carta ya está en user_watchlist
-    public boolean selectWatchlistCardId(Long userId, Long cardId){
-        String query = "SELECT id FROM user_watchlist WHERE user_id = ? AND card_id = ?";
+    public boolean selectWatchlistCardId(UserWatchlistDTO dto){
+        String query = "SELECT 1 FROM user_watchlist WHERE user_id = ? AND card_id = ? " +
+                "AND card_condition = ? AND is_foil = ?";
         try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)){
-            stmt.setLong(1, userId);
-            stmt.setLong(2, cardId);
+            stmt.setLong(1, dto.getUserId());
+            stmt.setLong(2, dto.getCardId());
+            stmt.setString(3, dto.getCondition());
+            stmt.setBoolean(4, dto.isFoil());
             ResultSet rs = stmt.executeQuery();
             if(rs.next()){
                 return true;
@@ -196,13 +196,16 @@ public class UserDAO {
 
     // Actualiza la cantidad de una carta en user_collection
     public boolean updateQuantityCollection(UserCollectionDTO dto, int quantity){
-        String query = "UPDATE user_collection SET quantity = quantity + ? WHERE user_id = ? AND card_id = ?";
-// SEGUIR IMPLEMENTANDO LOGICA DE GUARDADO DE CARTAS EN COLECCION DEL USUARIO
+        String query = "UPDATE user_collection SET quantity = quantity + ? WHERE user_id = ? AND card_id = ? " +
+                "AND purchase_price = ? AND card_condition = ? AND is_foil = ?";
         
         try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)){
             stmt.setInt(1, quantity);
-            stmt.setLong(2, userId);
-            stmt.setLong(3, cardId);
+            stmt.setLong(2, dto.getUserId());
+            stmt.setLong(3, dto.getCardId());
+            stmt.setDouble(4, dto.getPurchasePrice());
+            stmt.setString(5, dto.getCondition());
+            stmt.setBoolean(6, dto.isFoil());
 
             int filasAfectadas = stmt.executeUpdate();
             if(filasAfectadas > 0){
@@ -211,33 +214,60 @@ public class UserDAO {
         }catch (SQLException e){
             e.printStackTrace();
         }
-
         return false;
     }
 
     // Obtener todas las cartas del usuario de user_watchlist
-    public List<UserCollectionDTO> selectCollectionCards(Long userId){
-        List<UserCollectionDTO> userCollectionDTOList = new ArrayList<>();
-        String query = "SELECT user_id, card_id, purchase_price, quantity, added_at " +
-                "FROM user_collection WHERE user_id= ?";
+    public List<UserWatchlistDTO> selectMyWatchlist(Long userId){
+
+        List<UserWatchlistDTO> userWatchlistDTOList = new ArrayList<>();
+        String query = "SELECT wl.user_id, wl.card_id, wl.last_price, wl.card_condition, wl.is_foil, wl.added_at, " +
+                "sc.name, sc.printed_name, sc.lang, sc.image_url, sc.rarity, sc.set_name, sc.set_code, sc.collector_number, " +
+                "s.set_code, s.icon_svg_uri " +
+                "FROM user_watchlist wl " +
+                "JOIN scryfall_card sc ON wl.card_id = sc.id " +
+                "JOIN scryfall_set s ON sc.set_code = s.set_code " +
+                "WHERE user_id= ?";
+
         try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)){
+
             stmt.setLong(1, userId);
             ResultSet rs = stmt.executeQuery();
             while(rs.next()){
-                UserCollectionDTO dto = new UserCollectionDTO();
+                ScryfallCardDTO card = new ScryfallCardDTO();
+                card.setName(rs.getString("name"));
+                card.setPrintedName(rs.getString("printed_name"));
+                card.setLang(rs.getString("lang"));
+                card.setImageUrl(rs.getString("image_url"));
+                card.setRarity(rs.getString("rarity"));
+                card.setSetName(rs.getString("set_name"));
+                card.setScryfallId(rs.getString("set_code"));
+                card.setIconSvgUri(rs.getString("icon_svg_uri"));
+                card.setCollectorNumber(rs.getString("collector_number"));
+                card.setFoil(rs.getBoolean("is_foil"));
+
+                UserWatchlistDTO dto = new UserWatchlistDTO();
                 dto.setUserId(rs.getLong("user_id"));
                 dto.setCardId(rs.getLong("card_id"));
-                dto.setQuantity(rs.getInt("quantity"));
-                dto.setAddedAt(rs.getDate("added_ad").toLocalDate().atStartOfDay().toLocalDate());
-                userCollectionDTOList.add(dto);
+                dto.setLastPrice(rs.getDouble("last_price"));
+                dto.setCondition(rs.getString("card_condition"));
+                dto.setFoil(rs.getBoolean("is_foil"));
+                dto.setAddedAt(rs.getDate("added_at").toLocalDate().atStartOfDay().toLocalDate());
+                dto.setScryfallCardDTO(card);
+
+                userWatchlistDTOList.add(dto);
             }
         }catch(SQLException e){
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-        return userCollectionDTOList;
+
+        for(UserWatchlistDTO d : userWatchlistDTOList){
+            System.out.println(d.toString());
+        }
+        return userWatchlistDTOList;
     }
 
-    // Obtener cartas de la colección del usuario de user_collection
+    // Obtener todas las cartas de la colección del usuario en user_collection
     public List<UserCollectionDTO> selectMyCollection(Long userId){
 
         List<UserCollectionDTO> userCollectionDTO = new ArrayList<>();
