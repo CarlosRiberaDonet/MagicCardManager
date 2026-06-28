@@ -4,34 +4,30 @@ import com.magic.investor_api.scryfall.dto.ScryfallCardDTO;
 
 import java.time.LocalDate;
 
-public class UserCollectionDTO {
+public class UserWatchlistDTO {
 
     private Long userId;
     private Long cardId;
-    private Double purchasePrice;
-    private int quantity;
+    private Double lastPrice;
     private String condition;
     private boolean isFoil;
     private LocalDate addedAt;
-    private ScryfallCardDTO card;
+    private ScryfallCardDTO scryfallCardDTO;
 
-    public UserCollectionDTO() {}
+    // CONSTRUCTOR
 
-    public UserCollectionDTO(Long userId, Long cardId){
-        this.userId = userId;
-        this.cardId = cardId;
+    public UserWatchlistDTO() {
     }
 
-    public UserCollectionDTO(Long userId, Long cardId, Double purchasePrice,
-                             String cardCondition, boolean isFoil) {
+    public UserWatchlistDTO(Long userId, Long cardId, Double lastPrice, String condition, boolean isFoil ) {
         this.userId = userId;
         this.cardId = cardId;
-        this.purchasePrice = purchasePrice;
-        this.condition = cardCondition;
+        this.lastPrice = lastPrice;
+        this.condition = condition;
         this.isFoil = isFoil;
     }
 
-    // getters/setters
+    // GETTERS Y SETTERS
 
     public Long getUserId() {
         return userId;
@@ -49,20 +45,12 @@ public class UserCollectionDTO {
         this.cardId = cardId;
     }
 
-    public Double getPurchasePrice() {
-        return purchasePrice;
+    public Double getLastPrice() {
+        return lastPrice;
     }
 
-    public void setPurchasePrice(Double purchasePrice) {
-        this.purchasePrice = purchasePrice;
-    }
-
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
+    public void setLastPrice(Double lastPrice) {
+        this.lastPrice = lastPrice;
     }
 
     public String getCondition() {
@@ -81,14 +69,6 @@ public class UserCollectionDTO {
         isFoil = foil;
     }
 
-    public ScryfallCardDTO getCard() {
-        return card;
-    }
-
-    public void setCard(ScryfallCardDTO card) {
-        this.card = card;
-    }
-
     public LocalDate getAddedAt() {
         return addedAt;
     }
@@ -97,18 +77,24 @@ public class UserCollectionDTO {
         this.addedAt = addedAt;
     }
 
+    public ScryfallCardDTO getScryfallCardDTO() {
+        return scryfallCardDTO;
+    }
+
+    public void setScryfallCardDTO(ScryfallCardDTO scryfallCardDTO) {
+        this.scryfallCardDTO = scryfallCardDTO;
+    }
+
     @Override
     public String toString() {
-        return "UserCollectionDTO{" +
+        return "UserWatchlistDTO{" +
                 "userId=" + userId +
                 ", cardId=" + cardId +
-                ", purchasePrice=" + purchasePrice +
-                ", quantity=" + quantity +
+                ", lastPrice=" + lastPrice +
                 ", condition='" + condition + '\'' +
                 ", isFoil=" + isFoil +
                 ", addedAt=" + addedAt +
-                ", card=" + card +
+                ", scryfallCardDTO=" + scryfallCardDTO +
                 '}';
     }
 }
-

@@ -6,6 +6,7 @@ import com.magic.investor_api.auth.AuthDAO;
 import com.magic.investor_api.user.dto.ModifyUserRequest;
 import com.magic.investor_api.user.dto.UserCollectionDTO;
 import com.magic.investor_api.user.dto.UserDTO;
+import com.magic.investor_api.user.dto.UserWatchlistDTO;
 import com.magic.investor_api.user.model.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -94,49 +95,50 @@ public class UserService {
     public boolean deleteUserAccount(Long userId){
         return authDAO.deleteUser(userId);
     }
-
-    //Obtener ids de user_collection mediante userId
-    public List<UserCollectionDTO> getCollectionCards(Long userId){
-        return userDAO.selectCollectionCards(userId);
-    }
-
     // Comprobar si el usuario tiene la carta en user_collection
-    public int getCardQuantity(Long userId, Long cardId){
+    public int getCardQuantity(Long userId, Long cardId, String condition, boolean isFoil){
         UserCollectionDTO dto = new UserCollectionDTO(userId, cardId);
-        return userDAO.selectCollectionCardQuantity(dto);
+        dto.setCondition(condition);
+        dto.setFoil(isFoil);
+        return userDAO.selectCollectionCardTotal(dto);
     }
 
     // Comprobar si el usuario tiene la carta en user_watchlist
-    public boolean getWatchlistCardId(Long userId, Long cardId){
-       return userDAO.selectWatchlistCardId(userId, cardId);
+    public boolean getWatchlistCardId(UserWatchlistDTO dto){
+       return userDAO.selectWatchlistCardId(dto);
     }
 
     // Añadir carta a tabla user_collection
-    public boolean addToCollection(Long userId, UserCollectionDTO userCollectionDTO) {
-        userCollectionDTO.setUserId(userId);
-        return userDAO.insertCollectionCard(userCollectionDTO);
+    public boolean addToCollection(Long userId, UserCollectionDTO dto) {
+        dto.setUserId(userId);
+        return userDAO.insertCollectionCard(dto);
     }
 
     // Eliminar carta de tabla user_collection
-    public boolean delFromCollection(Long userId, UserCollectionDTO userCollectionDTO){
-        userCollectionDTO.setUserId(userId);
-        return userDAO.deleteCollectionCard(userCollectionDTO);
+    public boolean delFromCollection(Long userId, UserCollectionDTO dto){
+        dto.setUserId(userId);
+        return userDAO.deleteCollectionCard(dto);
     }
 
     // Añadir carta a tabla user_watchlist
-    public boolean addToWatchlist(Long userId, UserCollectionDTO userCollectionDTO){
-        userCollectionDTO.setUserId(userId);
-        return userDAO.insertWatchlistCard(userCollectionDTO);
+    public boolean addToWatchlist(Long userId, UserWatchlistDTO dto){
+        dto.setUserId(userId);
+        return userDAO.insertWatchlistCard(dto);
     }
 
     // Eliminar carta de tabla user_watchlist
-    public boolean delFromWatchlist(Long userId, UserCollectionDTO userCollectionDTO){
-        userCollectionDTO.setUserId(userId);
-        return userDAO.deleteWatchlistCard(userCollectionDTO);
+    public boolean delFromWatchlist(Long userId, UserWatchlistDTO dto){
+        dto.setUserId(userId);
+        return userDAO.deleteWatchlistCard(dto);
     }
 
-    // Obtener lista de cartas de la colección del usuario
+    // Obtener lista de cartas de la colección del user
     public List<UserCollectionDTO> getMyCollection(Long userId){
         return userDAO.selectMyCollection(userId);
+    }
+
+    // Obtener lista de cartas de la watchlist del user
+    public List<UserWatchlistDTO> getMyWatchlist(Long userId){
+        return userDAO.selectMyWatchlist(userId);
     }
 }
