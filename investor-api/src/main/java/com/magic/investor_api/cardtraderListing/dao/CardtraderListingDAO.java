@@ -4,7 +4,6 @@ import com.magic.investor_api.cardtraderListing.model.CardtraderListing;
 import com.magic.investor_api.cardtraderPrice.model.CardtraderPrice;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -34,7 +33,8 @@ public class CardtraderListingDAO {
             if(rs.next()){
                 CardtraderListing listing = new CardtraderListing();
                 listing.setId(rs.getLong("id"));
-                listing.setCardMappingId(rs.getLong("card_mapping_id"));
+                listing.setCardId(rs.getLong("card_id"));
+                listing.setScryfallId(rs.getString("scryfall_id"));
                 listing.setCardtraderId(rs.getLong("cardtrader_id"));
                 listing.setPrice(rs.getBigDecimal("price"));
                 listing.setCondition(rs.getString("card_condition"));
@@ -57,7 +57,7 @@ public class CardtraderListingDAO {
                 "MIN(price) AS low," +
                 "AVG(price) AS avg " +
                 "FROM cardtrader_listing " +
-                "GROUP BY card_id, lang, card_condition, is_foil";
+                "GROUP BY cardtrader_id, lang, card_condition, is_foil";
 
         try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)){
 

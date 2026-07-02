@@ -3,8 +3,12 @@ package com.magic.investor_api.cardtrader.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.magic.investor_api.cardtrader.dao.CardtraderDAO;
 import com.magic.investor_api.cardtrader.model.CardtraderCard;
-import com.magic.investor_api.cardtrader.ports.CardTraderAPI;
+import com.magic.investor_api.api.CardTraderAPI;
 import com.magic.investor_api.cardtrader.repository.CardtraderRepository;
+import com.magic.investor_api.cardtraderListing.model.CardtraderListing;
+import com.magic.investor_api.cardtraderListing.service.CardtraderListingService;
+import com.magic.investor_api.cardtraderPrice.dto.CardtraderPriceDTO;
+import com.magic.investor_api.cardtraderPrice.service.CardtraderPriceService;
 import com.magic.investor_api.expansion.dao.ExpansionDAO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,6 +23,8 @@ public class CardTraderService {
     private final CardtraderRepository cardtraderRepository;
     private final ExpansionDAO expansionDAO;
     private final CardtraderDAO cardtraderDAO;
+    private final CardtraderListingService cardTraderListingService;
+    private final CardtraderPriceService cardtraderPriceService;
 
     // Obtiene lista de expansiones de la API cardtrader
     public void downloadCardtraderExpansion(){
@@ -81,7 +87,6 @@ public class CardTraderService {
     public void mapCardtraderSets(){
         cardtraderDAO.mappingCardtraderSets();
     }
-
 
     // Obtener cardtrader_id a través del scryfall_id
     public Long getCardtraderIdByScryfallId(String scryfallId){

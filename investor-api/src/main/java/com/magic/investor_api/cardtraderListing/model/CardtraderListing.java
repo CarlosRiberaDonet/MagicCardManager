@@ -19,27 +19,30 @@ public class CardtraderListing {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "card_mapping_id")
-    private Long cardMappingId;
+    @Column(name="card_id")
+    private Long cardId;
+
+    @Column(name="scryfall_id")
+    private String scryfallId;
 
     @Column(name ="cardtrader_id")
     private Long cardtraderId;
 
-    @Column(name = "price", precision = 10, scale = 2)
+    @Column(name="price", precision = 10, scale = 2)
     private BigDecimal price;
 
-    @Column(name ="card_condition")
+    @Column(name="card_condition")
     private String condition;
 
-    @Column(name = "lang")
+    @Column(name="lang")
     private String lang;
 
-    @Column(name = "is_foil")
+    @Column(name="is_foil")
     private boolean isFoil;
 
-    @Column(name = "url")
+    @Column(name="url")
     private String url;
 
-    @Column(name = "fetched_at")
+    @Column(name="fetched_at")
     private LocalDateTime fetchedAt;
 }

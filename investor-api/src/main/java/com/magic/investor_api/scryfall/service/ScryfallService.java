@@ -11,6 +11,7 @@ import com.magic.investor_api.api.ScryfallAPI;
 import com.magic.investor_api.cardmarketPrice.model.CardmarketPrice;
 import com.magic.investor_api.cardmarketPrice.service.CardmarketPriceService;
 import com.magic.investor_api.cardtrader.service.CardTraderService;
+import com.magic.investor_api.cardtraderListing.model.CardtraderListing;
 import com.magic.investor_api.cardtraderListing.service.CardtraderListingService;
 import com.magic.investor_api.cardtraderPrice.dto.CardtraderPriceDTO;
 import com.magic.investor_api.cardtraderPrice.service.CardtraderPriceService;
@@ -274,7 +275,6 @@ public class ScryfallService {
 
             // Si cardmarket_price tiene precios para la carta
             if(cardmarketPrice != null){
-                System.out.println("PRECIOS OBTENIDOS DE CARDMARKET: " + cardmarketPrice);
                 card.setCardPrice(cardmarketPrice);  // Le asigno los precios obtenidos
             }
         }
@@ -282,12 +282,18 @@ public class ScryfallService {
         else{
            long cardTraderId = cardTraderService.getCardtraderIdByScryfallId(card.getScryfallId());
            if(cardTraderId > 0) {
+
+               // Creo objeto CardTraderListing
+               CardtraderListing listing = new CardtraderListing();
+               listing.setCardtraderId(cardTraderId);
+               listing.setCondition(condition);
+               listing.setLang(lang);
+               listing.setFoil(isFoil);
+
                // Trato de obtener precios de cardtrader_price
-               CardtraderPriceDTO cardtraderPrice = cardtraderPriceService.getCardtraderPrice(cardTraderId, lang, condition, isFoil);
+               CardtraderPriceDTO cardtraderPrice = cardtraderPriceService.getCardtraderPrice(listing);
                // Si cardtrader_price tiene precios para la carta
                if (cardtraderPrice != null) {
-                   System.out.println("PRECIOS OBTENIDOS DE CARDTRADER: " + cardtraderPrice);
-
                    card.setCardPrice(cardtraderPrice); // Le asigno los precios obtenidos
                }
            }
