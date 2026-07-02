@@ -41,7 +41,7 @@ public class CardtraderDAO {
 
         String query = "SELECT cardtrader_id " +
                         "FROM cardtrader_card " +
-                        "WHERE scryfall_id = ? ";
+                        "WHERE scryfall_id = ?";
 
         try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
 

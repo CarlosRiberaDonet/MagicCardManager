@@ -1,7 +1,7 @@
 package com.magic.investor_api.admin;
 
 import com.magic.investor_api.cardtrader.dao.CardtraderDAO;
-import com.magic.investor_api.cardtrader.ports.CardTraderAPI;
+import com.magic.investor_api.api.CardTraderAPI;
 import com.magic.investor_api.api.CardmarketDownloader;
 import com.magic.investor_api.cardtrader.service.CardTraderService;
 import com.magic.investor_api.cardtraderPrice.service.CardtraderPriceService;
