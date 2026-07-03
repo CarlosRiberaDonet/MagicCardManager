@@ -35,7 +35,7 @@ public class CardtraderPriceService {
     // Obtener lista de precios mediante cardtraderId
     public void getCardtraderPrices(CardtraderListing request){
         //  Obtener y mapear JsonNode del mercado de cartas cardtrader
-        cardTraderListingService.updateCardPrice(request.getCardtraderId());
+        cardTraderListingService.updateCardPrice(request);
 
         // Insertar lista de cartas de cardtrader_listing en cardtrader_price
         convertCardtraderListingToPriceCache();
