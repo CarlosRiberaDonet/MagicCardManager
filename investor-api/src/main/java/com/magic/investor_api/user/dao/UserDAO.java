@@ -1,5 +1,6 @@
 package com.magic.investor_api.user.dao;
 
+import com.magic.investor_api.cardtraderListing.model.CardtraderListing;
 import com.magic.investor_api.scryfall.dto.ScryfallCardDTO;
 import com.magic.investor_api.cardmarketPrice.model.CardmarketPrice;
 import com.magic.investor_api.user.dto.UserCollectionDTO;
@@ -223,10 +224,12 @@ public class UserDAO {
         List<UserWatchlistDTO> userWatchlistDTOList = new ArrayList<>();
         String query = "SELECT wl.user_id, wl.card_id, wl.last_price, wl.card_condition, wl.is_foil, wl.added_at, " +
                 "sc.name, sc.printed_name, sc.lang, sc.image_url, sc.rarity, sc.set_name, sc.set_code, sc.collector_number, " +
-                "s.set_code, s.icon_svg_uri " +
+                "s.set_code, s.icon_svg_uri, " +
+                "cm.low, cm.trend, cm.low_foil, cm.trend_foil " +
                 "FROM user_watchlist wl " +
                 "JOIN scryfall_card sc ON wl.card_id = sc.id " +
                 "JOIN scryfall_set s ON sc.set_code = s.set_code " +
+                "JOIN cardmarket_price cm ON cm.cardmarket_id = sc.cardmarket_id " +
                 "WHERE user_id= ?";
 
         try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)){
@@ -234,6 +237,20 @@ public class UserDAO {
             stmt.setLong(1, userId);
             ResultSet rs = stmt.executeQuery();
             while(rs.next()){
+                CardmarketPrice cardmarketPrice = new CardmarketPrice();
+                cardmarketPrice.setLow(rs.getBigDecimal("low"));
+                cardmarketPrice.setTrend(rs.getBigDecimal("trend"));
+                cardmarketPrice.setLowFoil(rs.getBigDecimal("low_foil"));
+                cardmarketPrice.setTrendFoil(rs.getBigDecimal("trend_foil"));
+
+                UserWatchlistDTO dto = new UserWatchlistDTO();
+                dto.setUserId(rs.getLong("user_id"));
+                dto.setCardId(rs.getLong("card_id"));
+                dto.setLastPrice(rs.getDouble("last_price"));
+                dto.setCondition(rs.getString("card_condition"));
+                dto.setFoil(rs.getBoolean("is_foil"));
+                dto.setAddedAt(rs.getDate("added_at").toLocalDate().atStartOfDay().toLocalDate());
+
                 ScryfallCardDTO card = new ScryfallCardDTO();
                 card.setName(rs.getString("name"));
                 card.setPrintedName(rs.getString("printed_name"));
@@ -244,15 +261,15 @@ public class UserDAO {
                 card.setScryfallId(rs.getString("set_code"));
                 card.setIconSvgUri(rs.getString("icon_svg_uri"));
                 card.setCollectorNumber(rs.getString("collector_number"));
-                card.setFoil(rs.getBoolean("is_foil"));
+                card.setCardPrice(cardmarketPrice);
 
-                UserWatchlistDTO dto = new UserWatchlistDTO();
-                dto.setUserId(rs.getLong("user_id"));
-                dto.setCardId(rs.getLong("card_id"));
-                dto.setLastPrice(rs.getDouble("last_price"));
-                dto.setCondition(rs.getString("card_condition"));
-                dto.setFoil(rs.getBoolean("is_foil"));
-                dto.setAddedAt(rs.getDate("added_at").toLocalDate().atStartOfDay().toLocalDate());
+                if(!dto.getCondition().equals("NM") || card.getCardPrice() == null){
+                    CardtraderListing listing = new CardtraderListing();
+                    listing.setCardId(dto.getCardId());
+                    listing.setCondition(dto.getCondition());
+                    listing.setFoil(dto.isFoil());
+                }
+
                 dto.setScryfallCardDTO(card);
 
                 userWatchlistDTOList.add(dto);
@@ -326,6 +343,7 @@ public class UserDAO {
 
                 userCollectionDTO.add(collectionDTO);
             }
+            userCollectionDTO.toString();
         }catch (SQLException e){
             throw new RuntimeException(e);
         }

@@ -26,7 +26,6 @@ import org.springframework.stereotype.Service;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -263,7 +262,7 @@ public class ScryfallService {
     }
 
     // Obtiene carta con datos completos mediante su id
-    public ScryfallCardDTO getCardByscryfallId(Long cardId, String lang, String condition, boolean isFoil){
+    public ScryfallCardDTO getScryfallCard(Long cardId, String lang, String condition, boolean isFoil){
 
         // Obtengo datos de la carta
         ScryfallCardDTO card = scryfallCardDAO.getCardById(cardId);
