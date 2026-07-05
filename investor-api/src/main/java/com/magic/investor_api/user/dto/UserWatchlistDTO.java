@@ -15,7 +15,6 @@ public class UserWatchlistDTO {
     private ScryfallCardDTO scryfallCardDTO;
 
     // CONSTRUCTOR
-
     public UserWatchlistDTO() {
     }
 
