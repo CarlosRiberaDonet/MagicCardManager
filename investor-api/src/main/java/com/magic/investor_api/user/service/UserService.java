@@ -102,11 +102,9 @@ public class UserService {
     public boolean deleteUserAccount(Long userId){
         return authDAO.deleteUser(userId);
     }
+
     // Comprobar si el usuario tiene la carta en user_collection
-    public int getCardQuantity(Long userId, Long cardId, String condition, boolean isFoil){
-        UserCollectionDTO dto = new UserCollectionDTO(userId, cardId);
-        dto.setCondition(condition);
-        dto.setFoil(isFoil);
+    public int getCardQuantity(UserCollectionDTO dto){
         return userDAO.selectCollectionCardTotal(dto);
     }
 

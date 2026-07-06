@@ -9,6 +9,7 @@ public class UserCollectionDTO {
     private Long userId;
     private Long cardId;
     private Double purchasePrice;
+    private String lang;
     private int quantity;
     private String condition;
     private boolean isFoil;
@@ -73,6 +74,14 @@ public class UserCollectionDTO {
         this.condition = condition;
     }
 
+    public String getLang() {
+        return lang;
+    }
+
+    public void setLang(String lang) {
+        this.lang = lang;
+    }
+
     public boolean isFoil() {
         return isFoil;
     }
@@ -103,6 +112,7 @@ public class UserCollectionDTO {
                 "userId=" + userId +
                 ", cardId=" + cardId +
                 ", purchasePrice=" + purchasePrice +
+                ", lang=" + lang +
                 ", quantity=" + quantity +
                 ", condition='" + condition + '\'' +
                 ", isFoil=" + isFoil +
