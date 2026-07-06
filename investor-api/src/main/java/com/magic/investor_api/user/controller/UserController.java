@@ -27,14 +27,25 @@ public class UserController {
 
     // Comprueba si el usuario tiene añadida la carta en user_collection
     @GetMapping("/collection/contains")
-    public ResponseEntity<Integer> collectionQuantity(HttpServletRequest httpRequest,
-                                                      @RequestParam Long cardId,
-                                                      @RequestParam String condition,
-                                                      @RequestParam boolean isFoil) {
+    public ResponseEntity<Integer> collectionQuantity(
+            @RequestParam Long cardId,
+            @RequestParam String condition,
+            @RequestParam String lang,
+            @RequestParam boolean foil,
+            HttpServletRequest httpRequest) {
+
         String token = httpRequest.getHeader("Authorization").substring(7);
         Long userId = jwtService.extractUserId(token);
-        int quantity = userService.getCardQuantity(userId, cardId, condition, isFoil);
-        return ResponseEntity.ok(quantity); // 0 si no tiene la carta, > 0 si la tiene
+
+        UserCollectionDTO dto = new UserCollectionDTO();
+        dto.setUserId(userId);
+        dto.setCardId(cardId);
+        dto.setCondition(condition);
+        dto.setLang(lang);
+        dto.setFoil(foil);
+        int quantity = userService.getCardQuantity(dto);
+        System.out.println(quantity);
+        return ResponseEntity.ok(quantity);
     }
 
     // Comprueba si el usuario tiene añadida la carta en user_watchlist
@@ -100,7 +111,10 @@ public class UserController {
     public List<UserCollectionDTO> getUserCards(HttpServletRequest httpRequest) {
         String token = httpRequest.getHeader("Authorization").substring(7);
         Long userId = jwtService.extractUserId(token);
-        return userService.getMyCollection(userId);
+
+        List<UserCollectionDTO> dto = userService.getMyCollection(userId); // ME DEVUELVE []
+        System.out.println(dto);
+        return dto;
     }
 
     // Obtener watchlist del user
