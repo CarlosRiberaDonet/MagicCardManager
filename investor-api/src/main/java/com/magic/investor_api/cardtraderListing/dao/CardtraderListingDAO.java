@@ -53,7 +53,7 @@ public class CardtraderListingDAO {
 
         List<CardtraderPrice> cardtraderPriceList = new ArrayList<>();
 
-        String query = "SELECT cardtrader_id, lang, card_condition, is_foil, " +
+        String query = "SELECT card_id, cardtrader_id, lang, card_condition, is_foil, " +
                 "MIN(price) AS low," +
                 "AVG(price) AS avg " +
                 "FROM cardtrader_listing " +

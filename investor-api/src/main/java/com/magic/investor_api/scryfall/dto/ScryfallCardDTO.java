@@ -51,8 +51,10 @@ public class ScryfallCardDTO {
     private String typeLine;
     private String borderColor;
     private String frame;
+    private String condition;
     private boolean isFoil;
     private boolean isReprint;
     private LocalDate releasedAt;
     private Object cardPrice;
+    private String priceSource;
 }

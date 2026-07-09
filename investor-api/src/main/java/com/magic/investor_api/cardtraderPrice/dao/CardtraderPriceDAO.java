@@ -17,8 +17,8 @@ public class CardtraderPriceDAO {
     @Autowired
     private DataSource dataSource;
 
-    // Buscar carta mediante filtros en cardtrader_price
-    public CardtraderPriceDTO selectFromCardtraderPriceCache(CardtraderListing dto){
+    // Obtener precios de cardtrader_price
+    public CardtraderPriceDTO selectPriceFromCardtraderPrice(CardtraderListing dto){
 
         String query = "SELECT id, avg, low, trend, avg1, avg7, avg30, fetched_at " +
                 "FROM cardtrader_price " +

@@ -134,7 +134,14 @@ public class CardmarketPriceService {
     }
 
     // Obtengo precios de cardmarket_price
-    public CardmarketPrice getCardPrice(Long cardmarketId){
-        return cardmarketPriceDAO.getCardmarketPrice(cardmarketId);
+    public CardmarketPrice getCardmarketPrice(Long cardmarketId){
+        // Trato de obtener los precios de carmarket_price
+        CardmarketPrice cardmarketPrice = cardmarketPriceDAO.getCardmarketPrice(cardmarketId);
+
+        // Compruebo si cardmarket_price tiene precios para la carta
+        if(cardmarketPrice.getAvg() != null || cardmarketPrice.getLow() != null || cardmarketPrice.getTrend() != null){
+            return cardmarketPrice;  // Devuelvo los los precios obtenidos
+        }
+        return null; // Retorno valor nulo
     }
 }
