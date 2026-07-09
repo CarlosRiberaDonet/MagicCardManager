@@ -1,8 +1,7 @@
 package com.magic.investor_api.user.service;
 
 import com.magic.investor_api.auth.JwtService;
-import com.magic.investor_api.cardtrader.service.CardTraderService;
-import com.magic.investor_api.scryfall.service.ScryfallService;
+import com.magic.investor_api.cardmarketPrice.service.CardmarketPriceService;
 import com.magic.investor_api.user.dao.UserDAO;
 import com.magic.investor_api.auth.AuthDAO;
 import com.magic.investor_api.user.dto.ModifyUserRequest;
@@ -22,17 +21,14 @@ public class UserService {
     private final AuthDAO authDAO;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
-    private final CardTraderService cardTraderService;
-    private final ScryfallService scryfallService;
+    private CardmarketPriceService cardmarketPriceService;
 
     public UserService(UserDAO userDAO, AuthDAO authDAO, PasswordEncoder passwordEncoder,
-                       JwtService jwtService, CardTraderService cardTraderService, ScryfallService scryfallService) {
+                       JwtService jwtService) {
         this.userDAO = userDAO;
         this.authDAO = authDAO;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
-        this.cardTraderService = cardTraderService;
-        this.scryfallService = scryfallService;
     }
 
     // Registrar nuevo usuario en la BD
@@ -139,22 +135,14 @@ public class UserService {
 
     // Obtener lista de cartas de la colección del user
     public List<UserCollectionDTO> getMyCollection(Long userId){
+        // Obtengo colección del usuario
         return userDAO.selectMyCollection(userId);
     }
 
     // Obtener lista de cartas de la watchlist del user
     public List<UserWatchlistDTO> getMyWatchlist(Long userId){
-
         // Obtengo lista de cartas
-        List<UserWatchlistDTO> userWatchlistDTO = userDAO.selectMyWatchlist(userId);
+        return userDAO.selectMyWatchlist(userId);
 
-        // Recorro la lista
-       /* for(UserWatchlistDTO u : userWatchlistDTO){
-            // Obtengo detalles de cada carta
-            long cardTraderId = scryfallService.getScryfallCard(u.getCardId(), u.get);
-
-        }
-        // Obtengo precio actual de la carta*/
-        return userWatchlistDTO;
     }
 }

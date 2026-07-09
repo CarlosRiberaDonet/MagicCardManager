@@ -14,6 +14,7 @@ import com.magic.investor_api.cardtrader.service.CardTraderService;
 import com.magic.investor_api.cardtraderListing.model.CardtraderListing;
 import com.magic.investor_api.cardtraderListing.service.CardtraderListingService;
 import com.magic.investor_api.cardtraderPrice.dto.CardtraderPriceDTO;
+import com.magic.investor_api.cardtraderPrice.model.CardtraderPrice;
 import com.magic.investor_api.cardtraderPrice.service.CardtraderPriceService;
 import com.magic.investor_api.expansion.dao.ExpansionDAO;
 import com.magic.investor_api.expansion.ScryfallSet;
@@ -41,10 +42,8 @@ public class ScryfallService {
     private final ScryfallRepository ScryfallCardRepository;
     private final ExpansionDAO expansionDAO;
     private final ScryfallCardDAO scryfallCardDAO;
-    private final CardTraderService cardTraderService;
     private final CardmarketPriceService cardmarketPriceService;
     private final CardtraderPriceService cardtraderPriceService;
-    private final CardtraderListingService cardtraderListingService;
     private CardPageDTO cardPageDTO;
 
 
@@ -266,45 +265,29 @@ public class ScryfallService {
 
         // Obtengo datos de la carta
         ScryfallCardDTO card = scryfallCardDAO.getCardById(cardId);
+        // Seteo datos a objeto DTO
+        card.setLang(lang);
+        card.setCondition(condition);
+        card.setFoil(isFoil);
 
         // Si existe cardmarketId y la condicion es NM
         if(card.getCardmarketId() > 0 && condition.equals("NM")){
-            // Trato de obtener los precios de carmarket_price
-            CardmarketPrice cardmarketPrice = cardmarketPriceService.getCardPrice(card.getCardmarketId());
-
-            // Si cardmarket_price tiene precios para la carta
+            // Trato de obtener precios de cardmarket_price
+            CardmarketPrice cardmarketPrice =  cardmarketPriceService.getCardmarketPrice(card.getCardmarketId());
+            // Si la carta tiene precio en cardmarket_price, devuelvo el objeto
             if(cardmarketPrice != null){
-                card.setCardPrice(cardmarketPrice);  // Le asigno los precios obtenidos
+                card.setCardPrice(cardmarketPrice);
+                return card;
             }
         }
-        // Si no hay precios en cardmarket, trato de obtenerlos de cardtrader_price
-        else{
-           long cardTraderId = cardTraderService.getCardtraderIdByScryfallId(card.getScryfallId());
-           if(cardTraderId > 0) {
 
-               // Creo objeto CardTraderListing
-               CardtraderListing listing = new CardtraderListing();
-               listing.setCardtraderId(cardTraderId);
-               listing.setCondition(condition);
-               listing.setLang(lang);
-               listing.setFoil(isFoil);
-
-               // Trato de obtener precios de cardtrader_price
-               CardtraderPriceDTO cardtraderPrice = cardtraderPriceService.getCardtraderPrice(listing);
-               // Si cardtrader_price tiene precios para la carta
-               if (cardtraderPrice != null) {
-                   card.setCardPrice(cardtraderPrice); // Le asigno los precios obtenidos
-               }
-           }
+        // Si la carta no tiene cardmarketId o, condition != "NM" o, no hay precios en carmarket_price
+        // Trato de obtener precio de desde cardtrader_price
+        CardtraderPriceDTO cardtraderPrice = cardtraderPriceService.getCardtraderPrice(card);
+        if(cardtraderPrice != null){
+            card.setCardPrice(cardtraderPrice);
+            return card;
         }
-
         return card;
-    }
-
-
-    public CardmarketPrice buildCardmarketPrice(Long cardmarketId){
-        CardmarketPrice cardmarketPrice = cardmarketPriceService.getCardPrice(cardmarketId);
-
-        return cardmarketPrice;
     }
 }

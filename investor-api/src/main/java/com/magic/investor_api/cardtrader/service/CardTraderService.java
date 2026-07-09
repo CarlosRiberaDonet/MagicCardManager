@@ -23,8 +23,6 @@ public class CardTraderService {
     private final CardtraderRepository cardtraderRepository;
     private final ExpansionDAO expansionDAO;
     private final CardtraderDAO cardtraderDAO;
-    private final CardtraderListingService cardTraderListingService;
-    private final CardtraderPriceService cardtraderPriceService;
 
     // Obtiene lista de expansiones de la API cardtrader
     public void downloadCardtraderExpansion(){

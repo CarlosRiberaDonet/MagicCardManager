@@ -1,10 +1,14 @@
 package com.magic.investor_api.user.dao;
 
+import com.magic.investor_api.cardtrader.dao.CardtraderDAO;
 import com.magic.investor_api.cardtraderListing.model.CardtraderListing;
+import com.magic.investor_api.cardtraderPrice.dao.CardtraderPriceDAO;
+import com.magic.investor_api.cardtraderPrice.dto.CardtraderPriceDTO;
 import com.magic.investor_api.scryfall.dto.ScryfallCardDTO;
 import com.magic.investor_api.cardmarketPrice.model.CardmarketPrice;
 import com.magic.investor_api.user.dto.UserCollectionDTO;
 import com.magic.investor_api.user.dto.UserWatchlistDTO;
+import com.magic.investor_api.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
@@ -22,6 +26,13 @@ public class UserDAO {
     @Autowired
     private DataSource dataSource;
     private PasswordEncoder passwordEncoder;
+    private final CardtraderDAO cardtraderDAO;
+    private final CardtraderPriceDAO cardtraderPriceDAO;
+
+    public UserDAO(CardtraderDAO cardtraderDAO, CardtraderPriceDAO cardtraderPriceDAO){
+        this.cardtraderDAO = cardtraderDAO;
+        this.cardtraderPriceDAO = cardtraderPriceDAO;
+    }
 
     // Insertar carta en la tabla user_collection
     public boolean insertCollectionCard(UserCollectionDTO dto){
@@ -231,7 +242,7 @@ public class UserDAO {
                 "FROM user_watchlist wl " +
                 "JOIN scryfall_card sc ON wl.card_id = sc.id " +
                 "JOIN scryfall_set s ON sc.set_code = s.set_code " +
-                "JOIN cardmarket_price cm ON cm.cardmarket_id = sc.cardmarket_id " +
+                "LEFT JOIN cardmarket_price cm ON cm.cardmarket_id = sc.cardmarket_id " +
                 "WHERE user_id= ?";
 
         try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)){
@@ -298,9 +309,9 @@ public class UserDAO {
                 "cp.avg, cp.low, cp.trend, cp.avg_foil, cp.low_foil, cp.trend_foil, updated_at " +
                 "FROM user_collection uc " +
                 "JOIN scryfall_card sc ON uc.card_id = sc.id " +
-                "JOIN scryfall_set s ON sc.set_code = s.set_code " +
-                "JOIN cardmarket_price cp ON cp.cardmarket_id = sc.cardmarket_id " +
-                "WHERE user_id = ?";
+                "LEFT JOIN scryfall_set s ON sc.set_code = s.set_code " +
+                "LEFT JOIN cardmarket_price cp ON cp.cardmarket_id = sc.cardmarket_id " +
+                "WHERE uc.user_id = ?";
 
         try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)){
             stmt.setLong(1, userId);
@@ -308,14 +319,20 @@ public class UserDAO {
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                CardmarketPrice cardmarketPrice = new CardmarketPrice();
-                cardmarketPrice.setLow(rs.getBigDecimal("low"));
-                cardmarketPrice.setTrend(rs.getBigDecimal("trend"));
-                cardmarketPrice.setLowFoil(rs.getBigDecimal("low_foil"));
-                cardmarketPrice.setTrendFoil(rs.getBigDecimal("trend_foil"));
-                cardmarketPrice.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
-
+                UserCollectionDTO collectionDTO = new UserCollectionDTO();
                 ScryfallCardDTO scryfallCardDTO = new ScryfallCardDTO();
+                CardmarketPrice cardmarketPrice = new CardmarketPrice();
+
+                collectionDTO.setUserId(rs.getLong("user_id"));
+                collectionDTO.setCardId(rs.getLong("card_id"));
+                collectionDTO.setPurchasePrice(rs.getDouble("purchase_price"));
+                collectionDTO.setQuantity(rs.getInt("quantity"));
+                collectionDTO.setCondition(rs.getString("card_condition"));
+                collectionDTO.setFoil(rs.getBoolean("is_foil"));
+                collectionDTO.setLang(rs.getString("lang"));
+                collectionDTO.setAddedAt(rs.getDate("added_at").toLocalDate());
+                collectionDTO.setCard(scryfallCardDTO);
+
                 scryfallCardDTO.setId(rs.getLong("card_id"));
                 scryfallCardDTO.setScryfallId(rs.getString("scryfall_id"));
                 scryfallCardDTO.setName(rs.getString("name"));
@@ -333,16 +350,39 @@ public class UserDAO {
                 scryfallCardDTO.setCardPrice(cardmarketPrice);
                 scryfallCardDTO.setIconSvgUri(rs.getString("icon_svg_uri"));
 
-                UserCollectionDTO collectionDTO = new UserCollectionDTO();
-                collectionDTO.setUserId(rs.getLong("user_id"));
-                collectionDTO.setCardId(rs.getLong("card_id"));
-                collectionDTO.setPurchasePrice(rs.getDouble("purchase_price"));
-                collectionDTO.setQuantity(rs.getInt("quantity"));
-                collectionDTO.setCondition(rs.getString("card_condition"));
-                collectionDTO.setFoil(rs.getBoolean("is_foil"));
-                collectionDTO.setLang(rs.getString("lang"));
-                collectionDTO.setAddedAt(rs.getDate("added_at").toLocalDate());
-                collectionDTO.setCard(scryfallCardDTO);
+                cardmarketPrice.setLow(rs.getBigDecimal("low"));
+                cardmarketPrice.setTrend(rs.getBigDecimal("trend"));
+                cardmarketPrice.setLowFoil(rs.getBigDecimal("low_foil"));
+                cardmarketPrice.setTrendFoil(rs.getBigDecimal("trend_foil"));
+                Timestamp ts = rs.getTimestamp("updated_at");
+                cardmarketPrice.setUpdatedAt(ts != null ? ts.toLocalDateTime() : null);
+
+                // Si el campo updated_at es null, la carta no tiene precio en la tabla cardmarket_price
+                // Trato de obtener los precios de cardtrader_price
+                if(cardmarketPrice.getUpdatedAt() == null){
+                    // Obtengo cardtraderId
+                    Long cardTraderId = cardtraderDAO.selectCardTraderId(scryfallCardDTO.getScryfallId());
+
+                    // Si existe cardtraderId
+                    if(cardTraderId > 0) {
+                        // Creo objeto CardTraderListing
+                        CardtraderListing listing = new CardtraderListing();
+                        listing.setCardtraderId(cardTraderId);
+                        // Utilizo ENUM para equiparar el valor del campo condition recibido con el de la tabla de la BD
+                        listing.setCondition(Utils.CardCondition.valueOf(collectionDTO.getCondition()).getCardTraderValue());
+                        listing.setLang(collectionDTO.getLang());
+                        listing.setFoil(collectionDTO.isFoil());
+
+                        // Trato de obtener precios de cardtrader_price
+                        CardtraderPriceDTO cardtraderPrice = cardtraderPriceDAO.selectPriceFromCardtraderPrice(listing);
+                        if(cardtraderPrice != null){
+                            scryfallCardDTO.setCardPrice(cardtraderPrice);
+                            scryfallCardDTO.setPriceSource("CARDTRADER");
+                        }
+                    }
+                }else{
+                    scryfallCardDTO.setPriceSource("CARDMARKET");
+                }
 
                 userCollectionDTO.add(collectionDTO);
             }
