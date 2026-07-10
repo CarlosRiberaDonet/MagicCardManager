@@ -266,14 +266,14 @@ public class ScryfallService {
         // Obtengo datos de la carta
         ScryfallCardDTO card = scryfallCardDAO.getCardById(cardId);
         // Seteo datos a objeto DTO
-        card.setLang(lang);
+        //card.setLang(lang);
         card.setCondition(condition);
         card.setFoil(isFoil);
 
         // Si existe cardmarketId y la condicion es NM
         if(card.getCardmarketId() > 0 && condition.equals("NM")){
             // Trato de obtener precios de cardmarket_price
-            CardmarketPrice cardmarketPrice =  cardmarketPriceService.getCardmarketPrice(card.getCardmarketId());
+            CardmarketPrice cardmarketPrice = cardmarketPriceService.getCardmarketPrice(card.getCardmarketId());
             // Si la carta tiene precio en cardmarket_price, devuelvo el objeto
             if(cardmarketPrice != null){
                 card.setCardPrice(cardmarketPrice);

@@ -61,8 +61,8 @@ public class CardtraderListingService {
 
                 for (JsonNode item : arrayNode) {
                     CardtraderListing listing = new CardtraderListing();
-                    listing.setScryfallId(request.getScryfallId());
                     listing.setCardId(request.getCardId());
+                    listing.setScryfallId(request.getScryfallId());
                     listing.setCardtraderId(item.path("blueprint_id").asLong());
                     listing.setPrice(BigDecimal.valueOf(item.path("price_cents").asLong()).movePointLeft(2));
                     listing.setCondition(item.path("properties_hash").path("condition").asText());

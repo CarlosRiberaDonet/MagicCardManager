@@ -12,7 +12,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class CardtraderPriceDTO {
 
-    private Long id;
+    private Long cardId;
     private Long cardtraderId;
     private String scryfallId;
     private String lang;

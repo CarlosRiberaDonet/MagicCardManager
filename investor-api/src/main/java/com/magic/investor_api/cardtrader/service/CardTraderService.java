@@ -1,15 +1,16 @@
 package com.magic.investor_api.cardtrader.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.magic.investor_api.cardmarketPrice.model.CardmarketPrice;
+import com.magic.investor_api.cardmarketPrice.service.CardmarketPriceService;
 import com.magic.investor_api.cardtrader.dao.CardtraderDAO;
 import com.magic.investor_api.cardtrader.model.CardtraderCard;
 import com.magic.investor_api.api.CardTraderAPI;
 import com.magic.investor_api.cardtrader.repository.CardtraderRepository;
-import com.magic.investor_api.cardtraderListing.model.CardtraderListing;
-import com.magic.investor_api.cardtraderListing.service.CardtraderListingService;
 import com.magic.investor_api.cardtraderPrice.dto.CardtraderPriceDTO;
 import com.magic.investor_api.cardtraderPrice.service.CardtraderPriceService;
 import com.magic.investor_api.expansion.dao.ExpansionDAO;
+import com.magic.investor_api.scryfall.dto.ScryfallCardDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
@@ -23,6 +24,8 @@ public class CardTraderService {
     private final CardtraderRepository cardtraderRepository;
     private final ExpansionDAO expansionDAO;
     private final CardtraderDAO cardtraderDAO;
+    private final CardmarketPriceService cardmarketPriceService;
+    private final CardtraderPriceService cardtraderPriceService;
 
     // Obtiene lista de expansiones de la API cardtrader
     public void downloadCardtraderExpansion(){
@@ -89,5 +92,31 @@ public class CardTraderService {
     // Obtener cardtrader_id a través del scryfall_id
     public Long getCardtraderIdByScryfallId(String scryfallId){
         return cardtraderDAO.selectCardTraderId(scryfallId);
+    }
+
+    // Obtener precios actualizados
+    public ScryfallCardDTO getCardtraderPrices(ScryfallCardDTO card){
+
+        // Obtengo datos de la carta
+        card = scryfallCardDAO.getCardById(cardId);
+        // Si existe cardmarketId y la condicion es NM
+        if(card.getCardmarketId() > 0 && card.getCondition().equals("NM")){
+            // Trato de obtener precios de cardmarket_price
+            CardmarketPrice cardmarketPrice = cardmarketPriceService.getCardmarketPrice(card.getCardmarketId());
+            // Si la carta tiene precio en cardmarket_price, devuelvo el objeto
+            if(cardmarketPrice != null){
+                card.setCardPrice(cardmarketPrice);
+                return card;
+            }
+        }
+
+        // Si la carta no tiene cardmarketId o, condition != "NM" o, no hay precios en carmarket_price
+        // Trato de obtener precio de desde cardtrader_price
+        CardtraderPriceDTO cardtraderPrice = cardtraderPriceService.getCardtraderPrice(card);
+        if(cardtraderPrice != null){
+            card.setCardPrice(cardtraderPrice);
+            return card;
+        }
+        return card;
     }
 }
