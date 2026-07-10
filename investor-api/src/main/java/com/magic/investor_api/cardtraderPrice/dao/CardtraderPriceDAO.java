@@ -20,7 +20,7 @@ public class CardtraderPriceDAO {
     // Obtener precios de cardtrader_price
     public CardtraderPriceDTO selectPriceFromCardtraderPrice(CardtraderListing dto){
 
-        String query = "SELECT id, avg, low, trend, avg1, avg7, avg30, fetched_at " +
+        String query = "SELECT card_id, avg, low, trend, avg1, avg7, avg30, fetched_at " +
                 "FROM cardtrader_price " +
                 "WHERE cardtrader_id = ? AND card_condition = ? AND lang = ?  AND is_foil = ?";
 
@@ -34,7 +34,7 @@ public class CardtraderPriceDAO {
             ResultSet rs = stmt.executeQuery();
             if(rs.next()){
                 CardtraderPriceDTO dtoPrice = new CardtraderPriceDTO();
-                dtoPrice.setId(rs.getLong("id"));
+                dtoPrice.setCardId(rs.getLong("card_id"));
                 dtoPrice.setAvg(rs.getBigDecimal("avg"));
                 dtoPrice.setLow(rs.getBigDecimal("low"));
                 dtoPrice.setTrend(rs.getBigDecimal("trend"));

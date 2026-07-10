@@ -49,7 +49,7 @@ public class CardtraderListingDAO {
     }
 
     // Obtener datos de cardtrader_listing
-    public List<CardtraderPrice> getCardtraderListingValues(){
+    public List<CardtraderPrice> getCardtraderListingValues(Long cardId){
 
         List<CardtraderPrice> cardtraderPriceList = new ArrayList<>();
 
@@ -57,15 +57,19 @@ public class CardtraderListingDAO {
                 "MIN(price) AS low," +
                 "AVG(price) AS avg " +
                 "FROM cardtrader_listing " +
+                "WHERE card_id = ? " +
                 "GROUP BY cardtrader_id, lang, card_condition, is_foil";
 
         try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)){
+
+            stmt.setLong(1, cardId);
 
             ResultSet rs = stmt.executeQuery();
 
             while(rs.next()){
                 CardtraderPrice cardPriceCache = new CardtraderPrice();
 
+                cardPriceCache.setCardId(cardId);
                 cardPriceCache.setCardtraderId(rs.getLong("cardtrader_id"));
                 cardPriceCache.setLang(rs.getString("lang"));
                 cardPriceCache.setCondition(rs.getString("card_condition"));

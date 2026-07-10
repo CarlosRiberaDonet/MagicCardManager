@@ -49,6 +49,7 @@ public class SecurityConfig {
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/pricecache/**").permitAll()
                         .requestMatchers("/user/**").authenticated()
+                        .requestMatchers("/cardtrader/**").authenticated()
                         .requestMatchers("/prices/**").hasRole("ADMIN")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
