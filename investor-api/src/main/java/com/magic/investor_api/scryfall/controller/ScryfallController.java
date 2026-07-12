@@ -78,6 +78,6 @@ public class ScryfallController {
                                       @RequestParam(required = false, defaultValue = "NM") String condition,
                                       @RequestParam(required = false, defaultValue = "false") boolean isFoil
     ){
-        return scryfallService.getScryfallCard(cardId, lang, condition, isFoil);
+        return scryfallService.selectScryfallCard(cardId, lang, condition, isFoil);
     }
 }

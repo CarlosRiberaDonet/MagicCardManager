@@ -5,7 +5,6 @@ import com.magic.investor_api.cardtrader.service.CardTraderService;
 import com.magic.investor_api.cardtraderPrice.dto.CardtraderPriceDTO;
 import com.magic.investor_api.cardtraderPrice.service.CardtraderPriceService;
 import com.magic.investor_api.scryfall.dto.ScryfallCardDTO;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

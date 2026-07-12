@@ -1,15 +1,12 @@
 package com.magic.investor_api.cardtrader.controller;
 
 import com.magic.investor_api.cardtrader.service.CardTraderService;
-import com.magic.investor_api.cardtraderPrice.model.CardtraderPrice;
+import com.magic.investor_api.cardtraderPrice.dto.CardtraderPriceDTO;
 import com.magic.investor_api.scryfall.dto.ScryfallCardDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-
 @RestController
 @RequestMapping("/cardtrader")
 @RequiredArgsConstructor
@@ -38,14 +35,15 @@ public class CardTraderController {
                                                 @RequestParam String condition,
                                                 @RequestParam boolean isFoil
     ){
-        ScryfallCardDTO dto = new ScryfallCardDTO();
-        dto.setId(cardId);
-        dto.setScryfallId(scryfallId);
-        dto.setLang(lang);
-        dto.setCondition(condition);
-        dto.setFoil(isFoil);
-        dto = cardTraderService.getCardtraderPrices(dto);
+        // REEMPLAZAR POR LLAMADA A cardtraderService -> ...
+        CardtraderPriceDTO priceDTO = new CardtraderPriceDTO();
+        priceDTO = cardTraderService.getCardtraderPrices(cardId, lang, condition, isFoil);
+        if (priceDTO == null) {
+            return ResponseEntity.noContent().build(); // 204
+        }
 
-        return ResponseEntity.ok(dto);
+        System.out.println(priceDTO);
+
+        return ResponseEntity.ok(priceDTO);
     }
 }

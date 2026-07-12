@@ -28,7 +28,7 @@ public class CardmarketPriceDAO {
     }
 
     // Obtener precios de card_price
-    public CardmarketPrice getCardmarketPrice(Long cardmarketId){
+    public CardmarketPrice selectCardmarketPrice(Long cardmarketId){
 
         CardmarketPrice cardmarketPrice = new CardmarketPrice();
         String query = "SELECT id, cardmarket_id, avg, low, trend, avg1, avg7, avg30, " +
