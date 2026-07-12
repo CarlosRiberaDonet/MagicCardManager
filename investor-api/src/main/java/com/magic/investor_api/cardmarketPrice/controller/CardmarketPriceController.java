@@ -30,4 +30,6 @@ public class CardmarketPriceController {
 
         return ResponseEntity.ok("Base de datos actualizada.");
     }
+
+    // Obtener precios de la tabla cardmaket_price
 }
