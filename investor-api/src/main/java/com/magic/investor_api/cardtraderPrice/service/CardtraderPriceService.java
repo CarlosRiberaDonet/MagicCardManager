@@ -64,12 +64,17 @@ public class CardtraderPriceService {
     // Consulta de precios de la carta en cardtrader_price
     public CardtraderPriceDTO getCardtraderPrice(ScryfallCardDTO card){
 
-        // Obtengo el cardTraderId mediante scryfallId
-        long cardTraderId = cardtraderDAO.selectCardTraderId(card.getScryfallId());
-        // Si existe cardtraderId
-        if(cardTraderId > 0) {
-            // Creo objeto CardTraderListing
-            CardtraderListing listing = new CardtraderListing();
+        // Asigno el cardTraderId mediante scryfallId
+        card.setCardTraderId(cardtraderDAO.selectCardTraderId(card.getScryfallId()));
+
+        // Obtengo precios de la tabla cardtrader_price
+        cardtraderPriceDAO.selectPriceFromCardtraderPrice(card);
+        return null;
+    }
+
+
+    // Creo objeto CardTraderListing
+    /*CardtraderListing listing = new CardtraderListing();
             listing.setCardId(card.getId());
             listing.setScryfallId(card.getScryfallId());
             listing.setCardtraderId(cardTraderId);
@@ -83,10 +88,7 @@ public class CardtraderPriceService {
             CardtraderPriceDTO cardtraderPrice = cardtraderPriceDAO.selectPriceFromCardtraderPrice(listing);
             // Si cardtrader_price tiene precios para la carta
             if (cardtraderPrice != null) {
-                card.setCardPrice(cardtraderPrice); // Le asigno los precios obtenidos
-                return cardtraderPrice;
-            }
-        }
-        return null;
-    }
+        card.setCardPrice(cardtraderPrice); // Le asigno los precios obtenidos
+        return cardtraderPrice;
+    }*/
 }

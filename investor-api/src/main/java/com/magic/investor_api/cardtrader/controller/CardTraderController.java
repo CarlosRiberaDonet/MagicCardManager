@@ -30,19 +30,19 @@ public class CardTraderController {
     @PostMapping("/lastPrices")
     public ResponseEntity<?> selectCardtraderCard(HttpServletRequest httpRequest,
                                                 @RequestParam Long cardId,
-                                                @RequestParam String scryfallId,
                                                 @RequestParam String lang,
                                                 @RequestParam String condition,
                                                 @RequestParam boolean isFoil
     ){
-        // REEMPLAZAR POR LLAMADA A cardtraderService -> ...
+
+        // Debo obtener los precios de cardtrader para cardDetail 138
+        System.out.println("Obtener precios de: " + cardId + lang + condition + isFoil);
         CardtraderPriceDTO priceDTO = new CardtraderPriceDTO();
         priceDTO = cardTraderService.getCardtraderPrices(cardId, lang, condition, isFoil);
+
         if (priceDTO == null) {
             return ResponseEntity.noContent().build(); // 204
         }
-
-        System.out.println(priceDTO);
 
         return ResponseEntity.ok(priceDTO);
     }

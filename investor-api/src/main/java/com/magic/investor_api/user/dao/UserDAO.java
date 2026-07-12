@@ -366,15 +366,15 @@ public class UserDAO {
                     // Si existe cardtraderId
                     if(cardTraderId > 0) {
                         // Creo objeto CardTraderListing
-                        CardtraderListing listing = new CardtraderListing();
-                        listing.setCardtraderId(cardTraderId);
+                        ScryfallCardDTO dto = new ScryfallCardDTO();
+                        dto.setCardTraderId(cardTraderId);
                         // Utilizo ENUM para equiparar el valor del campo condition recibido con el de la tabla de la BD
-                        listing.setCondition(Utils.CardCondition.valueOf(collectionDTO.getCondition()).getCardTraderValue());
-                        listing.setLang(collectionDTO.getLang());
-                        listing.setFoil(collectionDTO.isFoil());
+                        dto.setCondition(Utils.CardCondition.valueOf(collectionDTO.getCondition()).getCardTraderValue());
+                        dto.setLang(collectionDTO.getLang());
+                        dto.setFoil(collectionDTO.isFoil());
 
                         // Trato de obtener precios de cardtrader_price
-                        CardtraderPriceDTO cardtraderPrice = cardtraderPriceDAO.selectPriceFromCardtraderPrice(listing);
+                        CardtraderPriceDTO cardtraderPrice = cardtraderPriceDAO.selectPriceFromCardtraderPrice(dto);
                         if(cardtraderPrice != null){
                             scryfallCardDTO.setCardPrice(cardtraderPrice);
                             scryfallCardDTO.setPriceSource("CARDTRADER");

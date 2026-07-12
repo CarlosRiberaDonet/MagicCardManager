@@ -241,14 +241,14 @@ public class ScryfallService {
         return scryfallCardDAO.getCardById(cardId);
     }
 
+    // Obtener carmarketId de la tabla scryfall_card
+    public Long getCarmarketId(Long cardId){
+        return scryfallCardDAO.selectCardmarketIdBycardId(cardId);
+    }
+
     // Obtener precios desde cardmarket_price
     public CardmarketPrice getCardmarketPrice(Long cardmarketId){
         return cardmarketPriceService.getCardmarketPriceByCardmarketId(cardmarketId);
-    }
-
-    // Obtener precios desde cartrader_price
-    public CardtraderPriceDTO getCardtraderPrice(ScryfallCardDTO card){
-        return cardtraderPriceService.getCardtraderPrice(card);
     }
 
     // Obtiene carta con datos completos mediante su id
@@ -262,7 +262,7 @@ public class ScryfallService {
         card.setFoil(isFoil);
 
         // Si existe cardmarketId y la condicion es NM
-        if(card.getCardmarketId() > 0 && condition.equals("NM")){
+       /* if(card.getCardmarketId() > 0 && condition.equals("NM")){
             // Trato de obtener precios de cardmarket_price
             CardmarketPrice cardmarketPrice = getCardmarketPrice(card.getCardmarketId());
             // Si la carta tiene precio en cardmarket_price, devuelvo el objeto
@@ -278,7 +278,7 @@ public class ScryfallService {
         if(cardtraderPrice != null){
             card.setCardPrice(cardtraderPrice);
             return card;
-        }
+        }*/
         return card;
     }
 }

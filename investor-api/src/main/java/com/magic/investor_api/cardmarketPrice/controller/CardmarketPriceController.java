@@ -1,18 +1,18 @@
 package com.magic.investor_api.cardmarketPrice.controller;
 
 import com.magic.investor_api.api.CardmarketDownloader;
+import com.magic.investor_api.cardmarketPrice.model.CardmarketPrice;
 import com.magic.investor_api.cardmarketPrice.service.CardmarketPriceService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
 
 @RestController
-@RequestMapping("/prices")
+@RequestMapping("/cardmarket")
 @RequiredArgsConstructor
 public class CardmarketPriceController {
 
@@ -32,4 +32,20 @@ public class CardmarketPriceController {
     }
 
     // Obtener precios de la tabla cardmaket_price
+    @GetMapping("/{cardId}")
+    public ResponseEntity<?> getCardmarketPrice(@PathVariable Long cardId) {
+
+        Long cardmarketId = cardmarketPriceService.getCarmarketId(cardId);
+        if (cardmarketId == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        CardmarketPrice price = cardmarketPriceService.getCardmarketPriceByCardmarketId(cardmarketId);
+
+        if (price == null) {
+            return ResponseEntity.noContent().build(); // 204
+        }
+
+        return ResponseEntity.ok(price);
+    }
 }
