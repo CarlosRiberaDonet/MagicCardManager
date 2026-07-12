@@ -2,6 +2,7 @@ package com.magic.investor_api.cardtraderPrice.dao;
 
 import com.magic.investor_api.cardtraderListing.model.CardtraderListing;
 import com.magic.investor_api.cardtraderPrice.dto.CardtraderPriceDTO;
+import com.magic.investor_api.scryfall.dto.ScryfallCardDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -18,7 +19,7 @@ public class CardtraderPriceDAO {
     private DataSource dataSource;
 
     // Obtener precios de cardtrader_price
-    public CardtraderPriceDTO selectPriceFromCardtraderPrice(CardtraderListing dto){
+    public CardtraderPriceDTO selectPriceFromCardtraderPrice(ScryfallCardDTO dto){
 
         String query = "SELECT card_id, avg, low, trend, avg1, avg7, avg30, fetched_at " +
                 "FROM cardtrader_price " +
@@ -26,7 +27,7 @@ public class CardtraderPriceDAO {
 
         try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)){
 
-            stmt.setLong(1, dto.getCardtraderId());
+            stmt.setLong(1, dto.getCardTraderId());
             stmt.setString(2, dto.getCondition());
             stmt.setString(3, dto.getLang());
             stmt.setBoolean(4, dto.isFoil());

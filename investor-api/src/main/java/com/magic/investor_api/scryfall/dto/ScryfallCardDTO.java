@@ -36,6 +36,7 @@ import java.time.LocalDate;
 public class ScryfallCardDTO {
 
     private Long id;
+    private Long cardTraderId;
     private String scryfallId;
     private Long cardmarketId;
     private String name;

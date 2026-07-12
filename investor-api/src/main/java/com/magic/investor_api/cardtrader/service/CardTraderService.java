@@ -27,7 +27,6 @@ public class CardTraderService {
     private final ExpansionDAO expansionDAO;
     private final CardtraderDAO cardtraderDAO;
     private final ScryfallService scryfallService;
-    private final CardmarketPriceService cardmarketPriceService;
     private final CardtraderPriceService cardtraderPriceService;
 
     // Obtiene lista de expansiones de la API cardtrader
@@ -97,7 +96,7 @@ public class CardTraderService {
         return cardtraderDAO.selectCardTraderId(scryfallId);
     }
 
-    // Obtener carta con precios actualizados
+    // Obtener precios de cardtrader
     public CardtraderPriceDTO getCardtraderPrices(Long cardId, String lang, String condition, boolean isFoil){
 
         ScryfallCardDTO card = new ScryfallCardDTO();
@@ -106,6 +105,6 @@ public class CardTraderService {
         card.setCondition(condition);
         card.setFoil(isFoil);
 
-        return scryfallService.getCardtraderPrice(card);
+        return cardtraderPriceService.getCardtraderPrice(card);
     }
 }

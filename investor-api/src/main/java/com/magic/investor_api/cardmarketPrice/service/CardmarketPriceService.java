@@ -5,10 +5,11 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.magic.investor_api.scryfall.dao.ScryfallCardDAO;
 import com.magic.investor_api.cardmarketPrice.dao.CardmarketPriceDAO;
 import com.magic.investor_api.cardmarketPrice.model.CardmarketPrice;
 import com.magic.investor_api.cardmarketPrice.repository.CardmarketPriceRepository;
+import com.magic.investor_api.scryfall.dao.ScryfallCardDAO;
+import com.magic.investor_api.scryfall.service.ScryfallService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,11 +28,10 @@ public class CardmarketPriceService {
     @Autowired
     private final CardmarketPriceRepository cardmarketPriceRepository;
     @Autowired
-    private ScryfallCardDAO cardDAO;
-    @Autowired
     private CardmarketPriceDAO cardmarketPriceDAO;
     private ObjectMapper objectMapper = new ObjectMapper();
     private final String basePath = System.getProperty("user.dir");
+    private final ScryfallCardDAO scryfallCardDAO;
 
     // Importar precios de JSON Cardmarket a card_price
     public void importGuidePricesToBD() throws IOException {
@@ -133,15 +133,13 @@ public class CardmarketPriceService {
                 : value.decimalValue();
     }
 
-    // Obtengo precios de cardmarket_price
-    public CardmarketPrice getCardmarketPriceByCardmarketId(Long cardmarketId){
-        // Trato de obtener los precios de carmarket_price
-        CardmarketPrice cardmarketPrice = cardmarketPriceDAO.selectCardmarketPrice(cardmarketId);
+    // Obtener cardmarketId
+    public Long getCarmarketId(Long cardId){
+        return scryfallCardDAO.selectCardmarketIdBycardId(cardId);
+    }
 
-        // Compruebo si cardmarket_price tiene precios para la carta
-        if(cardmarketPrice.getAvg() != null || cardmarketPrice.getLow() != null || cardmarketPrice.getTrend() != null){
-            return cardmarketPrice;  // Devuelvo los los precios obtenidos
-        }
-        return null; // Retorno valor nulo
+    // Obtengo precios de cardmarket_price
+    public CardmarketPrice getCardmarketPriceByCardmarketId(Long cardmarketId) {
+        return cardmarketPriceDAO.selectCardmarketPrice(cardmarketId);
     }
 }

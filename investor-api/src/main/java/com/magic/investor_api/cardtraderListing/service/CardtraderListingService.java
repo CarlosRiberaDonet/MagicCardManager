@@ -2,11 +2,9 @@ package com.magic.investor_api.cardtraderListing.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.magic.investor_api.api.CardTraderAPI;
-import com.magic.investor_api.cardtrader.service.CardTraderService;
 import com.magic.investor_api.cardtraderListing.dao.CardtraderListingDAO;
 import com.magic.investor_api.cardtraderListing.repository.CardtraderListingRepository;
 import com.magic.investor_api.cardtraderListing.model.CardtraderListing;
-import com.magic.investor_api.cardtraderPrice.service.CardtraderPriceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

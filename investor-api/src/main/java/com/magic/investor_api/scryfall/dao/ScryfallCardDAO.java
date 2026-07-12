@@ -195,6 +195,24 @@ public class ScryfallCardDAO {
         return 0;
     }
 
+    // Obtener cardmarketId de la tabla scryfall_card
+    public Long selectCardmarketIdBycardId(Long cardId){
+        String sql = "SELECT cardmarket_id FROM scryfall_card WHERE id = ?";
+
+        try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)){
+
+            stmt.setLong(1, cardId);
+
+            ResultSet rs = stmt.executeQuery();
+            if(rs.next()){
+                // Retornar el valor obtenido
+               return rs.getLong("cardmarket_id");
+            }
+        }catch (SQLException e){
+            throw new RuntimeException(e);
+        }
+        return -1L;
+    }
 
     // Obtener detalles de carta mediante id de scryfall_id
     public ScryfallCardDTO getScryfallCardById(String scryfallId){
