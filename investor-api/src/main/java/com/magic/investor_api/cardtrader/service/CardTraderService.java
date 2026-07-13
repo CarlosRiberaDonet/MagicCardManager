@@ -97,10 +97,11 @@ public class CardTraderService {
     }
 
     // Obtener precios de cardtrader
-    public CardtraderPriceDTO getCardtraderPrices(Long cardId, String lang, String condition, boolean isFoil){
+    public CardtraderPriceDTO getCardtraderPrices(Long cardId, String scryfallId, String lang, String condition, boolean isFoil){
 
         ScryfallCardDTO card = new ScryfallCardDTO();
         card.setId(cardId);
+        card.setScryfallId(scryfallId);
         card.setLang(lang);
         card.setCondition(condition);
         card.setFoil(isFoil);
