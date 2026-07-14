@@ -76,13 +76,16 @@ public class UserController {
 
     // Eliminar carta en user_collection
     @DeleteMapping("/collection/del")
-    public ResponseEntity<String> delFromCollection(HttpServletRequest httpRequest,
-                                                    @RequestBody UserCollectionDTO request){
+    public ResponseEntity<Boolean> delFromCollection(
+            HttpServletRequest httpRequest,
+            @RequestBody UserCollectionDTO request) {
+
         String token = httpRequest.getHeader("Authorization").substring(7);
         Long userId = jwtService.extractUserId(token);
+
         boolean result = userService.delFromCollection(userId, request);
-        if(result) return ResponseEntity.ok("Carta eliminada");
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al eliminar carta");
+
+        return ResponseEntity.ok(result);
     }
 
     // Añadir carta en user_watchlist
