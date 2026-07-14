@@ -24,5 +24,5 @@ public class CardtraderPriceDTO {
     private BigDecimal avg1;
     private BigDecimal avg7;
     private BigDecimal avg30;
-    private LocalDate fetchedAt;
+    private LocalDate updatedAt;
 }

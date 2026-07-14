@@ -53,7 +53,7 @@ public class UserDAO {
             stmt.setLong(2, dto.getCardId());
             stmt.setDouble(3, dto.getPurchasePrice());
             stmt.setString(4,dto.getLang());
-            stmt.setInt(5, dto.getQuantity());
+            stmt.setInt(5, 1);
             stmt.setString(6, dto.getCondition());
             stmt.setBoolean(7, dto.isFoil());
 
@@ -77,13 +77,14 @@ public class UserDAO {
         }
         else if(quantity == 1) { // Si quantity == 1, elimino la fila
             String query = "DELETE FROM user_collection WHERE user_id = ? AND card_id = ? AND purchase_price = ? " +
-                    "AND card_condition = ? AND is_foil = ?";
+                    "AND card_condition = ? AND lang = ? AND is_foil = ?";
             try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
                 stmt.setLong(1, dto.getUserId());
                 stmt.setLong(2, dto.getCardId());
                 stmt.setDouble(3, dto.getPurchasePrice());
                 stmt.setString(4, dto.getCondition());
-                stmt.setBoolean(5, dto.isFoil());
+                stmt.setString(5, dto.getLang());
+                stmt.setBoolean(6, dto.isFoil());
 
                 int filasAfectadas = stmt.executeUpdate();
                 return filasAfectadas > 0;
@@ -304,7 +305,7 @@ public class UserDAO {
 
         String query = "SELECT uc.user_id, uc.card_id, uc.purchase_price, uc.quantity, uc.card_condition, uc.is_foil, uc.lang, uc.added_at, " +
                 "sc.id, sc.scryfall_id, sc.cardmarket_id, sc.name, sc.printed_name, sc.lang AS card_lang, sc.image_url, sc.rarity, sc.set_name, " +
-                "sc.set_code, sc.collector_number, sc.cardmarket_url, sc.type_line, sc.border_color, sc.frame, sc.is_foil, sc.is_reprint, sc.released_at," +
+                "sc.set_code, sc.collector_number, sc.is_foil," +
                 "s.icon_svg_uri, " +
                 "cp.avg, cp.low, cp.trend, cp.avg_foil, cp.low_foil, cp.trend_foil, updated_at " +
                 "FROM user_collection uc " +
@@ -342,11 +343,6 @@ public class UserDAO {
                 scryfallCardDTO.setRarity(rs.getString("rarity"));
                 scryfallCardDTO.setSetName(rs.getString("set_name"));
                 scryfallCardDTO.setCollectorNumber(rs.getString("collector_number"));
-                scryfallCardDTO.setTypeLine(rs.getString("type_line"));
-                scryfallCardDTO.setBorderColor(rs.getString("border_color"));
-                scryfallCardDTO.setFrame(rs.getString("frame"));
-                scryfallCardDTO.setReprint(rs.getBoolean("is_reprint"));
-                scryfallCardDTO.setReleasedAt(rs.getDate("released_at") != null ? rs.getDate("released_at").toLocalDate() : null);
                 scryfallCardDTO.setCardPrice(cardmarketPrice);
                 scryfallCardDTO.setIconSvgUri(rs.getString("icon_svg_uri"));
 
@@ -362,7 +358,7 @@ public class UserDAO {
                 if(cardmarketPrice.getUpdatedAt() == null){
                     // Obtengo cardtraderId
                     Long cardTraderId = cardtraderDAO.selectCardTraderId(scryfallCardDTO.getScryfallId());
-
+                    System.out.println("cardtraderId obtenido: " + cardTraderId);
                     // Si existe cardtraderId
                     if(cardTraderId > 0) {
                         // Creo objeto CardTraderListing
@@ -383,6 +379,7 @@ public class UserDAO {
                 }else{
                     scryfallCardDTO.setPriceSource("CARDMARKET");
                 }
+                System.out.println(collectionDTO);
 
                 userCollectionDTO.add(collectionDTO);
             }

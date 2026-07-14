@@ -21,7 +21,7 @@ public class CardtraderPriceDAO {
     // Obtener precios de cardtrader_price
     public CardtraderPriceDTO selectPriceFromCardtraderPrice(ScryfallCardDTO dto){
 
-        String query = "SELECT card_id, avg, low, trend, avg1, avg7, avg30, fetched_at " +
+        String query = "SELECT card_id, cardtrader_id, lang, card_condition, is_foil, avg, low, trend, avg1, avg7, avg30, updated_at " +
                 "FROM cardtrader_price " +
                 "WHERE cardtrader_id = ? AND card_condition = ? AND lang = ?  AND is_foil = ?";
 
@@ -36,13 +36,17 @@ public class CardtraderPriceDAO {
             if(rs.next()){
                 CardtraderPriceDTO dtoPrice = new CardtraderPriceDTO();
                 dtoPrice.setCardId(rs.getLong("card_id"));
+                dtoPrice.setCardtraderId(rs.getLong("cardtrader_id"));
+                dtoPrice.setLang(rs.getString("lang"));
+                dtoPrice.setCondition(rs.getString("card_condition"));
+                dtoPrice.setFoil(rs.getBoolean("is_foil"));
                 dtoPrice.setAvg(rs.getBigDecimal("avg"));
                 dtoPrice.setLow(rs.getBigDecimal("low"));
                 dtoPrice.setTrend(rs.getBigDecimal("trend"));
                 dtoPrice.setAvg1(rs.getBigDecimal("avg1"));
                 dtoPrice.setAvg7(rs.getBigDecimal("avg7"));
                 dtoPrice.setAvg30(rs.getBigDecimal("avg30"));
-                dtoPrice.setFetchedAt(rs.getDate("fetched_at").toLocalDate());
+                dtoPrice.setUpdatedAt(rs.getDate("updated_at").toLocalDate());
 
                 return dtoPrice;
             }

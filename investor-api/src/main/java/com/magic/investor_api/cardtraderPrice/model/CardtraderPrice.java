@@ -52,6 +52,6 @@ public class CardtraderPrice {
     @Column(name = "avg30", precision = 10, scale = 2)
     private BigDecimal avg30;
 
-    @Column(name = "fetched_at")
-    private LocalDateTime fetchedAt;
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 }
