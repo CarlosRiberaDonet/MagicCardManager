@@ -80,7 +80,6 @@ public class UserController {
                                                     @RequestBody UserCollectionDTO request){
         String token = httpRequest.getHeader("Authorization").substring(7);
         Long userId = jwtService.extractUserId(token);
-        System.out.println("Eliminar carta: "+ request.toString());
         boolean result = userService.delFromCollection(userId, request);
         if(result) return ResponseEntity.ok("Carta eliminada");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al eliminar carta");

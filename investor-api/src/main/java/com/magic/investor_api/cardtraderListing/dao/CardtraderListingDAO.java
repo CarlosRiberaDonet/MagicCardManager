@@ -76,7 +76,7 @@ public class CardtraderListingDAO {
                 cardPriceCache.setFoil(rs.getBoolean("is_foil"));
                 cardPriceCache.setAvg(rs.getBigDecimal("avg"));
                 cardPriceCache.setLow(rs.getBigDecimal("low"));
-                cardPriceCache.setFetchedAt(LocalDateTime.now());
+                cardPriceCache.setUpdatedAt(LocalDateTime.now());
                 cardtraderPriceList.add(cardPriceCache);
             }
         }catch (SQLException e){

@@ -118,6 +118,7 @@ public class UserService {
     // Eliminar carta de tabla user_collection
     public boolean delFromCollection(Long userId, UserCollectionDTO dto){
         dto.setUserId(userId);
+        System.out.println(dto);
         return userDAO.deleteCollectionCard(dto);
     }
 
