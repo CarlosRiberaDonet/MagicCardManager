@@ -47,15 +47,12 @@ public class SchedulerTask {
         //cardtraderDAO.mappingCardtraderSets();
 
         //9. Descargar JSON con guia de precios de cardmarket
-        //cardmarketDownloader.downloadGuidePrice();
+        cardmarketDownloader.downloadGuidePrice();
 
-        //10. Descargar precio de cardmarket
-        //cardmarketDownloader.downloadGuidePrice();
+        //10. Importa precios de JSON cardmarket a BD
+        cardmarketPriceService.importGuidePricesToBD();
 
-        //12. Importa precios de JSON cardmarket a BD
-        //cardmarketPriceService.importGuidePricesToBD();
-
-        //13. Actualizar precios de scryfall_card desde carmarket_price
-        //scryfallCardDAO.updateScryfallPrice();
+        //11. Actualizar precios de scryfall_card desde carmarket_price
+        scryfallCardDAO.updateScryfallPrice();
     }
 }
