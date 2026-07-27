@@ -1,177 +1,207 @@
-# Magic Investor
+<div align="center">
 
-Aplicacion web full stack para la busqueda, analisis y seguimiento de inversiones en cartas de Magic: The Gathering. Integra datos de Scryfall y Cardmarket para ofrecer precios actualizados, gestion de coleccion personal y watchlist de seguimiento.
+# 🎴 Magic Investor
+
+**Aplicación web full stack para la búsqueda, análisis y seguimiento de inversiones en cartas de Magic: The Gathering**
+
+[![Java](https://img.shields.io/badge/Java-21-orange?logo=openjdk)](https://www.oracle.com/java/)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-6DB33F?logo=springboot)](https://spring.io/projects/spring-boot)
+[![MySQL](https://img.shields.io/badge/MySQL-8.x-4479A1?logo=mysql&logoColor=white)](https://www.mysql.com/)
+[![JWT](https://img.shields.io/badge/Auth-JWT-000000?logo=jsonwebtokens)](https://jwt.io/)
+
+[Descripción](#descripción) •
+[Tecnologías](#tecnologías) •
+[Arquitectura](#arquitectura) •
+[Instalación](#instalación-y-ejecución) •
+[Documentación técnica](docs/DOCUMENTACION_TECNICA.md)
+
+</div>
 
 ---
 
-## Indice
+## Tabla de contenidos
 
-- [Descripcion](#descripcion)
-- [Tecnologias](#tecnologias)
+- [Descripción](#descripción)
+- [Tecnologías](#tecnologías)
 - [Arquitectura](#arquitectura)
 - [Base de datos](#base-de-datos)
 - [API REST](#api-rest)
-- [Seguridad JWT](#seguridad-jwt)
+- [Seguridad](#seguridad)
 - [Frontend](#frontend)
-- [Instalacion y ejecucion](#instalacion-y-ejecucion)
-- [Primera carga de datos](#primera-carga-de-datos)
-- [Actualizacion automatica](#actualizacion-automatica)
+- [Instalación y ejecución](#instalación-y-ejecución)
 - [Funcionalidades](#funcionalidades)
-- [Roadmap](#roadmap)
 
 ---
 
-## Descripcion
+## Descripción
 
-Magic Investor es una herramienta orientada a inversores y coleccionistas de Magic: The Gathering. Integra datos de **Scryfall** (catalogo completo de cartas) y **Cardmarket** (precios de mercado) para ofrecer una experiencia completa de busqueda, filtrado y seguimiento del valor de cartas.
+**Magic Investor** es una herramienta orientada a inversores y coleccionistas de *Magic: The Gathering*. Integra datos de **Scryfall** (catálogo de cartas) y **Cardmarket** (precios de mercado) para ofrecer una experiencia completa de búsqueda, filtrado y seguimiento de valor de cartas.
 
 El sistema permite:
-- Buscar cartas con hasta 8 filtros combinables simultaneamente
-- Consultar precios actualizados y tendencias de mercado (low, trend, avg1/7/30)
-- Gestionar una coleccion personal con seguimiento de inversion (precio de compra vs valor actual)
-- Mantener una watchlist de cartas de interes
-- Actualizacion automatica diaria de precios desde Cardmarket
-- Autenticacion segura con JWT y gestion de roles (USER / ADMIN)
+
+- Buscar cartas con múltiples filtros simultáneos
+- Consultar precios históricos y tendencias de mercado
+- Gestionar una colección personal con seguimiento de inversión
+- Mantener una watchlist de cartas de interés
+- Actualización automática diaria de precios
+
+> 📄 Detalle de arquitectura, modelo de datos y decisiones técnicas: **[Documentación técnica](docs/DOCUMENTACION_TECNICA.md)**
 
 ---
 
-## Tecnologias
+## Tecnologías
 
-### Backend
+<table>
+<tr><td valign="top">
 
-| Tecnologia | Version | Uso |
+**Backend**
+
+| Tecnología | Versión | Uso |
 |---|---|---|
 | Java | 21 | Lenguaje principal |
 | Spring Boot | 3.x | Framework REST |
-| Spring Security | 3.x | Autenticacion y autorizacion |
-| JJWT | 0.12.6 | Generacion y validacion de tokens JWT |
+| Spring Security | 3.x | Autenticación y autorización |
+| JJWT | 0.12.6 | Generación/validación de JWT |
 | MySQL | 8.x | Base de datos relacional |
-| JDBC | -- | Acceso a datos con patron DAO manual |
+| JDBC | — | Acceso a datos (DAO manual) |
 | Jackson | 2.x | Parseo de JSON en streaming |
-| Lombok | -- | Reduccion de boilerplate |
-| Maven | 3.x | Gestion de dependencias y build |
+| Lombok | — | Reducción de boilerplate |
+| Maven | — | Gestión de dependencias |
 
-### Frontend
+</td><td valign="top">
 
-| Tecnologia | Uso |
+**Frontend**
+
+| Tecnología | Uso |
 |---|---|
 | HTML5 / CSS3 | Estructura y estilos |
-| JavaScript ES6+ | Logica e interactividad |
-| Modulos ES6 | Organizacion y separacion de responsabilidades |
+| JavaScript ES6+ | Lógica e interactividad |
+| Módulos ES6 | Organización del código |
 | noUiSlider | Slider de rango de precio |
-| Google Fonts (Cinzel + Crimson Pro) | Tipografia premium |
+| Google Fonts (Cinzel + Crimson Pro) | Tipografía premium |
 
-### APIs externas
+**APIs externas**
 
 | API | Uso |
 |---|---|
-| Scryfall Bulk Data | Catalogo completo de cartas (~500MB) |
-| Scryfall Sets API | Informacion de ediciones |
+| Scryfall Bulk Data | Catálogo completo de cartas |
+| Scryfall Sets API | Información de ediciones |
 | Cardmarket Price Guide | Precios diarios de mercado |
+
+</td></tr>
+</table>
 
 ---
 
 ## Arquitectura
 
-El proyecto sigue una arquitectura en capas clasica de Spring Boot con separacion clara de responsabilidades:
+Arquitectura en capas clásica de Spring Boot, con acceso a datos manual vía JDBC para las búsquedas:
 
-```
-Frontend (JS Modules)
-        |
-        | HTTP / REST
-        v
-Controller Layer          <- Recibe peticiones, extrae parametros, devuelve respuestas
-        |
-Service Layer             <- Logica de negocio, calculos, coordinacion
-        |
-DAO Layer                 <- Acceso a datos con JDBC y PreparedStatement
-        |
-MySQL 8
-```
+```mermaid
+flowchart TD
+    A[Frontend · index.html / cardDetail.html / collection.html / navbar.html] -- HTTP/REST --> B[Controller Layer]
+    B --> C[Service Layer]
+    C --> D[DAO Layer · JDBC]
+    D --> E[(MySQL 8)]
 
-### Capas del backend
+    B1["CardController · UserController<br/>AuthController · ExpansionController<br/>AdminController"]
+    C1["CardService · UserService<br/>ScryfallService · CardmarketImportService<br/>ExpansionService"]
+    D1["ScryfallCardDAO · UserDAO<br/>ExpansionDAO · CardPriceDAO"]
 
-```
-com.magic.investor_api
-├── API/                  <- Clientes de APIs externas (Scryfall, Cardmarket, CardTrader)
-├── Auth/                 <- Filtro JWT, servicio JWT, controlador de autenticacion
-├── config/               <- Spring Security, CORS, configuracion async
-├── controller/           <- Endpoints REST
-├── dao/                  <- Acceso a BD con JDBC
-├── dto/                  <- Objetos de transferencia de datos
-├── mapper/               <- Mapeo de JSON a modelos
-├── model/                <- Entidades JPA
-├── repository/           <- Repositorios JPA (usados puntualmente)
-├── Scheduler/            <- Tareas programadas
-└── service/              <- Logica de negocio
+    B -.-> B1
+    C -.-> C1
+    D -.-> D1
 ```
 
-### Decisiones de diseno
+### Decisiones de diseño
 
-**DAO manual con JDBC** en lugar de JPA para todas las queries de busqueda. Permite construccion dinamica de queries con `StringBuilder` y `PreparedStatement`, garantizando seguridad contra SQL injection y control total sobre el rendimiento.
-
-**Parseo en streaming con Jackson** para procesar los JSONs de Scryfall (500MB+) sin cargar el archivo completo en memoria, evitando desbordamientos de heap.
-
-**JWT stateless** para autenticacion sin estado en servidor, ideal para APIs REST. El token contiene `userId`, `email` y `role`, eliminando consultas a BD en cada peticion autenticada.
-
-**Queries dinamicas con `WHERE 1=1`** para combinar hasta 8 filtros opcionales de forma limpia, segura y extensible.
-
-**Indices en columnas de filtrado** (`name`, `rarity`, `lang`, `set_code`, `price`, etc.) que reducen tiempos de consulta de segundos a milisegundos.
+- **DAO manual con JDBC** en lugar de JPA para queries complejas y dinámicas con múltiples filtros opcionales. Permite construcción de queries con `StringBuilder` e índices optimizados.
+- **JWT stateless** para autenticación sin sesiones en servidor, ideal para APIs REST.
+- **Parseo en streaming con Jackson** para procesar los JSON de Scryfall (~500 MB) sin cargarlos en memoria.
+- **Queries dinámicas con `WHERE 1=1`** para combinar filtros opcionales de forma limpia y segura con `PreparedStatement`.
 
 ---
 
 ## Base de datos
 
-### Esquema principal
+### Diagrama entidad-relación
 
+```mermaid
+erDiagram
+    SCRYFALL_CARD ||--o| CARD_PRICE : "cardmarket_id"
+    SCRYFALL_CARD }o--|| SCRYFALL_SET : "set_code"
+    USER ||--o{ USER_COLLECTION : "posee"
+    USER ||--o{ USER_WATCHLIST : "sigue"
+    SCRYFALL_CARD ||--o{ USER_COLLECTION : "referenciada en"
+    SCRYFALL_CARD ||--o{ USER_WATCHLIST : "referenciada en"
+
+    SCRYFALL_CARD {
+        bigint id PK
+        string scryfall_id
+        bigint cardmarket_id FK
+        string name
+        string printed_name
+        string lang
+        string image_url
+        string rarity
+        string set_name
+        string set_code FK
+        string collector_number
+        string cardmarket_url
+        double price
+        double price_foil
+        string type_line
+        date released_at
+    }
+
+    CARD_PRICE {
+        bigint id PK
+        bigint cardmarket_id FK
+        double avg
+        double low
+        double trend
+        double avg1
+        double avg7
+        double avg30
+        double avg_foil
+        double low_foil
+        double trend_foil
+        datetime updated_at
+    }
+
+    SCRYFALL_SET {
+        bigint id PK
+        string code
+        string name
+        date released_at
+        string icon_svg_uri
+    }
+
+    USER {
+        bigint id PK
+        string email UK
+        string password
+        string role
+    }
+
+    USER_COLLECTION {
+        bigint id PK
+        bigint user_id FK
+        bigint card_id FK
+        double purchase_price
+        int quantity
+        datetime added_at
+    }
+
+    USER_WATCHLIST {
+        bigint id PK
+        bigint user_id FK
+        bigint card_id FK
+        datetime added_at
+    }
 ```
-scryfall_card
-─────────────
-id (PK)
-scryfall_id
-cardmarket_id (FK -> card_price)
-name / printed_name
-lang
-image_url
-rarity
-set_name / set_code (FK -> scryfall_set)
-collector_number
-cardmarket_url
-price / price_foil
-type_line
-border_color / frame
-is_foil / is_reprint
-released_at
 
-card_price                    scryfall_set
-──────────                    ────────────
-id (PK)                       id (PK)
-cardmarket_id                 code (UNIQUE)
-avg / low / trend             name
-avg1 / avg7 / avg30           released_at
-avg_foil / low_foil           icon_svg_uri
-trend_foil
-avg1/7/30_foil
-updated_at
-
-user                          user_collection
-────                          ───────────────
-id (PK)                       id (PK)
-email (UNIQUE)                user_id (FK -> user)
-password (BCrypt)             card_id (FK -> scryfall_card)
-role (USER/ADMIN)             purchase_price
-                              quantity
-                              added_at
-
-user_watchlist
-──────────────
-id (PK)
-user_id (FK -> user)
-card_id (FK -> scryfall_card)
-added_at
-```
-
-### Indices en scryfall_card
+### Índices relevantes en `scryfall_card`
 
 ```sql
 INDEX idx_name (name)
@@ -189,141 +219,86 @@ INDEX idx_cardmarket (cardmarket_id)
 
 ## API REST
 
-### Autenticacion -- `/auth` (publica)
+### Autenticación — `/auth`
 
-| Metodo | Endpoint | Descripcion |
+| Método | Endpoint | Descripción | Auth |
+|---|---|---|---|
+| POST | `/auth/register` | Registrar nuevo usuario | No |
+| POST | `/auth/login` | Login — devuelve JWT | No |
+
+### Cartas — `/cards`
+
+| Método | Endpoint | Descripción | Auth |
+|---|---|---|---|
+| GET | `/cards/search` | Búsqueda con filtros | No |
+| GET | `/cards/id` | Detalle de carta por ID | No |
+
+**Parámetros de búsqueda:**
+
+| Parámetro | Tipo | Descripción |
 |---|---|---|
-| POST | `/auth/register` | Registrar nuevo usuario |
-| POST | `/auth/login` | Login -- devuelve token JWT |
-
-**Ejemplo login:**
-```json
-POST /auth/login
-{
-  "email": "usuario@email.com",
-  "password": "password"
-}
-```
-**Respuesta:** token JWT en texto plano.
-
----
-
-### Cartas -- `/cards` (publica)
-
-| Metodo | Endpoint | Descripcion |
-|---|---|---|
-| GET | `/cards/search` | Busqueda con filtros opcionales |
-| GET | `/cards/id?cardId=` | Detalle completo de carta por ID |
-
-**Parametros de busqueda (`/cards/search`):**
-
-| Parametro | Tipo | Descripcion |
-|---|---|---|
-| `name` | String | Nombre parcial (opcional) |
-| `setCode` | String | Codigo de edicion |
+| `name` | String | Nombre (parcial, opcional) |
+| `setCode` | String | Código de edición |
 | `rarity` | String | common / uncommon / rare / mythic |
-| `lang` | String | Codigo de idioma (en, es, fr...) |
+| `lang` | String | Código de idioma (en, es, fr...) |
 | `typeLine` | String | Tipo de carta |
-| `minPrice` | Double | Precio minimo |
-| `maxPrice` | Double | Precio maximo |
+| `minPrice` | Double | Precio mínimo |
+| `maxPrice` | Double | Precio máximo |
 | `orderBy` | String | price_asc / price_desc / name_asc / name_desc |
 | `hideNA` | Boolean | Ocultar cartas sin precio |
-| `page` | int | Numero de pagina (requerido) |
-| `size` | int | Resultados por pagina (requerido) |
+| `page` | int | Número de página |
+| `size` | int | Resultados por página |
 
-**Respuesta (`CardPageDTO`):**
-```json
-{
-  "totalCards": 245,
-  "page": 1,
-  "cardDTOList": [ ... ]
-}
-```
+### Usuario — `/user` *(requiere JWT)*
 
----
-
-### Ediciones -- `/sets` (publica)
-
-| Metodo | Endpoint | Descripcion |
+| Método | Endpoint | Descripción |
 |---|---|---|
-| GET | `/sets/scryfall` | Lista de ediciones con code e iconSvgUri |
-
----
-
-### Usuario -- `/user` (requiere JWT)
-
-| Metodo | Endpoint | Descripcion |
-|---|---|---|
-| GET | `/user/mycollection` | Coleccion completa con datos de carta y precios |
-| GET | `/user/collection` | Lista de IDs de cartas en coleccion |
-| GET | `/user/collection/contains?cardId=` | Cantidad de una carta en coleccion |
-| POST | `/user/collection/add` | Anadir carta a coleccion |
-| DELETE | `/user/collection/del` | Eliminar carta de coleccion |
-| GET | `/user/watchlist/contains?cardId=` | Comprobar si carta esta en watchlist |
-| POST | `/user/watchlist/add` | Anadir carta a watchlist |
+| GET | `/user/collection` | IDs de cartas en colección |
+| GET | `/user/collection/contains?cardId=` | Cantidad de una carta en colección |
+| POST | `/user/collection/add` | Añadir carta a colección |
+| DELETE | `/user/collection/del` | Eliminar carta de colección |
+| GET | `/user/mycollection` | Colección completa con detalles |
+| GET | `/user/watchlist/contains?cardId=` | Comprobar si carta está en watchlist |
+| POST | `/user/watchlist/add` | Añadir carta a watchlist |
 | DELETE | `/user/watchlist/del` | Eliminar carta de watchlist |
 
-**Body para add/del coleccion y watchlist (`UserCollectionDTO`):**
-```json
-{
-  "cardId": 12345,
-  "purchasePrice": 5.50
-}
-```
+### Ediciones — `/sets`
 
-> El `userId` se extrae automaticamente del token JWT -- nunca se envia desde el cliente.
+| Método | Endpoint | Descripción | Auth |
+|---|---|---|---|
+| GET | `/sets/scryfall` | Lista de ediciones disponibles | No |
+
+### Administración — `/admin` *(requiere rol ADMIN)*
+
+| Método | Endpoint | Descripción |
+|---|---|---|
+| POST | `/admin/update` | Forzar actualización completa de BD |
 
 ---
 
-### Administracion -- `/admin` (requiere rol ADMIN)
+## Seguridad
 
-| Metodo | Endpoint | Descripcion |
-|---|---|---|
-| POST | `/admin/update` | Forzar actualizacion completa de BD |
+### Autenticación JWT
 
-### Precios -- `/prices` (requiere rol ADMIN)
+El sistema utiliza **JSON Web Tokens** para autenticación stateless:
 
-| Metodo | Endpoint | Descripcion |
-|---|---|---|
-| POST | `/prices/import` | Descargar price guide de Cardmarket |
-| POST | `/prices/update` | Importar precios a tabla card_price |
-
-### Scryfall -- `/scryfall` (requiere rol ADMIN)
-
-| Metodo | Endpoint | Descripcion |
-|---|---|---|
-| POST | `/scryfall/editions` | Descargar e importar ediciones |
-| POST | `/scryfall/cards` | Descargar e importar cartas |
-| POST | `/scryfall/update-prices` | Actualizar precios en scryfall_card |
-
----
-
-## Seguridad JWT
-
-### Flujo de autenticacion
-
-```
-1. POST /auth/login  { email, password }
-2. Servidor valida password con BCrypt
-3. Genera JWT firmado con HMAC-SHA384
-   Payload: { userId, email, role, iat, exp (24h) }
-4. Cliente almacena token en localStorage
-5. Cada peticion protegida incluye:
-   Authorization: Bearer <token>
-6. JwtAuthFilter intercepta, valida y carga SecurityContext
-```
+1. El cliente envía credenciales a `POST /auth/login`.
+2. El servidor valida con BCrypt y genera un JWT firmado con HMAC-SHA384.
+3. El JWT contiene: `userId`, `email`, `role`, `iat`, `exp` (24h).
+4. El cliente incluye el token en cada petición: `Authorization: Bearer <token>`.
+5. `JwtAuthFilter` intercepta, valida y carga el contexto de seguridad.
 
 ### Roles y permisos
 
 | Rol | Acceso |
 |---|---|
-| Sin autenticar | Busqueda de cartas, ediciones, login, registro |
-| USER | Todo lo anterior + coleccion y watchlist propios |
-| ADMIN | Todo lo anterior + actualizacion de BD |
+| Sin autenticar | Búsqueda de cartas, login, registro |
+| USER | Gestión de colección y watchlist |
+| ADMIN | Todo lo anterior + actualización de BD |
 
-### Seguridad de contrasenas
+### Seguridad de contraseñas
 
-Las contrasenas se almacenan hasheadas con **BCrypt** (factor de coste 10). Nunca se almacenan ni transmiten en texto plano. El administrador del sistema se crea directamente en BD con hash BCrypt generado por codigo.
+Las contraseñas se almacenan hasheadas con **BCrypt** (factor de coste 10). Nunca se almacenan ni transmiten en texto plano.
 
 ---
 
@@ -333,72 +308,48 @@ Las contrasenas se almacenan hasheadas con **BCrypt** (factor de coste 10). Nunc
 
 ```
 /
-├── index.html              <- Pagina principal -- busqueda y grid de cartas
-├── cardDetail.html         <- Detalle de carta con precios y acciones
-├── collection.html         <- Coleccion personal del usuario
-├── navbar.html             <- Navbar compartido (carga dinamica)
-├── favicon.ico
+├── index.html              # Página principal — búsqueda
+├── cardDetail.html         # Detalle de carta
+├── collection.html         # Colección del usuario
+├── navbar.html             # Navbar compartido (carga dinámica)
 ├── css/
-│   ├── style.css           <- Estilos globales y grid de cartas
-│   ├── navbar.css          <- Navbar, modal de login, menu usuario
-│   ├── cardDetail.css      <- Detalle de carta y botones de accion
-│   └── collection.css      <- Pagina de coleccion
+│   ├── style.css           # Estilos globales
+│   ├── navbar.css          # Estilos del navbar y modal
+│   ├── cardDetail.css      # Estilos del detalle de carta
+│   └── collection.css      # Estilos de la colección
 └── js/
-    ├── app.js              <- Logica principal: busqueda, filtros, paginacion
-    ├── api.js              <- Llamadas al backend (cartas y ediciones)
-    ├── apiUser.js          <- Llamadas al backend (usuario, coleccion, watchlist)
-    ├── apiLogin.js         <- Llamadas al backend (autenticacion)
-    ├── auth.js             <- Modal login, menu usuario, gestion de token
-    ├── navbar.js           <- Carga dinamica del navbar
-    ├── cardsRenderer.js    <- Renderizado de cartas en grid
-    ├── pagination.js       <- Logica de paginacion
-    ├── userActions.js      <- Acciones de coleccion y watchlist
-    ├── cardDetail.js       <- Logica de la pagina de detalle
-    └── collection.js       <- Logica de la pagina de coleccion
+    ├── app.js              # Lógica principal — búsqueda y paginación
+    ├── api.js              # Llamadas al backend (cartas y ediciones)
+    ├── apiUser.js          # Llamadas al backend (usuario)
+    ├── auth.js             # Autenticación, modal, menú usuario
+    ├── navbar.js           # Carga dinámica del navbar
+    ├── cardsRenderer.js    # Renderizado de cartas en grid
+    ├── pagination.js       # Lógica de paginación
+    ├── userActions.js      # Acciones de colección y watchlist
+    ├── cardDetail.js       # Lógica de la página de detalle
+    └── collection.js       # Lógica de la página de colección
 ```
 
-### Arquitectura del frontend
+### Características del frontend
 
-```
-navbar.js  ->  carga navbar.html dinamicamente
-           ->  dispara evento 'navbarLoaded'
-           ->  mueve modal al body (evita stacking context)
-
-app.js     ->  escucha 'navbarLoaded'
-           ->  enlaza listeners de busqueda y filtros
-           ->  llama a api.js para buscar cartas
-           ->  llama a cardsRenderer.js para renderizar
-
-auth.js    ->  gestiona modal de login/registro
-           ->  gestiona menu desplegable de usuario
-           ->  almacena/elimina token JWT en localStorage
-
-userActions.js  ->  llama a apiUser.js para coleccion/watchlist
-                ->  abre modal si no hay token
-```
-
-### Caracteristicas del frontend
-
-- **Modulos ES6** con separacion clara de responsabilidades
-- **Navbar dinamico** cargado con `fetch()` y compartido en todas las paginas
-- **Autenticacion JWT** en `localStorage` con menu de usuario desplegable
-- **8 filtros combinables**: set, rareza, idioma, tipo, rango de precio con noUiSlider, ordenacion, ocultar sin precio
-- **Slider de precio** sincronizado con inputs numericos editables
-- **Paginacion** con total de paginas calculado desde el backend
-- **Vista lista y cuadricula** en la pagina de coleccion con estadisticas de inversion
-- **Responsive** para movil y tablet con media queries en 3 breakpoints
-- **Diseno premium** con paleta oscura, acentos dorados y tipografia Cinzel
+- **Módulos ES6** — separación clara de responsabilidades
+- **Navbar dinámico** — cargado con `fetch()` y compartido en todas las páginas
+- **Autenticación JWT** en `localStorage` con menú de usuario desplegable
+- **Filtros en tiempo real** — set, rareza, idioma, tipo, rango de precio con noUiSlider
+- **Vista lista / cuadrícula** en la página de colección
+- **Responsive** — adaptado a tablet y móvil con media queries
+- **Diseño premium** — paleta oscura con acentos dorados, tipografía Cinzel
 
 ---
 
-## Instalacion y ejecucion
+## Instalación y ejecución
 
 ### Requisitos
 
 - Java 21+
 - Maven 3.8+
 - MySQL 8+
-- Servidor HTTP local para el frontend (VS Code Live Server o similar)
+- Node.js (opcional, solo si se quiere servir el frontend con alguna herramienta basada en Node)
 
 ### Backend
 
@@ -407,15 +358,14 @@ userActions.js  ->  llama a apiUser.js para coleccion/watchlist
 git clone https://github.com/CarlosRiberaDonet/MagicManager.git
 cd MagicManager
 
-# 2. Configurar la BD en src/main/resources/application.properties
+# 2. Configurar la BD en application.properties
 spring.datasource.url=jdbc:mysql://localhost:3306/magic_investor
 spring.datasource.username=tu_usuario
 spring.datasource.password=tu_password
 
-# 3. Crear las tablas en MySQL
-# Ejecutar el schema SQL incluido en /docs/schema.sql
+# 3. Crear las tablas en MySQL (ver /docs/schema.sql)
 
-# 4. Arrancar el servidor
+# 4. Arrancar
 mvn spring-boot:run
 ```
 
@@ -423,52 +373,38 @@ El servidor arranca en `http://localhost:8081`.
 
 ### Frontend
 
-Abre `index.html` con Live Server de VS Code o cualquier servidor HTTP local.
+Sirve los archivos estáticos con cualquier servidor local. Con VS Code + Live Server, abre `index.html`.
 
----
+### Primera carga de datos
 
-## Primera carga de datos
-
-Con el servidor arrancado, autenticate como ADMIN y ejecuta en orden:
+Con el servidor arrancado, ejecuta en orden desde Postman o curl:
 
 ```bash
-# 1. Importar ediciones de Scryfall
+# 1. Descargar e importar ediciones de Scryfall
 POST http://localhost:8081/scryfall/editions
 
-# 2. Importar cartas de Scryfall (~500MB, proceso largo ~10-15 min)
+# 2. Descargar e importar cartas de Scryfall (~500MB, proceso largo)
 POST http://localhost:8081/scryfall/cards
 
-# 3. Descargar price guide de Cardmarket
+# 3. Descargar precios de Cardmarket
 POST http://localhost:8081/prices/import
 
-# 4. Importar precios a la tabla card_price
+# 4. Importar precios a la BD
 POST http://localhost:8081/prices/update
 
 # 5. Actualizar precios en scryfall_card
 POST http://localhost:8081/scryfall/update-prices
 ```
 
-> Todos los endpoints de administracion requieren el header:
-> `Authorization: Bearer <token_admin>`
+> ⚠️ Los endpoints de administración requieren token JWT con rol ADMIN en el header `Authorization`.
 
----
+### Actualización automática
 
-## Actualizacion automatica
-
-El sistema incluye un `SchedulerTask` que ejecuta el proceso completo de actualizacion automaticamente cada dia a las **6:00 AM**:
+El sistema incluye un `SchedulerTask` que ejecuta el proceso completo de actualización automáticamente cada día a las **6:00 AM**:
 
 ```java
 @Scheduled(cron = "0 0 6 * * *")
 public void updateBBDD()
-```
-
-El proceso incluye: descarga de price guide de Cardmarket, importacion a `card_price`, descarga de cartas de Scryfall, importacion a `scryfall_card` y actualizacion de precios.
-
-Para forzar una actualizacion manual sin esperar al scheduler:
-
-```bash
-POST http://localhost:8081/admin/update
-Authorization: Bearer <token_admin>
 ```
 
 ---
@@ -477,39 +413,38 @@ Authorization: Bearer <token_admin>
 
 ### Implementadas
 
-- Busqueda de cartas con 8 filtros combinables y paginacion
-- Detalle completo de carta con precios historicos (low, trend, avg1/7/30)
-- Enlace directo a Cardmarket con idioma correcto
-- Registro e inicio de sesion con JWT y BCrypt
-- Coleccion personal: anadir, eliminar, controlar cantidad por carta
-- Watchlist: seguimiento de cartas de interes
-- Pagina de coleccion con vista lista y cuadricula
-- Estadisticas de coleccion: total cartas, valor actual, invertido, ganancia/perdida
-- Iconos SVG de edicion en cartas y detalle
-- Actualizacion automatica diaria de precios
-- Panel de administracion para actualizaciones manuales
-- Diseno responsive para movil y tablet
-- Navbar compartido con carga dinamica
+- Búsqueda de cartas con múltiples filtros combinables
+- Paginación de resultados
+- Detalle completo de carta con precios históricos
+- Enlace directo a Cardmarket
+- Registro e inicio de sesión con JWT
+- Colección personal — añadir, eliminar, ver cantidad
+- Watchlist — seguimiento de cartas de interés
+- Estadísticas de colección (valor actual, invertido, ganancia)
+- Vista lista y cuadrícula de la colección
+- Actualización automática diaria de precios
+- Diseño responsive para móvil y tablet
 
 ### En desarrollo
 
-- Grafica de evolucion historica de precios por carta
-- Historial de precios en base de datos
-- Integracion con CardTrader API (blueprints y precios alternativos)
 - Scraper de precios para cartas sin datos de Cardmarket
-- Sistema de alertas de variacion de precio
-- Perfil de usuario con estadisticas globales de inversion
-- Funcionalidades premium con sistema de suscripcion
+- Gráfica histórica de precios
+- Panel de administración web
+- Notificaciones de variación de precio
+- Funcionalidades premium con autenticación de pago
 
 ---
 
 ## Autor
 
 **Carlos Ribera Donet**
-- GitHub: [CarlosRiberaDonet](https://github.com/CarlosRiberaDonet)
-- LinkedIn: [carlos-r-335390276](https://www.linkedin.com/in/carlos-r-335390276/)
-- Portfolio: [carlosriberadonet.github.io](https://carlosriberadonet.github.io/Carlos-Ribera/)
+
+[![GitHub](https://img.shields.io/badge/GitHub-CarlosRiberaDonet-181717?logo=github)](https://github.com/CarlosRiberaDonet)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Carlos%20Ribera-0A66C2?logo=linkedin)](https://www.linkedin.com/in/carlos-r-335390276/)
+[![Portfolio](https://img.shields.io/badge/Portfolio-carlosriberadonet.github.io-black)](https://carlosriberadonet.github.io/Carlos-Ribera/)
 
 ---
 
-*Proyecto desarrollado como aplicacion full stack con Java Spring Boot y JavaScript vanilla. Disenado con vision comercial como herramienta SaaS para inversores de Magic: The Gathering.*
+<div align="center">
+<sub>Proyecto desarrollado como aplicación full stack con Java Spring Boot y JavaScript vanilla. Diseñado para su comercialización como herramienta SaaS para inversores de Magic: The Gathering.</sub>
+</div>
