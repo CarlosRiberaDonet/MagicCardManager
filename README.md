@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🎴 Magic Investor
+# Magic Investor
 
 **Aplicación web full stack para la búsqueda, análisis y seguimiento de inversiones en cartas de Magic: The Gathering**
 
