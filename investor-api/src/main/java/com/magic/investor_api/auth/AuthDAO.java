@@ -21,7 +21,7 @@ public class AuthDAO {
 
         String sql = "INSERT INTO user (email, password, role) VALUES(?, ?, ?)";
 
-        return jdbcTemplate.update(sql, userDTO.getEmail(), userDTO.getPassword(), "ADMIN");
+        return jdbcTemplate.update(sql, userDTO.getEmail(), userDTO.getPassword(), "USER");
     }
 
     // Obtener id del user a través de su email
