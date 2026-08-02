@@ -38,7 +38,6 @@ public class CardtraderPriceController {
         dto.setLang(lang);
         dto.setCondition(condition);
         dto.setFoil(isFoil);
-        System.out.println("OBTENIENDO PRECIO: " + dto);
         if (cardtraderPriceService.updateCardtraderPrices(dto)) {
 
             CardtraderPriceDTO price = cardtraderPriceService.getCardtraderPrice(dto);

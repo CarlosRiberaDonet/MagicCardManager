@@ -32,19 +32,19 @@ public class SchedulerTask {
     public void updateBBDD() throws IOException {
 
         //1. Descarga e inserta en la BBD las ediciones de scryfall
-        //scryfallService.importScryfallEditionsToDB();
+        scryfallService.importScryfallEditionsToDB();
 
         //2. Descargar cartas de scryfallInserta y las inserta en BBD
-        //scryfallService.importScryfallCardsToBD();
+        scryfallService.importScryfallCardsToBD();
 
         //3. Descargar e insertar ediciones de cardtrader
-        //cardTraderService.downloadCardtraderExpansion();
+        cardTraderService.downloadCardtraderExpansion();
 
         //4. Descargar cartas de cardtrader por número de edición
-        //cardTraderService.cardsByExpansion();
+        cardTraderService.cardsByExpansion();
 
         //5. Mapear campos set_name/set_code a cardtrader_card
-        //cardtraderDAO.mappingCardtraderSets();
+        cardtraderDAO.mappingCardtraderSets();
 
         //9. Descargar JSON con guia de precios de cardmarket
         cardmarketDownloader.downloadGuidePrice();

@@ -15,8 +15,8 @@ public class ScryfallAPI {
     private static final String SCRYFALL_EDITIONS = "https://api.scryfall.com/sets";
     private static final String SCRYFALL_ALL_CARDS = "https://data.scryfall.io/all-cards/all-cards-20260401092717.json";
     private final String basePath = System.getProperty("user.dir");
-    String EDITIONS_PATH = basePath + "/src/main/resources/editions.json";
-    String CARDS_PATH = basePath + "/src/main/resources/cards.json";
+    String EDITIONS_PATH = basePath + "/editions.json";
+    String CARDS_PATH = basePath + "/cards.json";
 
     // Descarga ediciones desde scryfall y guarda en formato JSON
     public void getEditions(){

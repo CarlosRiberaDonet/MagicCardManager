@@ -39,7 +39,7 @@ public class CardmarketPriceService {
         // Limpiar tabla antes de cargar nuevos datos
         cardmarketPriceDAO.truncateCardPrice();
 
-        String path = basePath + "/src/main/resources/guide-prices.json";
+        String path = basePath + "/guide-prices.json";
 
         List<CardmarketPrice> batch = new ArrayList<>();
 

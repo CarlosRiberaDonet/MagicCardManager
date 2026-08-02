@@ -3,7 +3,6 @@ package com.magic.investor_api.cardmarketPrice.controller;
 import com.magic.investor_api.api.CardmarketDownloader;
 import com.magic.investor_api.cardmarketPrice.model.CardmarketPrice;
 import com.magic.investor_api.cardmarketPrice.service.CardmarketPriceService;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

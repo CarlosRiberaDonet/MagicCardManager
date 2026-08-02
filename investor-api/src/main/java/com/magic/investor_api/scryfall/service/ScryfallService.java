@@ -10,8 +10,6 @@ import com.magic.investor_api.CardPageDTO;
 import com.magic.investor_api.api.ScryfallAPI;
 import com.magic.investor_api.cardmarketPrice.model.CardmarketPrice;
 import com.magic.investor_api.cardmarketPrice.service.CardmarketPriceService;
-import com.magic.investor_api.cardtraderPrice.dto.CardtraderPriceDTO;
-import com.magic.investor_api.cardtraderPrice.service.CardtraderPriceService;
 import com.magic.investor_api.expansion.dao.ExpansionDAO;
 import com.magic.investor_api.expansion.ScryfallSet;
 import com.magic.investor_api.scryfall.dto.ScryfallCardDTO;
@@ -40,7 +38,6 @@ public class ScryfallService {
     private final ExpansionDAO expansionDAO;
     private final ScryfallCardDAO scryfallCardDAO;
     private final CardmarketPriceService cardmarketPriceService;
-    private final CardtraderPriceService cardtraderPriceService;
     private CardPageDTO cardPageDTO;
 
 
@@ -62,7 +59,7 @@ public class ScryfallService {
     public void importScryfallEditionsToDB() {
         // Descarga JSON con las ediciones
         scryfallDownloader.getEditions();
-        String EDITIONS = path + "/src/main/resources/editions.json";
+        String EDITIONS = path + "/editions.json";
         try{
             InputStream input = new FileInputStream(EDITIONS);
             List<ScryfallSet> scryfallExpansionList = new ArrayList<>();
@@ -83,8 +80,8 @@ public class ScryfallService {
     public void importScryfallCardsToBD() throws IOException {
 
         // Descargar cartas de scryfall
-        //scryfallDownloader.downloadCards();
-        String CARDS = path + "/src/main/resources/cards.json";
+        scryfallDownloader.downloadCards();
+        String CARDS = path + "/cards.json";
 
         InputStream input = new FileInputStream(CARDS);
         JsonFactory factory = new JsonFactory();

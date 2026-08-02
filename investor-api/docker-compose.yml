@@ -1,0 +1,40 @@
+services:
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: unaPasswordSegura
+      MYSQL_DATABASE: magic
+      MYSQL_USER: investor_app
+      MYSQL_PASSWORD: unaPasswordSegura
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./BD_MAGIC.sql:/docker-entrypoint-initdb.d/BD_MAGIC.sql
+    ports:
+      - "3307:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    image: investor-api-backend:latest
+    ports:
+      - "8080:8080"
+    environment:
+      DB_HOST: db
+      DB_USER: investor_app
+      DB_PASSWORD: unaPasswordSegura
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    image: investor-api-frontend:latest
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:
