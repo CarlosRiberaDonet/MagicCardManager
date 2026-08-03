@@ -28,8 +28,7 @@ public class SecurityConfig {
         config.setAllowedOriginPatterns(List.of(
                 "http://localhost:*",
                 "http://127.0.0.1:*",
-                "http://82.70.89.37:*",
-                "http://magic-investor.duckdns.org"
+                "https://magic-investor.duckdns.org"
         ));
 
         config.setAllowedMethods(List.of(
@@ -72,25 +71,19 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
 
-                        // Preflight CORS
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                        // Endpoints públicos
                         .requestMatchers("/scryfall/**").permitAll()
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/pricecache/**").permitAll()
 
-                        // Usuarios autenticados
                         .requestMatchers("/user/**").authenticated()
 
-                        // CardTrader autenticado
                         .requestMatchers("/cardtrader/**").authenticated()
 
-                        // Admin
                         .requestMatchers("/prices/**").hasRole("ADMIN")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
 
-                        // Todo lo demás requiere login
                         .anyRequest().authenticated()
                 )
 

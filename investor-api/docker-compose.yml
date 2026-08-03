@@ -1,40 +1,67 @@
 services:
+
   db:
     image: mysql:8.0
+    container_name: magic-investor-db
+    restart: unless-stopped
+
     environment:
       MYSQL_ROOT_PASSWORD: unaPasswordSegura
       MYSQL_DATABASE: magic
       MYSQL_USER: investor_app
       MYSQL_PASSWORD: unaPasswordSegura
+
     volumes:
       - mysql_data:/var/lib/mysql
       - ./BD_MAGIC.sql:/docker-entrypoint-initdb.d/BD_MAGIC.sql
-    ports:
-      - "3307:3306"
+
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 5s
       timeout: 5s
       retries: 10
 
+    networks:
+      - proxy
+
+
   backend:
     image: investor-api-backend:latest
-    ports:
-      - "8080:8080"
+    container_name: magic-investor-backend
+    restart: unless-stopped
+
     environment:
       DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: magic
       DB_USER: investor_app
       DB_PASSWORD: unaPasswordSegura
+      PORT: 8080
+
     depends_on:
       db:
         condition: service_healthy
 
+    networks:
+      - proxy
+
+
   frontend:
     image: investor-api-frontend:latest
-    ports:
-      - "80:80"
+    container_name: magic-investor-frontend
+    restart: unless-stopped
+
     depends_on:
       - backend
 
+    networks:
+      - proxy
+
+
 volumes:
   mysql_data:
+
+
+networks:
+  proxy:
+    external: true
