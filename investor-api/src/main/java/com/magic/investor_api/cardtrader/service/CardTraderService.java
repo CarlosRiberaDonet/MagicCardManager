@@ -1,18 +1,17 @@
 package com.magic.investor_api.cardtrader.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.magic.investor_api.cardmarketPrice.model.CardmarketPrice;
-import com.magic.investor_api.cardmarketPrice.service.CardmarketPriceService;
 import com.magic.investor_api.cardtrader.dao.CardtraderDAO;
 import com.magic.investor_api.cardtrader.model.CardtraderCard;
 import com.magic.investor_api.api.CardTraderAPI;
 import com.magic.investor_api.cardtrader.repository.CardtraderRepository;
+import com.magic.investor_api.cardtraderListing.model.CardtraderListing;
+import com.magic.investor_api.cardtraderPrice.dao.CardtraderPriceDAO;
 import com.magic.investor_api.cardtraderPrice.dto.CardtraderPriceDTO;
 import com.magic.investor_api.cardtraderPrice.service.CardtraderPriceService;
 import com.magic.investor_api.expansion.dao.ExpansionDAO;
 import com.magic.investor_api.scryfall.dto.ScryfallCardDTO;
-import com.magic.investor_api.scryfall.model.ScryfallCard;
-import com.magic.investor_api.scryfall.service.ScryfallService;
+import com.magic.investor_api.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
@@ -26,7 +25,7 @@ public class CardTraderService {
     private final CardtraderRepository cardtraderRepository;
     private final ExpansionDAO expansionDAO;
     private final CardtraderDAO cardtraderDAO;
-    private final ScryfallService scryfallService;
+    private final CardtraderPriceDAO cardtraderPriceDAO;
     private final CardtraderPriceService cardtraderPriceService;
 
     // Obtiene lista de expansiones de la API cardtrader
@@ -96,9 +95,9 @@ public class CardTraderService {
         return cardtraderDAO.selectCardTraderId(scryfallId);
     }
 
-    // Obtener precios de cardtrader
-    public CardtraderPriceDTO getCardtraderPrices(Long cardId, String scryfallId, String lang, String condition, boolean isFoil){
-
+    // Crear objeto CardtraderCard
+    public ScryfallCardDTO buildScryfallCardDTO(Long cardId, String scryfallId, String lang,
+                                                      String condition, boolean isFoil){
         ScryfallCardDTO card = new ScryfallCardDTO();
         card.setId(cardId);
         card.setScryfallId(scryfallId);
@@ -106,6 +105,11 @@ public class CardTraderService {
         card.setCondition(condition);
         card.setFoil(isFoil);
 
+        return card;
+    }
+
+    // Obtener precios de cardtrader_price
+    public CardtraderPriceDTO getCardtraderPrices(ScryfallCardDTO card){
         return cardtraderPriceService.getCardtraderPrice(card);
     }
 }

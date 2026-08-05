@@ -25,6 +25,9 @@ public class CardtraderPrice {
     @Column(name = "cardtrader_id")
     private Long cardtraderId;
 
+    @Column(name = "scryfall_id")
+    private String scryfallId;
+
     @Column(name = "lang")
     private String lang;
 

@@ -22,7 +22,7 @@ USE magic;
 -- Ediciones descargadas desde scryfall
 CREATE TABLE scryfall_set (
 id BIGINT AUTO_INCREMENT PRIMARY KEY,
-set_code VARCHAR(10) NOT NULL,
+set_code VARCHAR(10) UNIQUE NOT NULL,
 name VARCHAR(255) NOT NULL,
 released_at DATE,
 icon_svg_uri VARCHAR(255)
@@ -50,7 +50,7 @@ VALUES ('card_variant_sync', 0);
 -- Fuente: Scryfall (catálogo base, todos los idiomas)
 CREATE TABLE scryfall_card (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    scryfall_id VARCHAR(100) UNIQUE,
+    scryfall_id VARCHAR(100) NOT NULL UNIQUE,
     cardmarket_id BIGINT,
     name VARCHAR(255),
     printed_name VARCHAR(255),
@@ -101,7 +101,7 @@ CREATE TABLE cardtrader_card (
 -- Fuente: CardMarket pricelist (precios de referencia diarios)
 CREATE TABLE cardmarket_price (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    cardmarket_id BIGINT NOT NULL,
+    cardmarket_id BIGINT NOT NULL UNIQUE,
     avg DECIMAL(10,2),
     low DECIMAL(10,2),
     trend DECIMAL(10,2),
@@ -120,17 +120,17 @@ CREATE TABLE cardmarket_price (
 
 CREATE TABLE cardtrader_listing (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-	card_id BIGINT,
+	card_id BIGINT NOT NULL,
     scryfall_id VARCHAR(100),
     cardtrader_id BIGINT NOT NULL,
     price DECIMAL(10,2),
-	card_condition VARCHAR(20) DEFAULT 'NM',
+	card_condition VARCHAR(20),
     lang CHAR(5),
     is_foil BOOLEAN DEFAULT FALSE,
 	url VARCHAR(500),
     fetched_at DATETIME NOT NULL,
 
-	CONSTRAINT fk_listing_card_id FOREIGN KEY (card_id) REFERENCES scryfall_card(id),
+	CONSTRAINT uk_listing UNIQUE (card_id, lang, card_condition, is_foil),
     INDEX idx_lookup (card_id, scryfall_id, cardtrader_id, lang, card_condition, is_foil)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -149,6 +149,7 @@ CREATE TABLE cardtrader_price(
     avg7 DECIMAL(10,2),
     avg30 DECIMAL(10,2),
     updated_at DATETIME NOT NULL,
+CONSTRAINT uk_price UNIQUE (card_id, lang, card_condition, is_foil),
 
     INDEX idx_lookup (
 		card_id,
@@ -195,3 +196,7 @@ CREATE TABLE user_watchlist (
     CONSTRAINT uq_watchlist UNIQUE (user_id, card_id, card_condition, is_foil)
 )
 CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+
+SELECT * FROM user;
+SELECT COUNT(*) FROM scryfall_set;

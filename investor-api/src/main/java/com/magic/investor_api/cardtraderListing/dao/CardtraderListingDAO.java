@@ -5,10 +5,7 @@ import com.magic.investor_api.cardtraderPrice.model.CardtraderPrice;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +15,56 @@ public class CardtraderListingDAO {
 
     @Autowired
     private DataSource dataSource;
+
+    // Insertar o actualizar precios en cardtrader_listing
+    public void insertCardtraderListingPrices(List<CardtraderListing> listing) {
+        System.out.println("INSERTANDO PRECIOS DE CARDTRADER_LISTING");
+        String sql = """
+        INSERT INTO cardtrader_listing (
+            card_id,
+            scryfall_id,
+            cardtrader_id,
+            price,
+            card_condition,
+            lang,
+            is_foil,
+            url,
+            fetched_at
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ON DUPLICATE KEY UPDATE
+            scryfall_id = VALUES(scryfall_id),
+            cardtrader_id = VALUES(cardtrader_id),
+            price = VALUES(price),
+            card_condition = VALUES(card_condition),
+            lang = VALUES(lang),
+            is_foil = VALUES(is_foil),
+            url = VALUES(url),
+            fetched_at = VALUES(fetched_at)
+        """;
+
+        try (Connection conn = dataSource.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            for(CardtraderListing l : listing){
+                stmt.setLong(1, l.getCardId());
+                stmt.setString(2, l.getScryfallId());
+                stmt.setLong(3, l.getCardtraderId());
+                stmt.setBigDecimal(4, l.getPrice());
+                stmt.setString(5, l.getCondition());
+                stmt.setString(6, l.getLang());
+                stmt.setBoolean(7, l.isFoil());
+                stmt.setString(8, l.getUrl());
+                stmt.setTimestamp(9, Timestamp.valueOf(l.getFetchedAt()));
+
+                stmt.executeUpdate();
+            }
+
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     // Buscar cardtraderId en cardtrader_listing
     public CardtraderListing checkCardtraderIdOnCardtraderListing(Long cartraderId){

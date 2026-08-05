@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.sql.SQLOutput;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -29,20 +30,19 @@ public class CardtraderListingService {
     }
 
     //  Obtener y mapear JsonNode del mercado de cartas cardtrader
-    public boolean updateCardPrice(CardtraderListing request){
-
+    public void updateCardPrice(CardtraderListing request){
+        System.out.println("MAPEANDO DESDE CARDTRADERLISTINGSERVICES UPDATECARDPRICE");
         // Obtengo lista de cartas a través del cardtraderId
         JsonNode node = cardTraderAPI.fetchCardProducts(request.getCardtraderId());
 
         // Leo la respuesta JSON y convierto a objeto de tipo CardtraderListing e inserto en cardtrader_listing
         readCardtraderJsonNode(request, node);
-
-        return true;
     }
 
     // Leer JSON de cartas y mapearlas a Lista<CardTraderListing>
     public void readCardtraderJsonNode(CardtraderListing request, JsonNode node) {
 
+        System.out.println("LEYENDO JSON DE CARDTRADER");
         List<CardtraderListing> batch = new ArrayList<>();
 
         try {
@@ -75,6 +75,6 @@ public class CardtraderListingService {
         } catch (RuntimeException e) {
             throw new RuntimeException(e);
         }
-        repository.saveAll(batch);
+        cardtraderListingDAO.insertCardtraderListingPrices(batch);
     }
 }
