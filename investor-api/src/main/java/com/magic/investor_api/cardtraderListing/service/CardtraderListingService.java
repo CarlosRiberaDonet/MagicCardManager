@@ -31,7 +31,6 @@ public class CardtraderListingService {
 
     //  Obtener y mapear JsonNode del mercado de cartas cardtrader
     public void updateCardPrice(CardtraderListing request){
-        System.out.println("MAPEANDO DESDE CARDTRADERLISTINGSERVICES UPDATECARDPRICE");
         // Obtengo lista de cartas a través del cardtraderId
         JsonNode node = cardTraderAPI.fetchCardProducts(request.getCardtraderId());
 
@@ -42,7 +41,6 @@ public class CardtraderListingService {
     // Leer JSON de cartas y mapearlas a Lista<CardTraderListing>
     public void readCardtraderJsonNode(CardtraderListing request, JsonNode node) {
 
-        System.out.println("LEYENDO JSON DE CARDTRADER");
         List<CardtraderListing> batch = new ArrayList<>();
 
         try {

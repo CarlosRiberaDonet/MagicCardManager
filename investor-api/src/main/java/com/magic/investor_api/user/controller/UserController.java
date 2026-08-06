@@ -44,7 +44,6 @@ public class UserController {
         dto.setLang(lang);
         dto.setFoil(foil);
         int quantity = userService.getCardQuantity(dto);
-        System.out.println(quantity);
         return ResponseEntity.ok(quantity);
     }
 
@@ -114,7 +113,6 @@ public class UserController {
         String token = httpRequest.getHeader("Authorization").substring(7);
         Long userId = jwtService.extractUserId(token);
         List<UserCollectionDTO> dto = userService.getMyCollection(userId);
-        System.out.println(dto);
         return dto;
     }
 
@@ -142,7 +140,6 @@ public class UserController {
         Long userId = jwtService.extractUserId(token);
         // Cambiar email del user y crear objeto UserDTO(para recuperar el userId de la sesión)
         User user = userService.changeUserEmail(userService.getUserDTO(userId).getEmail(), request);
-        System.out.println(user);
         if(user == null){
             return ResponseEntity.internalServerError().build();
         }

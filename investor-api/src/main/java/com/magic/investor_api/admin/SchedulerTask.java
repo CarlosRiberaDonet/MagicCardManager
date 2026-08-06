@@ -1,10 +1,8 @@
 package com.magic.investor_api.admin;
 
 import com.magic.investor_api.cardtrader.dao.CardtraderDAO;
-import com.magic.investor_api.api.CardTraderAPI;
 import com.magic.investor_api.api.CardmarketDownloader;
 import com.magic.investor_api.cardtrader.service.CardTraderService;
-import com.magic.investor_api.cardtraderPrice.service.CardtraderPriceService;
 import com.magic.investor_api.cardmarketPrice.service.CardmarketPriceService;
 import com.magic.investor_api.scryfall.dao.ScryfallCardDAO;
 import com.magic.investor_api.scryfall.service.ScryfallService;
@@ -24,9 +22,7 @@ public class SchedulerTask {
     private final CardtraderDAO cardtraderDAO;
     private final CardmarketDownloader cardmarketDownloader;
     private final CardmarketPriceService cardmarketPriceService;
-    private final CardtraderPriceService cardtraderPriceService;
 
-    private final CardTraderAPI cardTraderAPI;
 
     @Scheduled(cron = "0 0 6 * * *") // todos los días a las 6:00 AM
     public void updateBBDD() throws IOException {

@@ -21,10 +21,7 @@ public class CardmarketPriceController {
     // Descargar el price guide de cardmarket
     @PostMapping("/update")
     public ResponseEntity<String> startDownloadGuidePrices() throws IOException {
-
-        System.out.println("Descargando precios desde cardmarket");
         cardmarketDownloader.downloadGuidePrice();
-        System.out.println("Actualizando lista de precios...");
         cardmarketPriceService.importGuidePricesToBD();
 
         return ResponseEntity.ok("Base de datos actualizada.");

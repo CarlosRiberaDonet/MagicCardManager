@@ -9,6 +9,7 @@ import com.magic.investor_api.cardtraderPrice.dao.CardtraderPriceDAO;
 import com.magic.investor_api.cardtraderPrice.model.CardtraderPrice;
 import com.magic.investor_api.cardtraderPrice.repository.CardtraderPriceRepository;
 import com.magic.investor_api.scryfall.dto.ScryfallCardDTO;
+import com.magic.investor_api.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,30 +25,32 @@ public class CardtraderPriceService {
     private final CardtraderDAO cardtraderDAO;
     private final CardtraderListingService cardTraderListingService;
 
-    // Insertar lista de cartas de cardtrader_listing en cardtrader_price
-    public void convertCardtraderListingToCardtraderPrice(Long cardId){
+    // Consulta de precios de la carta en cardtrader_price
+    public CardtraderPriceDTO getCardtraderPrice(ScryfallCardDTO card){
 
-        // Lista de cartas filtradas de cardtrader_listing
-        List<CardtraderPrice> cardPriceList = cardtraderListingDAO.getCardtraderListingValues(cardId);
+        // Asigno el cardTraderId mediante scryfallId
+        card.setCardTraderId(cardtraderDAO.selectCardTraderId(card.getScryfallId()));
+        card.setCondition(
+                Utils.CardCondition.valueOf(card.getCondition())
+                        .getCardTraderValue()
+        );
 
-        // Inserto la lista en cardtrader_price
-        cardtraderPriceDAO.insertCardtraderPrice(cardPriceList);
+        // Obtengo precios de la tabla cardtrader_price
+        return cardtraderPriceDAO.selectPriceFromCardtraderPrice(card);
     }
 
     // Actualizar precios de cardtrader_listing y cardtrader_price mediante cardtraderId
-    public boolean updateCardtraderPrices(ScryfallCardDTO card){
+    public void updateCardtraderPrices(ScryfallCardDTO card){
 
-        System.out.println("SCRYFALL ID: " + card.getScryfallId());
-        // Obtengo el cardTraderId mediante scryfallId
-        long cardTraderId = cardtraderDAO.selectCardTraderId(card.getScryfallId());
-        System.out.println("CARDTRADER ID: " + cardTraderId);
+        // Asigno el cardTraderId mediante scryfallId
+        card.setCardTraderId(cardtraderDAO.selectCardTraderId(card.getScryfallId()));
 
-        if(cardTraderId > 0){
+        if(card.getCardTraderId() > 0){
             // Creo objeto cardtraderListing con los valores obtenidos
             CardtraderListing listing = new CardtraderListing();
             listing.setCardId(card.getId());
             listing.setScryfallId(card.getScryfallId());
-            listing.setCardtraderId(cardTraderId);
+            listing.setCardtraderId(card.getCardTraderId());
             listing.setCondition(card.getCondition());
             listing.setLang(card.getLang());
             listing.setFoil(card.isFoil());
@@ -59,16 +62,15 @@ public class CardtraderPriceService {
             convertCardtraderListingToCardtraderPrice(card.getId());
 
         }
-        return false;
     }
 
-    // Consulta de precios de la carta en cardtrader_price
-    public CardtraderPriceDTO getCardtraderPrice(ScryfallCardDTO card){
+    // Insertar lista de cartas de cardtrader_listing en cardtrader_price
+    public void convertCardtraderListingToCardtraderPrice(Long cardId){
 
-        // Asigno el cardTraderId mediante scryfallId
-        card.setCardTraderId(cardtraderDAO.selectCardTraderId(card.getScryfallId()));
+        // Lista de cartas filtradas de cardtrader_listing
+        List<CardtraderPrice> cardPriceList = cardtraderListingDAO.getCardtraderListingValues(cardId);
 
-        // Obtengo precios de la tabla cardtrader_price
-        return cardtraderPriceDAO.selectPriceFromCardtraderPrice(card);
+        // Inserto la lista en cardtrader_price
+        cardtraderPriceDAO.insertCardtraderPrice(cardPriceList);
     }
 }

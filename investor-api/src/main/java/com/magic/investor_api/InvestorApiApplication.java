@@ -14,7 +14,5 @@ public class
 
 	public static void main(String[] args) throws IOException {
 		SpringApplication.run(InvestorApiApplication.class, args);
-
-		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 	}
 }

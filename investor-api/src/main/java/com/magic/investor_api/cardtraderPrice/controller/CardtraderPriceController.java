@@ -5,14 +5,11 @@ import com.magic.investor_api.cardtrader.service.CardTraderService;
 import com.magic.investor_api.cardtraderPrice.dto.CardtraderPriceDTO;
 import com.magic.investor_api.cardtraderPrice.service.CardtraderPriceService;
 import com.magic.investor_api.scryfall.dto.ScryfallCardDTO;
-import jdk.swing.interop.SwingInterOpUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.sql.SQLOutput;
 import java.util.Map;
 
 @RestController
@@ -41,13 +38,16 @@ public class CardtraderPriceController {
         dto.setLang(lang);
         dto.setCondition(condition);
         dto.setFoil(isFoil);
-        System.out.println(dto);
-        if (cardtraderPriceService.updateCardtraderPrices(dto)) {
 
-            CardtraderPriceDTO price = cardtraderPriceService.getCardtraderPrice(dto);
+        // Actualiza precios de cardtrader API
+        cardtraderPriceService.updateCardtraderPrices(dto);
+        // Obtiene precios de cardtrader_price
+        CardtraderPriceDTO price = cardtraderPriceService.getCardtraderPrice(dto);
 
+        if(price != null){
             return ResponseEntity.ok(price);
         }
+
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(Map.of(

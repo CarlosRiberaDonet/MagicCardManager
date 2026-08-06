@@ -22,11 +22,4 @@ public class AdminController {
         scheduledTask.updateBBDD();
         return ResponseEntity.ok("Actualización iniciada");
     }
-
-    // Limpiar de la tabla las expansiones que no tienen cartas
-    @PostMapping("clean/expansion")
-        public ResponseEntity<String> cleanExpansion(){
-        return ResponseEntity.ok("Expansiones actualizadas.");
-        }
-
 }

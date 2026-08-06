@@ -24,11 +24,10 @@ public class ScryfallAPI {
            URL url = new URL(SCRYFALL_EDITIONS);
            try(InputStream in = url.openStream()){
                FileOutputStream out = new FileOutputStream(EDITIONS_PATH);
-               System.out.println("Iniciando descarga de ediciones desde scryfall...");
+
                // Copia el contenido del stream de scryfall al directorio EDITIONS
                in.transferTo(out);
            }
-            System.out.println("Archivo guardado con éxito en: " + EDITIONS_PATH);
         }catch (IOException e) {
             System.err.println("Error al descargar el JSON de ediciones: " + e.getMessage());
         }
@@ -40,12 +39,9 @@ public class ScryfallAPI {
             URL url = new URL(SCRYFALL_ALL_CARDS);
             try (InputStream in = url.openStream();
                 FileOutputStream out = new FileOutputStream(CARDS_PATH)) {
-                System.out.println("Iniciando descarga de cartas desde scryfall...");
                 // Copia el contenido del stream de scryfall al directorio CARDS
                 in.transferTo(out);
             }
-
-            System.out.println("Archivo guardado con éxito en: " + CARDS_PATH);
 
         } catch (IOException e) {
             System.err.println("Error al descargar el JSON de cartas: " + e.getMessage());

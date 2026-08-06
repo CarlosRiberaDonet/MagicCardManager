@@ -39,7 +39,6 @@ public class UserDAO {
 
         // Compruebo si la carta ya está en la colección del usuario
         if (selectCollectionCardQuantity(dto) > 0) {
-            System.out.println("La carta ya está en la colección " );
             return updateQuantityCollection(dto, +1); // Sumo +1 a la cantidad de la carta
         }
 
@@ -292,9 +291,6 @@ public class UserDAO {
             throw new RuntimeException(e);
         }
 
-        for(UserWatchlistDTO d : userWatchlistDTOList){
-            System.out.println(d.toString());
-        }
         return userWatchlistDTOList;
     }
 
@@ -358,7 +354,6 @@ public class UserDAO {
                 if(cardmarketPrice.getUpdatedAt() == null){
                     // Obtengo cardtraderId
                     Long cardTraderId = cardtraderDAO.selectCardTraderId(scryfallCardDTO.getScryfallId());
-                    System.out.println("cardtraderId obtenido: " + cardTraderId);
                     // Si existe cardtraderId
                     if(cardTraderId > 0) {
                         // Creo objeto CardTraderListing
@@ -379,7 +374,6 @@ public class UserDAO {
                 }else{
                     scryfallCardDTO.setPriceSource("CARDMARKET");
                 }
-                System.out.println(collectionDTO);
 
                 userCollectionDTO.add(collectionDTO);
             }

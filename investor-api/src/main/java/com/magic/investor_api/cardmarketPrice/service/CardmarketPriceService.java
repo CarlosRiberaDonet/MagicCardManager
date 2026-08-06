@@ -17,6 +17,9 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,67 +36,60 @@ public class CardmarketPriceService {
     private final String basePath = System.getProperty("user.dir");
     private final ScryfallCardDAO scryfallCardDAO;
 
-    // Importar precios de JSON Cardmarket a card_price
     public void importGuidePricesToBD() throws IOException {
 
         // Limpiar tabla antes de cargar nuevos datos
         cardmarketPriceDAO.truncateCardPrice();
 
-        String path = basePath + "/guide-prices.json";
+        Path jsonPath = Paths.get(basePath, "guide-prices.json");
 
         List<CardmarketPrice> batch = new ArrayList<>();
 
         JsonFactory factory = new JsonFactory();
 
-        try (JsonParser parser = factory.createParser(new File(path))) {
+        try (JsonParser parser = factory.createParser(jsonPath.toFile())) {
 
-            // El JSON raíz debe ser un objeto { ... }
             if (parser.nextToken() != JsonToken.START_OBJECT) {
                 throw new IOException("JSON inválido: se esperaba un objeto raíz");
             }
 
-            // Recorremos campos del objeto raíz: version, createdAt, priceGuides
             while (parser.nextToken() != JsonToken.END_OBJECT) {
 
                 String fieldName = parser.currentName();
-
-                // Avanzar al valor del campo actual
                 parser.nextToken();
 
-                // Solo nos interesa priceGuides
                 if (!"priceGuides".equals(fieldName)) {
                     parser.skipChildren();
                     continue;
                 }
 
-                // Ahora estamos en el ARRAY priceGuides
                 if (parser.currentToken() != JsonToken.START_ARRAY) {
                     throw new IOException("priceGuides no es un array válido");
                 }
 
-                // Iterar sobre cada elemento del array
                 while (parser.nextToken() != JsonToken.END_ARRAY) {
 
-                    // Convertimos cada objeto del array a JsonNode de forma segura
                     JsonNode guide = objectMapper.readTree(parser);
 
-                    // Mapeo a entidad
                     CardmarketPrice price = mapNodeToCardmarketPrice(guide);
-
                     batch.add(price);
 
-                    // Batch insert cada 1000 registros
                     if (batch.size() >= 1000) {
                         cardmarketPriceRepository.saveAll(batch);
                         batch.clear();
-                        System.out.println("Batch insert ejecutado");
                     }
                 }
             }
 
-            // Insert final de lo que quede en memoria
             if (!batch.isEmpty()) {
                 cardmarketPriceRepository.saveAll(batch);
+            }
+
+        } finally {
+            try {
+                Files.deleteIfExists(jsonPath);
+            } catch (IOException e) {
+                System.err.println("No se pudo eliminar guide-prices.json: " + e.getMessage());
             }
         }
     }
@@ -104,8 +100,6 @@ public class CardmarketPriceService {
         JsonNode idProductNode = node.get("idProduct");
 
         if (idProductNode == null) {
-            System.out.println("Nodo sin idProduct:");
-            System.out.println(node.toPrettyString());
             return null;
         }
         price.setCardmarketId(node.get("idProduct").asLong());

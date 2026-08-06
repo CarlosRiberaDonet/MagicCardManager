@@ -14,8 +14,7 @@ public class CardmarketDownloader {
     String CARDS_PRICES_JSON_PATH = basePath + "/guide-prices.json";
     public void downloadGuidePrice() {
         try {
-            System.out.println("user.dir = " + System.getProperty("user.dir"));
-            System.out.println("Destino = " + CARDS_PRICES_JSON_PATH);
+
             URL url = new URL(URL_S3);
             try (InputStream in = url.openStream();
                  FileOutputStream out = new FileOutputStream(CARDS_PRICES_JSON_PATH)) {

@@ -25,7 +25,6 @@ public class ScryfallController {
     @PostMapping("/editions")
     public ResponseEntity<String> editions(){
         try{
-            System.out.println("Proceso de descarga iniciado...");
             scryfallService.importScryfallEditionsToDB();
             return ResponseEntity.ok("Descarga completada.");
         }catch (Exception e) {
@@ -38,7 +37,6 @@ public class ScryfallController {
     @PostMapping("/cards")
     public ResponseEntity<String> cards() {
         try {
-            System.out.println("Proceso de descarga iniciado...");
             scryfallService.importScryfallCardsToBD();
             return ResponseEntity.ok("Descarga completada.");
         } catch (Exception e) {
@@ -74,10 +72,9 @@ public class ScryfallController {
     // Obtener detalles de carta
     @GetMapping("/{cardId}")
     public ScryfallCardDTO searchCardById(@PathVariable Long cardId,
-                                      @RequestParam(required = false) String lang,
                                       @RequestParam(required = false, defaultValue = "NM") String condition,
                                       @RequestParam(required = false, defaultValue = "false") boolean isFoil
     ){
-        return scryfallService.selectScryfallCard(cardId, lang, condition, isFoil);
+        return scryfallService.selectScryfallCard(cardId, condition, isFoil);
     }
 }

@@ -196,7 +196,3 @@ CREATE TABLE user_watchlist (
     CONSTRAINT uq_watchlist UNIQUE (user_id, card_id, card_condition, is_foil)
 )
 CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
-
-SELECT * FROM user;
-SELECT COUNT(*) FROM scryfall_set;

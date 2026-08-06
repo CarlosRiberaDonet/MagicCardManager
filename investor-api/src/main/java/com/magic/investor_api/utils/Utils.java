@@ -6,11 +6,12 @@ public class Utils {
 
         M("Mint"),
         NM("Near Mint"),
-        EX("Excellent"),
-        GD("Good"),
+        EX("Slightly Played"),
+        GD("Moderately Played"),
         LP("Slightly Played"),
-        PL("Moderately Played"),
+        PL("Played"),
         PO("Poor");
+
 
         private final String cardTraderValue;
 

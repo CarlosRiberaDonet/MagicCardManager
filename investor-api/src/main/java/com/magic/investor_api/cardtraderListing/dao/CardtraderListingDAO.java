@@ -18,7 +18,6 @@ public class CardtraderListingDAO {
 
     // Insertar o actualizar precios en cardtrader_listing
     public void insertCardtraderListingPrices(List<CardtraderListing> listing) {
-        System.out.println("INSERTANDO PRECIOS DE CARDTRADER_LISTING");
         String sql = """
         INSERT INTO cardtrader_listing (
             card_id,

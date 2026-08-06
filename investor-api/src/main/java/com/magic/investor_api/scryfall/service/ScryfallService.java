@@ -10,18 +10,24 @@ import com.magic.investor_api.CardPageDTO;
 import com.magic.investor_api.api.ScryfallAPI;
 import com.magic.investor_api.cardmarketPrice.model.CardmarketPrice;
 import com.magic.investor_api.cardmarketPrice.service.CardmarketPriceService;
+import com.magic.investor_api.cardtraderPrice.dto.CardtraderPriceDTO;
+import com.magic.investor_api.cardtraderPrice.service.CardtraderPriceService;
 import com.magic.investor_api.expansion.dao.ExpansionDAO;
 import com.magic.investor_api.expansion.ScryfallSet;
 import com.magic.investor_api.scryfall.dto.ScryfallCardDTO;
 import com.magic.investor_api.scryfall.model.ScryfallCard;
 import com.magic.investor_api.scryfall.repository.ScryfallRepository;
 import com.magic.investor_api.scryfall.dao.ScryfallCardDAO;
+import com.magic.investor_api.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +44,7 @@ public class ScryfallService {
     private final ExpansionDAO expansionDAO;
     private final ScryfallCardDAO scryfallCardDAO;
     private final CardmarketPriceService cardmarketPriceService;
+    private final CardtraderPriceService cardtraderPriceService;
     private CardPageDTO cardPageDTO;
 
 
@@ -55,38 +62,46 @@ public class ScryfallService {
             Map.entry("zht", "language=11")
     );
 
-    // Insertar ediciones de scryfall json en la BD
     public void importScryfallEditionsToDB() {
-        // Descarga JSON con las ediciones
         scryfallDownloader.getEditions();
-        String EDITIONS = path + "/editions.json";
-        try{
-            InputStream input = new FileInputStream(EDITIONS);
+
+        Path editionsPath = Paths.get(path, "editions.json");
+
+        try (InputStream input = Files.newInputStream(editionsPath)) {
+
             List<ScryfallSet> scryfallExpansionList = new ArrayList<>();
+
             JsonNode root = objectMapper.readTree(input);
             JsonNode data = root.get("data");
-            for(JsonNode node : data){
+
+            for (JsonNode node : data) {
                 ScryfallSet edition = mapNodeToScryfallSet(node);
                 scryfallExpansionList.add(edition);
             }
-            // Insertar lista de expansiones en la BD
+
             expansionDAO.insertScryfallSet(scryfallExpansionList);
-        } catch (IOException e){
+
+        } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            try {
+                Files.deleteIfExists(editionsPath);
+            } catch (IOException e) {
+                System.err.println("No se pudo eliminar editions.json: " + e.getMessage());
+            }
         }
     }
 
-    // Inserta cards de scryfall json en la BD
     public void importScryfallCardsToBD() throws IOException {
 
-        // Descargar cartas de scryfall
+        // Descargar cartas de Scryfall
         scryfallDownloader.downloadCards();
-        String CARDS = path + "/cards.json";
 
-        InputStream input = new FileInputStream(CARDS);
+        Path cardsPath = Paths.get(path, "cards.json");
         JsonFactory factory = new JsonFactory();
 
-        try (JsonParser parser = factory.createParser(input)) {
+        try (InputStream input = Files.newInputStream(cardsPath);
+             JsonParser parser = factory.createParser(input)) {
 
             if (parser.nextToken() != JsonToken.START_ARRAY) {
                 throw new IOException("Formato JSON inválido");
@@ -98,26 +113,28 @@ public class ScryfallService {
             while (parser.nextToken() == JsonToken.START_OBJECT) {
                 JsonNode node = objectMapper.readTree(parser);
 
-                // Lógica de mapeo
                 ScryfallCard card = mapNodeToScryfallCard(node);
                 batch.add(card);
                 totalProcessed++;
 
-                // Cada 1000 cartas, vuelco a la BD
                 if (totalProcessed % 1000 == 0) {
                     ScryfallCardRepository.saveAll(batch);
                     batch.clear();
-                    System.out.println("Cartas en BD: " + totalProcessed);
                 }
             }
 
-            // Volcar las cartas que queden
             if (!batch.isEmpty()) {
                 ScryfallCardRepository.saveAll(batch);
-                batch.clear();
             }
-        } catch (IOException e){
+
+        } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            try {
+                Files.deleteIfExists(cardsPath);
+            } catch (IOException e) {
+                System.err.println("No se pudo eliminar cards.json: " + e.getMessage());
+            }
         }
     }
 
@@ -249,33 +266,36 @@ public class ScryfallService {
     }
 
     // Obtiene carta con datos completos mediante su id
-    public ScryfallCardDTO selectScryfallCard(Long cardId, String lang, String condition, boolean isFoil){
+    public ScryfallCardDTO selectScryfallCard(Long cardId, String condition, boolean isFoil){
 
         // Obtengo datos de la carta
         ScryfallCardDTO card = getScryfallCard(cardId);
         // Seteo datos a objeto DTO
-        //card.setLang(lang);
         card.setCondition(condition);
         card.setFoil(isFoil);
 
+        System.out.println(card);
+
         // Si existe cardmarketId y la condicion es NM
-       /* if(card.getCardmarketId() > 0 && condition.equals("NM")){
+        if(card.getCardmarketId() > 0 && condition.equals("NM")){
             // Trato de obtener precios de cardmarket_price
             CardmarketPrice cardmarketPrice = getCardmarketPrice(card.getCardmarketId());
-            // Si la carta tiene precio en cardmarket_price, devuelvo el objeto
+            // Si la carta tiene precio en cardmarket_price, asigno los precios obtenido de cardmarket_price
             if(cardmarketPrice != null){
                 card.setCardPrice(cardmarketPrice);
                 return card;
             }
-        }
+        } else{ // Si la carta no tiene cardmarketId o, condition != "NM" o, no hay precios en carmarket_price
 
-        // Si la carta no tiene cardmarketId o, condition != "NM" o, no hay precios en carmarket_price
-        // Trato de obtener precio de desde cardtrader_price
-        CardtraderPriceDTO cardtraderPrice = getCardtraderPrice(card);
-        if(cardtraderPrice != null){
-            card.setCardPrice(cardtraderPrice);
-            return card;
-        }*/
+
+            // Trato de obtener precio de desde cardtrader_price
+            CardtraderPriceDTO cardtraderPrice = cardtraderPriceService.getCardtraderPrice(card);
+            if(cardtraderPrice != null){
+                card.setCardPrice(cardtraderPrice);
+                return card;
+            }
+        }
+        card.setCondition(condition);
         return card;
     }
 }

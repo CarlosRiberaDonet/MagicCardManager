@@ -73,9 +73,7 @@ public class UserService {
             // Cambiar el email del user
             authDAO.changeUserEmail(email, request.getNewEmail());
             // Obtener usuario
-            System.out.println("Obteniendo datos del user");
             User user = authDAO.getUser(authDAO.findUserByEmail(request.getNewEmail()));
-            System.out.println(user);
             return user;
             // return authDAO.getUser(authDAO.findUserByEmail(email));
         }

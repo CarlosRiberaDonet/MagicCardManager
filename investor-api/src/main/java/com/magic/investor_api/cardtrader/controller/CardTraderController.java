@@ -42,7 +42,6 @@ public class CardTraderController {
             return ResponseEntity.noContent().build(); // 204
         }
 
-        System.out.println(priceDTO);
         return ResponseEntity.ok(priceDTO);
     }
 }
