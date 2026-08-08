@@ -19,7 +19,7 @@ public class ExpansionDAO {
     // Inserta las expansiones en la tabla scryfall_set
     public void insertScryfallSet(List<ScryfallSet> scryfallExpansionList) {
 
-        String INSERT_EXPANSION = "INSERT INTO scryfall_set(set_code, name, icon_svg_uri," +
+        String INSERT_EXPANSION = "INSERT IGNORE INTO scryfall_set(set_code, name, icon_svg_uri," +
                 " released_at) " +
                 "VALUES (?, ?, ?, ?)";
         try (Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(INSERT_EXPANSION)) {
@@ -40,7 +40,7 @@ public class ExpansionDAO {
     // Inserta las expansiones en la tabla cardtrader_set
     public void insertCardtraderExpansion(List<CardtraderSet> cardtraderExpansions) {
 
-        String query = "INSERT INTO cardtrader_set(id, code, name) " +
+        String query = "INSERT IGNORE INTO cardtrader_set(id, code, name) " +
                 "VALUES (?, ?, ?)";
 
         try (Connection conn = dataSource.getConnection();

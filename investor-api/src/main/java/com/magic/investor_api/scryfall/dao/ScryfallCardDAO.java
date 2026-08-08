@@ -2,6 +2,7 @@ package com.magic.investor_api.scryfall.dao;
 
 import com.magic.investor_api.cardmarketPrice.model.CardmarketPrice;
 import com.magic.investor_api.scryfall.dto.ScryfallCardDTO;
+import com.magic.investor_api.scryfall.model.ScryfallCard;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import javax.sql.DataSource;
@@ -17,6 +18,87 @@ public class ScryfallCardDAO {
     @Autowired
     private DataSource dataSource;
 
+    // Inserta cartas en en tabla scryfall_card
+    public void insertScryfallCards(List<ScryfallCard> cards) {
+
+        String sql = """
+        INSERT INTO scryfall_card (
+            scryfall_id,
+            cardmarket_id,
+            name,
+            printed_name,
+            lang,
+            image_url,
+            rarity,
+            set_name,
+            set_code,
+            collector_number,
+            cardmarket_url,
+            type_line,
+            border_color,
+            frame,
+            is_foil,
+            is_reprint,
+            released_at,
+            game_changer
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ON DUPLICATE KEY UPDATE
+            cardmarket_id = VALUES(cardmarket_id),
+            name = VALUES(name),
+            printed_name = VALUES(printed_name),
+            lang = VALUES(lang),
+            image_url = VALUES(image_url),
+            rarity = VALUES(rarity),
+            set_name = VALUES(set_name),
+            set_code = VALUES(set_code),
+            collector_number = VALUES(collector_number),
+            cardmarket_url = VALUES(cardmarket_url),
+            type_line = VALUES(type_line),
+            border_color = VALUES(border_color),
+            frame = VALUES(frame),
+            is_foil = VALUES(is_foil),
+            is_reprint = VALUES(is_reprint),
+            released_at = VALUES(released_at),
+            game_changer = VALUES(game_changer)
+        """;
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            for (ScryfallCard card : cards) {
+
+                stmt.setString(1, card.getScryfallId());
+                stmt.setObject(2, card.getCardmarketId());
+                stmt.setString(3, card.getName());
+                stmt.setString(4, card.getPrintedName());
+                stmt.setString(5, card.getLang());
+                stmt.setString(6, card.getImageUrl());
+                stmt.setString(7, card.getRarity());
+                stmt.setString(8, card.getSetName());
+                stmt.setString(9, card.getSetCode());
+                stmt.setString(10, card.getCollectorNumber());
+                stmt.setString(11, card.getCardmarketURL());
+                stmt.setString(12, card.getTypeLine());
+                stmt.setString(13, card.getBorderColor());
+                stmt.setString(14, card.getFrame());
+                stmt.setBoolean(15, card.isFoil());
+                stmt.setBoolean(16, card.isReprint());
+                stmt.setObject(17, card.getReleasedAt());
+                stmt.setBoolean(18, card.isGameChanger());
+
+                stmt.addBatch();
+            }
+
+            stmt.executeBatch();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(
+                    "Error insertando/actualizando cartas de Scryfall",
+                    e
+            );
+        }
+    }
     // Busca cartas aplicando filtros opcionales. Todos los parámetros son opcionales excepto size y offset.
     public List<ScryfallCardDTO> selectFiltersCard(
             String name,
@@ -214,54 +296,6 @@ public class ScryfallCardDAO {
         return -1L;
     }
 
-    // Obtener detalles de carta mediante id de scryfall_id
-    public ScryfallCardDTO getScryfallCardById(String scryfallId){
-
-        String query = "SELECT sc.id, sc.scryfall_id, sc.cardmarket_id, sc.name, sc.printed_name, " +
-                "sc.lang, sc.image_url, sc.rarity, sc.set_code, sc.set_name, sc.collector_number, sc.cardmarket_url, " +
-                "sc.price, sc.price_foil, sc.type_line, " +
-                "sc.border_color, sc.frame, sc.is_reprint, sc.released_at, " +
-                "ss.set_code, ss.icon_svg_uri " +
-                "FROM scryfall_card sc " +
-                "JOIN scryfall_set ss ON sc.set_code = ss.set_code " +
-                "WHERE id = ?";
-
-        try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)){
-
-            stmt.setString(1, scryfallId);
-
-            ResultSet rs = stmt.executeQuery();
-            if(rs.next()){
-                ScryfallCardDTO card = new ScryfallCardDTO();
-                card.setId(rs.getLong("id"));
-                card.setScryfallId(rs.getString("sc.scryfall_id"));
-                card.setCardmarketId(rs.getLong("sc.cardmarket_id"));
-                card.setName(rs.getString("sc.name"));
-                card.setPrintedName(rs.getString("sc.printed_name"));
-                card.setLang(rs.getString("sc.lang"));
-                card.setImageUrl(rs.getString("sc.image_url"));
-                card.setRarity(rs.getString("sc.rarity"));
-                card.setSetCode(rs.getString("set_code"));
-                card.setSetName(rs.getString("sc.set_name"));
-                card.setCollectorNumber(rs.getString("sc.collector_number"));
-                card.setCardmarketURL(rs.getString("sc.cardmarket_url"));
-                card.setTypeLine(rs.getString("sc.type_line"));
-                card.setBorderColor(rs.getString("sc.border_color"));
-                card.setFrame(rs.getString("sc.frame"));
-                card.setReprint(rs.getBoolean("sc.is_reprint"));
-                card.setSetCode(rs.getString("ss.set_code"));
-                card.setIconSvgUri(rs.getString("ss.icon_svg_uri"));
-
-                card.setReleasedAt(rs.getDate("released_at") != null ? rs.getDate("released_at").toLocalDate() : null);
-
-                return card;
-            }
-        }catch (SQLException e){
-            throw new RuntimeException(e);
-        }
-        return null;
-    }
-
     // Obtener detalles de carta
     public ScryfallCardDTO getCardById(Long cardId){
 
@@ -307,53 +341,6 @@ public class ScryfallCardDAO {
             throw new RuntimeException(e);
         }
         return null;
-    }
-
-    // Obtiene URL de cardmarket
-    public String getUrlCard(Long cardId){
-
-        String query = "SELECT url FROM scryfall_card WHERE id = ? ";
-        try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)){
-
-            stmt.setLong(1, cardId);
-            ResultSet rs = stmt.executeQuery();
-            if(rs.next()){
-                return rs.getString("url");
-            }
-        }catch (SQLException e){
-            throw new RuntimeException(e);
-        }
-        return "";
-    }
-
-    // Borra los datos de la tabla scryfall_card
-    public void truncateScryfallCard(){
-        String query = "TRUNCATE TABLE scryfall_card";
-
-        try(Connection conn = dataSource.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(query)){
-            stmt.executeUpdate();
-        }catch (SQLException e){
-            throw new RuntimeException(e);
-        }
-    }
-
-    // Obtiene todos los scryfall_id
-    public List<String> getScryfallIdList(){
-        List<String> scryfallIdList = new ArrayList<>();
-        String query = "SELECT ct.cardtrader_id FROM cardtrader_card ct " +
-                "WHERE EXISTS (SELECT 1 ";
-        try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)){
-
-            ResultSet rs = stmt.executeQuery();
-            while(rs.next()){
-                String id = rs.getString("scryfall_id");
-                scryfallIdList.add(id);
-            }
-        }catch (SQLException e){
-            throw new RuntimeException(e);
-        }
-        return scryfallIdList;
     }
 
     // Actualiza el campo price

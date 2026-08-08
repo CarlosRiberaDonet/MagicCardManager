@@ -71,7 +71,6 @@ CREATE TABLE scryfall_card (
     INDEX idx_name (name),
     INDEX idx_printed_name (printed_name),
     INDEX idx_cardmarket (cardmarket_id),
-    INDEX idx_scryfall (scryfall_id),
     INDEX idx_rarity (rarity),
     INDEX idx_lang (lang),
     INDEX idx_set_name (set_name),
@@ -84,7 +83,7 @@ CREATE TABLE cardtrader_card (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     scryfall_id VARCHAR(100),
     cardmarket_id BIGINT,
-    cardtrader_id BIGINT,
+    cardtrader_id BIGINT UNIQUE,
     name VARCHAR(255),
     rarity VARCHAR(20),
     expansion_id BIGINT NOT NULL,
@@ -196,3 +195,13 @@ CREATE TABLE user_watchlist (
     CONSTRAINT uq_watchlist UNIQUE (user_id, card_id, card_condition, is_foil)
 )
 CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+SELECT * FROM cardtrader_listing;
+SELECT * FROM cardtrader_price;
+
+TRUNCATE TABLE cardtrader_listing;
+TRUNCATE TABLE cardtrader_price;
+
+TRUNCATE TABLE user_user;
+TRUNCATE TABLE user_collection;
+TRUNCATE TABLE user_watchlist;

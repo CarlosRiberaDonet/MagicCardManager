@@ -70,4 +70,7 @@ public class ScryfallCard {
 
     @Column(name = "released_at")
     private LocalDate releasedAt;
+
+    @Column(name = "game_changer")
+    private boolean gameChanger;
 }

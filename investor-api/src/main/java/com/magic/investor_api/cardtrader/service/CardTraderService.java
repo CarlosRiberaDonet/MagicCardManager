@@ -22,10 +22,8 @@ import java.util.List;
 public class CardTraderService {
 
     private final CardTraderAPI cardTraderAPI;
-    private final CardtraderRepository cardtraderRepository;
     private final ExpansionDAO expansionDAO;
     private final CardtraderDAO cardtraderDAO;
-    private final CardtraderPriceDAO cardtraderPriceDAO;
     private final CardtraderPriceService cardtraderPriceService;
 
     // Obtiene lista de expansiones de la API cardtrader
@@ -36,29 +34,41 @@ public class CardTraderService {
 
     // Obtiene todas las cartas de las expansiones
     public void cardsByExpansion() {
+
         List<CardtraderCard> batch = new ArrayList<>();
-        // Lista de id de expansiones de card_trader_expansion
+
         List<Long> expansionList = expansionDAO.getExpansionListId();
 
-        for(Long e : expansionList){
-            try{
-                // Obtiene todas las cartas de cada expansión
+        for (Long e : expansionList) {
+
+            try {
+
                 JsonNode root = cardTraderAPI.getCardtraderCards(e);
 
-                if (root == null || root.isEmpty() || root.isMissingNode() || !root.isArray())  {
+                if (root == null ||
+                        root.isEmpty() ||
+                        root.isMissingNode() ||
+                        !root.isArray()) {
+
                     continue;
                 }
-                // Iteración de cartas dentro de la expansión
+
                 for (JsonNode node : root) {
-                    // Mapeo los datos obtenidos del JSON a objeto CardtraderCard
-                    batch.add(mapNodeToCardtraderCard(node)); // Agrego la carta al batch
+
+                    batch.add(
+                            mapNodeToCardtraderCard(node)
+                    );
                 }
-                // Vuelco el batch a la tabla cardtrader_card
+
                 if (!batch.isEmpty()) {
-                    cardtraderRepository.saveAll(batch);
+
+                    cardtraderDAO.insertCardtraderCards(batch);
+
                     batch.clear();
                 }
-            }catch (Exception ex){
+
+            } catch (Exception ex) {
+
                 ex.printStackTrace();
             }
         }

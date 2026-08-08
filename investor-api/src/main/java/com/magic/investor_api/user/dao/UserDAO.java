@@ -305,7 +305,7 @@ public class UserDAO {
                 "s.icon_svg_uri, " +
                 "cp.avg, cp.low, cp.trend, cp.avg_foil, cp.low_foil, cp.trend_foil, updated_at " +
                 "FROM user_collection uc " +
-                "JOIN scryfall_card sc ON uc.card_id = sc.id " +
+                "LEFT JOIN scryfall_card sc ON uc.card_id = sc.id " +
                 "LEFT JOIN scryfall_set s ON sc.set_code = s.set_code " +
                 "LEFT JOIN cardmarket_price cp ON cp.cardmarket_id = sc.cardmarket_id " +
                 "WHERE uc.user_id = ?";

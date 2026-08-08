@@ -94,6 +94,9 @@ public class ScryfallService {
 
     public void importScryfallCardsToBD() throws IOException {
 
+        System.out.println("========== INICIO IMPORTACIÓN SCRYFALL ==========");
+        long start = System.currentTimeMillis();
+
         // Descargar cartas de Scryfall
         scryfallDownloader.downloadCards();
 
@@ -115,19 +118,38 @@ public class ScryfallService {
 
                 ScryfallCard card = mapNodeToScryfallCard(node);
                 batch.add(card);
-                totalProcessed++;
 
-                if (totalProcessed % 1000 == 0) {
-                    ScryfallCardRepository.saveAll(batch);
+                if (batch.size() == 1000) {
+                    scryfallCardDAO.insertScryfallCards(batch);
                     batch.clear();
+                    System.out.println(
+                            "Scryfall: " + totalProcessed + " cartas procesadas"
+                    );
                 }
             }
 
             if (!batch.isEmpty()) {
-                ScryfallCardRepository.saveAll(batch);
+                scryfallCardDAO.insertScryfallCards(batch);
             }
 
+            long elapsed = System.currentTimeMillis() - start;
+
+            System.out.println(
+                    "========== IMPORTACIÓN SCRYFALL FINALIZADA =========="
+            );
+
+            System.out.println(
+                    "Total procesadas: " + totalProcessed
+            );
+
+            System.out.println(
+                    "Tiempo: " + (elapsed / 1000) + " segundos"
+            );
+
         } catch (IOException e) {
+            System.err.println(
+                    "========== ERROR EN IMPORTACIÓN SCRYFALL =========="
+            );
             e.printStackTrace();
         } finally {
             try {
