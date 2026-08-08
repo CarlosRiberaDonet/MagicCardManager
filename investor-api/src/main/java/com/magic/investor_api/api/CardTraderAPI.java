@@ -8,12 +8,15 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.List;
 
 
 @Service
 public class CardTraderAPI {
+    @Value("${cardtrader.api.token}")
+    private String apiToken;
 
     private final RestTemplate restTemplate = new RestTemplate();
 
@@ -21,8 +24,6 @@ public class CardTraderAPI {
     private static final String BLUEPRINTS_URL = "https://api.cardtrader.com/api/v2/blueprints";
 
     private static final String BASE_URL = "https://api.cardtrader.com/api/v2/marketplace/products";
-
-    private final String apiToken = [REDACTED-SECRET];
 
     // Obtener lista de expansiones de CardTrader
     public List<CardtraderSet> getExpansions() {

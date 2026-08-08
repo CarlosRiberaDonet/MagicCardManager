@@ -6,17 +6,17 @@ services:
     restart: unless-stopped
 
     environment:
-      MYSQL_ROOT_PASSWORD: unaPasswordSegura
-      MYSQL_DATABASE: magic
-      MYSQL_USER: investor_app
-      MYSQL_PASSWORD: unaPasswordSegura
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
 
     volumes:
       - mysql_data:/var/lib/mysql
       - ./BD_MAGIC.sql:/docker-entrypoint-initdb.d/BD_MAGIC.sql
 
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -31,11 +31,12 @@ services:
     restart: unless-stopped
 
     environment:
-      DB_HOST: db
-      DB_PORT: 3306
-      DB_NAME: magic
-      DB_USER: investor_app
-      DB_PASSWORD: unaPasswordSegura
+      CARDTRADER_API_TOKEN: ${CARDTRADER_API_TOKEN}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
       PORT: 8080
 
     depends_on:
