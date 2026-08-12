@@ -4,8 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
-import java.time.LocalDate;
-
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -24,5 +23,6 @@ public class CardtraderPriceDTO {
     private BigDecimal avg1;
     private BigDecimal avg7;
     private BigDecimal avg30;
-    private LocalDate updatedAt;
+    private LocalDateTime updatedAt;
+    private String priceSource;
 }

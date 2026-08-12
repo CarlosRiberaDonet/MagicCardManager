@@ -48,7 +48,6 @@ public class CardtraderPriceController {
             return ResponseEntity.ok(price);
         }
 
-
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(Map.of(
                         "message", "No se encontraron precios"

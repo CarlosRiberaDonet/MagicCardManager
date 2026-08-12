@@ -37,16 +37,6 @@ CREATE TABLE cardtrader_set (
     INDEX idx_name (name)
 )CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- Tabla que uso como checkpoint para contuniar actualizando cartas a través de su expansion (cardtrader)
-CREATE TABLE sync_progress (
-    code_expansion VARCHAR(255) PRIMARY KEY,
-    last_expansion_id BIGINT NOT NULL
-);
-
--- Inicialización mínima
-INSERT INTO sync_progress (code_expansion, last_expansion_id)
-VALUES ('card_variant_sync', 0);
-
 -- Fuente: Scryfall (catálogo base, todos los idiomas)
 CREATE TABLE scryfall_card (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -128,8 +118,7 @@ CREATE TABLE cardtrader_listing (
     is_foil BOOLEAN DEFAULT FALSE,
 	url VARCHAR(500),
     fetched_at DATETIME NOT NULL,
-
-	CONSTRAINT uk_listing UNIQUE (card_id, lang, card_condition, is_foil),
+    
     INDEX idx_lookup (card_id, scryfall_id, cardtrader_id, lang, card_condition, is_foil)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -195,13 +184,3 @@ CREATE TABLE user_watchlist (
     CONSTRAINT uq_watchlist UNIQUE (user_id, card_id, card_condition, is_foil)
 )
 CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
-SELECT * FROM cardtrader_listing;
-SELECT * FROM cardtrader_price;
-
-TRUNCATE TABLE cardtrader_listing;
-TRUNCATE TABLE cardtrader_price;
-
-TRUNCATE TABLE user_user;
-TRUNCATE TABLE user_collection;
-TRUNCATE TABLE user_watchlist;

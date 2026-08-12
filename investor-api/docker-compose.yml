@@ -32,6 +32,7 @@ services:
 
     environment:
       CARDTRADER_API_TOKEN: ${CARDTRADER_API_TOKEN}
+      JWT_SECRET: ${JWT_SECRET}
       DB_HOST: ${DB_HOST}
       DB_PORT: ${DB_PORT}
       DB_NAME: ${DB_NAME}

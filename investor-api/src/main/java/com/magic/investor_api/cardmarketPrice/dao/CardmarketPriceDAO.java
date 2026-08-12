@@ -49,16 +49,13 @@ public class CardmarketPriceDAO {
                 cardmarketPrice.setAvg1(rs.getBigDecimal("avg1"));
                 cardmarketPrice.setAvg7(rs.getBigDecimal("avg7"));
                 cardmarketPrice.setAvg30(rs.getBigDecimal("avg30"));
-
                 cardmarketPrice.setAvgFoil(rs.getBigDecimal("avg_foil"));
                 cardmarketPrice.setLowFoil(rs.getBigDecimal("low_foil"));
                 cardmarketPrice.setTrendFoil(rs.getBigDecimal("trend_foil"));
                 cardmarketPrice.setAvg1Foil(rs.getBigDecimal("avg1_foil"));
                 cardmarketPrice.setAvg7Foil(rs.getBigDecimal("avg7_foil"));
                 cardmarketPrice.setAvg30Foil(rs.getBigDecimal("avg30_foil"));
-
                 cardmarketPrice.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
-
                 return cardmarketPrice;
             }
 

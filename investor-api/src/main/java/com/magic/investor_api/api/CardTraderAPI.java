@@ -85,12 +85,7 @@ public class CardTraderAPI {
     public JsonNode fetchCardProducts(Long cardtraderId) {
 
         HttpHeaders headers = new HttpHeaders();
-        System.out.println("TOKEN PRESENTE: " + (apiToken != null));
-        System.out.println("TOKEN LONGITUD: " + (apiToken != null ? apiToken.length() : 0));
-        System.out.println("TOKEN INICIO: " +
-                (apiToken != null && apiToken.length() > 20
-                        ? apiToken.substring(0, 20)
-                        : "INVALIDO"));
+
         headers.setAccept(MediaType.parseMediaTypes("application/json"));
         headers.setBearerAuth(apiToken);
 

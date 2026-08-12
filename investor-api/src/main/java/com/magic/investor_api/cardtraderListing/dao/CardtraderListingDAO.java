@@ -29,18 +29,7 @@ public class CardtraderListingDAO {
             is_foil,
             url,
             fetched_at
-        )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ON DUPLICATE KEY UPDATE
-            scryfall_id = VALUES(scryfall_id),
-            cardtrader_id = VALUES(cardtrader_id),
-            price = VALUES(price),
-            card_condition = VALUES(card_condition),
-            lang = VALUES(lang),
-            is_foil = VALUES(is_foil),
-            url = VALUES(url),
-            fetched_at = VALUES(fetched_at)
-        """;
+        ) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)""";
 
         try (Connection conn = dataSource.getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -61,6 +50,101 @@ public class CardtraderListingDAO {
 
 
         } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    // Obtener medias históricas de cardtrader_listing
+    public List<CardtraderPrice> getCardtraderHistoricalValues(Long cardId) {
+
+        List<CardtraderPrice> cardtraderPriceList = new ArrayList<>();
+
+        String query = """
+        SELECT
+            card_id,
+            cardtrader_id,
+            lang,
+            card_condition,
+            is_foil,
+
+            AVG(
+                CASE
+                    WHEN fetched_at >= NOW() - INTERVAL 1 DAY
+                    THEN price
+                END
+            ) AS avg1,
+
+            AVG(
+                CASE
+                    WHEN fetched_at >= NOW() - INTERVAL 7 DAY
+                    THEN price
+                END
+            ) AS avg7,
+
+            AVG(
+                CASE
+                    WHEN fetched_at >= NOW() - INTERVAL 30 DAY
+                    THEN price
+                END
+            ) AS avg30
+
+        FROM cardtrader_listing
+
+        WHERE card_id = ?
+
+        GROUP BY
+            card_id,
+            cardtrader_id,
+            lang,
+            card_condition,
+            is_foil
+        """;
+
+        try (
+                Connection conn = dataSource.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(query)
+        ) {
+
+            stmt.setLong(1, cardId);
+
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+
+                CardtraderPrice cardPrice = new CardtraderPrice();
+
+                cardPrice.setCardId(rs.getLong("card_id"));
+                cardPrice.setCardtraderId(rs.getLong("cardtrader_id"));
+                cardPrice.setLang(rs.getString("lang"));
+                cardPrice.setCondition(rs.getString("card_condition"));
+                cardPrice.setFoil(rs.getBoolean("is_foil"));
+
+                cardPrice.setAvg1(rs.getBigDecimal("avg1"));
+                cardPrice.setAvg7(rs.getBigDecimal("avg7"));
+                cardPrice.setAvg30(rs.getBigDecimal("avg30"));
+
+                cardtraderPriceList.add(cardPrice);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return cardtraderPriceList;
+    }
+
+    // Eliminar entradas con mas de 30 días
+    public void deleteCardPricesOlderThan30Days(Long id){
+        String sql = "DELETE FROM cardtrader_listing " +
+                "WHERE card_id = ? AND fetched_at < NOW() - INTERVAL 30 DAY";
+
+        try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)){
+
+            stmt.setLong(1, id);
+
+            stmt.executeUpdate();
+
+        } catch(SQLException e){
             throw new RuntimeException(e);
         }
     }

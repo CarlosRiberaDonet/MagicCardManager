@@ -13,6 +13,7 @@ import com.magic.investor_api.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -21,7 +22,6 @@ public class CardtraderPriceService {
 
     private final CardtraderListingDAO cardtraderListingDAO;
     private final CardtraderPriceDAO cardtraderPriceDAO;
-    private final CardtraderPriceRepository repository;
     private final CardtraderDAO cardtraderDAO;
     private final CardtraderListingService cardTraderListingService;
 
@@ -60,7 +60,6 @@ public class CardtraderPriceService {
 
             // Insertar lista de cartas de cardtrader_listing en cardtrader_price
             convertCardtraderListingToCardtraderPrice(card.getId());
-
         }
     }
 
@@ -68,7 +67,37 @@ public class CardtraderPriceService {
     public void convertCardtraderListingToCardtraderPrice(Long cardId){
 
         // Lista de cartas filtradas de cardtrader_listing
-        List<CardtraderPrice> cardPriceList = cardtraderListingDAO.getCardtraderListingValues(cardId);
+        List<CardtraderPrice> cardPriceList = new ArrayList<>();
+        List<CardtraderPrice> lowAndAvgPriceList =  cardtraderListingDAO.getCardtraderListingValues(cardId);
+        List<CardtraderPrice> historicalValuesList = cardtraderListingDAO.getCardtraderHistoricalValues(cardId);
+        for(CardtraderPrice p : lowAndAvgPriceList) {
+            CardtraderPrice cardtraderPrice = new CardtraderPrice();
+
+            cardtraderPrice.setCardId(p.getCardId());
+            cardtraderPrice.setCardtraderId(p.getCardtraderId());
+            cardtraderPrice.setLang(p.getLang());
+            cardtraderPrice.setCondition(p.getCondition());
+            cardtraderPrice.setLow(p.getLow());
+            cardtraderPrice.setAvg(p.getAvg());
+            cardtraderPrice.setUpdatedAt(p.getUpdatedAt());
+
+            for (CardtraderPrice h : historicalValuesList) {
+
+                if (p.getCardtraderId().equals(h.getCardtraderId())
+                        && p.getLang().equals(h.getLang())
+                        && p.getCondition().equals(h.getCondition())
+                        && p.isFoil() == h.isFoil()) {
+
+                    cardtraderPrice.setAvg1(h.getAvg1());
+                    cardtraderPrice.setAvg7(h.getAvg7());
+                    cardtraderPrice.setAvg30(h.getAvg30());
+                    cardtraderPrice.setTrend(h.getTrend());
+
+                    break;
+                }
+            }
+        cardPriceList.add(cardtraderPrice);
+        }
 
         // Inserto la lista en cardtrader_price
         cardtraderPriceDAO.insertCardtraderPrice(cardPriceList);

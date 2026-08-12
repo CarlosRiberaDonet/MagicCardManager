@@ -7,9 +7,7 @@ import com.magic.investor_api.cardtraderListing.repository.CardtraderListingRepo
 import com.magic.investor_api.cardtraderListing.model.CardtraderListing;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
-import java.sql.SQLOutput;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -24,18 +22,16 @@ public class CardtraderListingService {
     private final CardTraderAPI cardTraderAPI;
     private final CardtraderListingDAO cardtraderListingDAO;
 
-    // Compruebo si este cardtraderId ya existe en cardtrader_listing
-    public CardtraderListing checkCardtraderId(Long cartraderId){
-        return cardtraderListingDAO.checkCardtraderIdOnCardtraderListing(cartraderId);
-    }
-
     //  Obtener y mapear JsonNode del mercado de cartas cardtrader
     public void updateCardPrice(CardtraderListing request){
         // Obtengo lista de cartas a través del cardtraderId
         JsonNode node = cardTraderAPI.fetchCardProducts(request.getCardtraderId());
 
-        // Leo la respuesta JSON y convierto a objeto de tipo CardtraderListing e inserto en cardtrader_listing
+        // Leer JSON e insertar snapshot
         readCardtraderJsonNode(request, node);
+
+        // Eliminar snapshots de esta carta con más de 30 días
+        cardtraderListingDAO.deleteCardPricesOlderThan30Days(request.getCardId());
     }
 
     // Leer JSON de cartas y mapearlas a Lista<CardTraderListing>

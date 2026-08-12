@@ -4,8 +4,10 @@ import com.magic.investor_api.user.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Service
@@ -14,18 +16,17 @@ public class JwtService {
     // ===========================
     // CLAVE SECRETA JWT
     // ===========================
-    // IMPORTANTE:
-    // - Debe ser suficientemente larga
-    // - En producción debe ir en application.properties o vault
-    private static final String SECRET_KEY =
-            "clave_secreta_muy_larga_para_que_sea_segura_1234567890";
+    private final String secretKey;
 
     // ===========================
     // KEY FIRMA JWT (ÚNICA Y FIJA)
     // ===========================
-    // Se crea una sola vez para evitar inconsistencias entre firma y verificación
-    private final SecretKey key =
-            Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
+    private final SecretKey key;
+
+    public JwtService(@Value("${jwt.secret}") String secretKey) {
+        this.secretKey = secretKey;
+        this.key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
+    }
 
     // ===========================
     // GENERAR TOKEN JWT
@@ -49,7 +50,7 @@ public class JwtService {
                 // Expiración (24 horas)
                 .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
 
-                // FIRMA DEL TOKEN (IMPORTANTE: HS256)
+                // Firma del token
                 .signWith(key, Jwts.SIG.HS256)
 
                 .compact();

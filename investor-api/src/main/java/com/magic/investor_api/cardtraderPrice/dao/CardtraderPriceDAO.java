@@ -5,7 +5,7 @@ import com.magic.investor_api.cardtraderPrice.model.CardtraderPrice;
 import com.magic.investor_api.scryfall.dto.ScryfallCardDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-
+import java.time.LocalDateTime;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.List;
@@ -105,8 +105,9 @@ public class CardtraderPriceDAO {
                 dtoPrice.setAvg1(rs.getBigDecimal("avg1"));
                 dtoPrice.setAvg7(rs.getBigDecimal("avg7"));
                 dtoPrice.setAvg30(rs.getBigDecimal("avg30"));
-                dtoPrice.setUpdatedAt(rs.getDate("updated_at").toLocalDate());
 
+                java.sql.Timestamp timestamp = rs.getTimestamp("updated_at");
+                dtoPrice.setUpdatedAt(timestamp.toLocalDateTime());
                 return dtoPrice;
             }
 
