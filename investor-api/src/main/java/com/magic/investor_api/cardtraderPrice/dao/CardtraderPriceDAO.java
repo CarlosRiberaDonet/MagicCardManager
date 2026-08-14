@@ -3,6 +3,7 @@ package com.magic.investor_api.cardtraderPrice.dao;
 import com.magic.investor_api.cardtraderPrice.dto.CardtraderPriceDTO;
 import com.magic.investor_api.cardtraderPrice.model.CardtraderPrice;
 import com.magic.investor_api.scryfall.dto.ScryfallCardDTO;
+import com.magic.investor_api.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
@@ -80,14 +81,16 @@ public class CardtraderPriceDAO {
     // Obtener precios de cardtrader_price
     public CardtraderPriceDTO selectPriceFromCardtraderPrice(ScryfallCardDTO dto){
 
-        String query = "SELECT card_id, cardtrader_id, lang, card_condition, is_foil, avg, low, trend, avg1, avg7, avg30, updated_at " +
+        String query = "SELECT card_id, cardtrader_id, lang, card_condition, is_foil, " +
+                "avg, low, trend, avg1, avg7, avg30, updated_at " +
                 "FROM cardtrader_price " +
                 "WHERE cardtrader_id = ? AND card_condition = ? AND lang = ?  AND is_foil = ?";
 
         try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)){
 
             stmt.setLong(1, dto.getCardTraderId());
-            stmt.setString(2, dto.getCondition());
+            stmt.setString(2, Utils.CardCondition.valueOf(dto.getCondition())
+                    .getCardTraderValue());
             stmt.setString(3, dto.getLang());
             stmt.setBoolean(4, dto.isFoil());
 
@@ -108,6 +111,9 @@ public class CardtraderPriceDAO {
 
                 java.sql.Timestamp timestamp = rs.getTimestamp("updated_at");
                 dtoPrice.setUpdatedAt(timestamp.toLocalDateTime());
+
+                dtoPrice.setPriceSource("Cardtrader");
+                System.out.println("SOURCE: " + dto.getPriceSource());
                 return dtoPrice;
             }
 

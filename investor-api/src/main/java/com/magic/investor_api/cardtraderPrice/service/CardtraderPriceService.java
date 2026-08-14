@@ -30,10 +30,6 @@ public class CardtraderPriceService {
 
         // Asigno el cardTraderId mediante scryfallId
         card.setCardTraderId(cardtraderDAO.selectCardTraderId(card.getScryfallId()));
-        card.setCondition(
-                Utils.CardCondition.valueOf(card.getCondition())
-                        .getCardTraderValue()
-        );
 
         // Obtengo precios de la tabla cardtrader_price
         return cardtraderPriceDAO.selectPriceFromCardtraderPrice(card);

@@ -8,8 +8,8 @@ public class Utils {
         NM("Near Mint"),
         EX("Slightly Played"),
         GD("Moderately Played"),
-        LP("Slightly Played"),
-        PL("Played"),
+        LP("Played"),
+        PL("Heavily Played"),
         PO("Poor");
 
 

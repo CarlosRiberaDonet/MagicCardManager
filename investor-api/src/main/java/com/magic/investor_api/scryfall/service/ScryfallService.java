@@ -296,33 +296,29 @@ public class ScryfallService {
         card.setCondition(condition);
         card.setFoil(isFoil);
 
+        // Trato de obtener precio de desde cardtrader_price
+        CardtraderPriceDTO cardtraderPrice = cardtraderPriceService.getCardtraderPrice(card);
+        if(cardtraderPrice != null){
+            card.setCardPrice(cardtraderPrice);
+            card.setPriceSource("CardTrader");
+            System.out.println("FUENTE: " + card.getPriceSource());
+
+            return card;
+        }
+
         // Si existe cardmarketId y la condicion es NM
-        if(card.getCardmarketId() > 0 && condition.equals("NM")){
+        if(card.getCardmarketId() > 0){
             // Trato de obtener precios de cardmarket_price
             CardmarketPrice cardmarketPrice = getCardmarketPrice(card.getCardmarketId());
             // Si la carta tiene precio en cardmarket_price, asigno los precios obtenido de cardmarket_price
             if(cardmarketPrice != null){
                 card.setCardPrice(cardmarketPrice);
                 card.setPriceSource("CardMarket");
-                System.out.println(card.getPriceSource());
-                System.out.println("Card_id con precios modificados: " + card.getId());
-                return card;
-            }
-        } else{ // Si la carta no tiene cardmarketId o, condition != "NM" o, no hay precios en carmarket_price
-
-            // Trato de obtener precio de desde cardtrader_price
-            CardtraderPriceDTO cardtraderPrice = cardtraderPriceService.getCardtraderPrice(card);
-            if(cardtraderPrice != null){
-                card.setCardPrice(cardtraderPrice);
-                card.setPriceSource("CardTrader");
-                System.out.println(card.getPriceSource());
-                System.out.println("Card_id con precios modificados: " + card.getId());
+                System.out.println("FUENTE: " + card.getPriceSource());
                 return card;
             }
         }
-        card.setCondition(condition);
 
-        System.out.println("Card_id con precios modificados: " + card.getId());
         return card;
     }
 }
