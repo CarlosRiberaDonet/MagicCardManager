@@ -104,6 +104,13 @@ public class UserService {
 
     // Comprobar si el usuario tiene la carta en user_watchlist
     public boolean getWatchlistCardId(UserWatchlistDTO dto){
+        System.out.println(
+                "WATCHLIST CONTAINS -> userId=" + dto.getUserId() +
+                        ", cardId=" + dto.getCardId() +
+                        ", condition=" + dto.getCondition() +
+                        ", foil=" + dto.isFoil() +
+                        ", lang=" + dto.getLang()
+        );
        return userDAO.selectWatchlistCardId(dto);
     }
 

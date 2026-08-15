@@ -2,32 +2,43 @@ package com.magic.investor_api.user.dto;
 
 import com.magic.investor_api.scryfall.dto.ScryfallCardDTO;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public class UserWatchlistDTO {
 
     private Long userId;
     private Long cardId;
-    private Double lastPrice;
+    private BigDecimal lastPrice;
     private String condition;
     private boolean isFoil;
     private LocalDate addedAt;
+    private String lang;
     private ScryfallCardDTO scryfallCardDTO;
 
     // CONSTRUCTOR
     public UserWatchlistDTO() {
     }
 
-    public UserWatchlistDTO(Long userId, Long cardId, Double lastPrice, String condition, boolean isFoil ) {
+    public UserWatchlistDTO(Long userId, Long cardId, BigDecimal lastPrice, String condition, boolean isFoil, String lang ) {
         this.userId = userId;
         this.cardId = cardId;
         this.lastPrice = lastPrice;
         this.condition = condition;
         this.isFoil = isFoil;
+        this.lang = lang;
+    }
+
+    public UserWatchlistDTO(Long userId, Long cardId, String condition, boolean isFoil, String lang) {
+        this.userId = userId;
+        this.cardId = cardId;
+        this.condition = condition;
+        this.isFoil = isFoil;
+        this.addedAt = addedAt;
+        this.lang = lang;
     }
 
     // GETTERS Y SETTERS
-
     public Long getUserId() {
         return userId;
     }
@@ -44,11 +55,11 @@ public class UserWatchlistDTO {
         this.cardId = cardId;
     }
 
-    public Double getLastPrice() {
+    public BigDecimal getLastPrice() {
         return lastPrice;
     }
 
-    public void setLastPrice(Double lastPrice) {
+    public void setLastPrice(BigDecimal lastPrice) {
         this.lastPrice = lastPrice;
     }
 
@@ -66,6 +77,14 @@ public class UserWatchlistDTO {
 
     public void setFoil(boolean foil) {
         isFoil = foil;
+    }
+
+    public String getLang() {
+        return lang;
+    }
+
+    public void setLang(String lang) {
+        this.lang = lang;
     }
 
     public LocalDate getAddedAt() {

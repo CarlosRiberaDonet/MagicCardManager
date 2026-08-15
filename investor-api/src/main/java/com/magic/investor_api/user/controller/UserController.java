@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -52,11 +53,11 @@ public class UserController {
     public ResponseEntity<Boolean>  getCardWatchlistById(HttpServletRequest httpRequest,
                                                          @RequestParam Long cardId,
                                                          @RequestParam String condition,
-                                                         @RequestParam Double lastPrice,
-                                                         @RequestParam boolean isFoil){
+                                                         @RequestParam boolean isFoil,
+                                                         @RequestParam String lang){
         String token = httpRequest.getHeader("Authorization").substring(7);
         Long userId = jwtService.extractUserId(token);
-        UserWatchlistDTO dto = new UserWatchlistDTO(userId, cardId, lastPrice, condition, isFoil);
+        UserWatchlistDTO dto = new UserWatchlistDTO(userId, cardId, condition, isFoil, lang);
         boolean result = userService.getWatchlistCardId(dto);
         if(result) return ResponseEntity.ok(true);
         return ResponseEntity.ok(false);
@@ -81,9 +82,7 @@ public class UserController {
 
         String token = httpRequest.getHeader("Authorization").substring(7);
         Long userId = jwtService.extractUserId(token);
-
         boolean result = userService.delFromCollection(userId, request);
-
         return ResponseEntity.ok(result);
     }
 
@@ -94,6 +93,7 @@ public class UserController {
         String token = httpRequest.getHeader("Authorization").substring(7);
         Long userId = jwtService.extractUserId(token);
         boolean result = userService.addToWatchlist(userId, request);
+
         if(result) return ResponseEntity.ok("Carta añadida correctamente");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al añadir carta");
     }
