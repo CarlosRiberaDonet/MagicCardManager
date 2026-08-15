@@ -300,9 +300,6 @@ public class ScryfallService {
         CardtraderPriceDTO cardtraderPrice = cardtraderPriceService.getCardtraderPrice(card);
         if(cardtraderPrice != null){
             card.setCardPrice(cardtraderPrice);
-            card.setPriceSource("CardTrader");
-            System.out.println("FUENTE: " + card.getPriceSource());
-
             return card;
         }
 
@@ -313,8 +310,6 @@ public class ScryfallService {
             // Si la carta tiene precio en cardmarket_price, asigno los precios obtenido de cardmarket_price
             if(cardmarketPrice != null){
                 card.setCardPrice(cardmarketPrice);
-                card.setPriceSource("CardMarket");
-                System.out.println("FUENTE: " + card.getPriceSource());
                 return card;
             }
         }

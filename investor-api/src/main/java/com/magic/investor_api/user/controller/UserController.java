@@ -112,8 +112,7 @@ public class UserController {
     public List<UserCollectionDTO> getUserCards(HttpServletRequest httpRequest) {
         String token = httpRequest.getHeader("Authorization").substring(7);
         Long userId = jwtService.extractUserId(token);
-        List<UserCollectionDTO> dto = userService.getMyCollection(userId);
-        return dto;
+        return userService.getMyCollection(userId);
     }
 
     // Obtener watchlist del user

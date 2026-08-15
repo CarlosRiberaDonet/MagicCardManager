@@ -57,5 +57,4 @@ public class ScryfallCardDTO {
     private boolean isReprint;
     private LocalDate releasedAt;
     private Object cardPrice;
-    private String priceSource;
 }

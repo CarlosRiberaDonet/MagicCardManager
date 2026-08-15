@@ -84,11 +84,11 @@ public class CardtraderPriceDAO {
         String query = "SELECT card_id, cardtrader_id, lang, card_condition, is_foil, " +
                 "avg, low, trend, avg1, avg7, avg30, updated_at " +
                 "FROM cardtrader_price " +
-                "WHERE cardtrader_id = ? AND card_condition = ? AND lang = ?  AND is_foil = ?";
+                "WHERE card_id = ? AND card_condition = ? AND lang = ?  AND is_foil = ?";
 
         try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)){
 
-            stmt.setLong(1, dto.getCardTraderId());
+            stmt.setLong(1, dto.getId());
             stmt.setString(2, Utils.CardCondition.valueOf(dto.getCondition())
                     .getCardTraderValue());
             stmt.setString(3, dto.getLang());
@@ -113,7 +113,7 @@ public class CardtraderPriceDAO {
                 dtoPrice.setUpdatedAt(timestamp.toLocalDateTime());
 
                 dtoPrice.setPriceSource("Cardtrader");
-                System.out.println("SOURCE: " + dto.getPriceSource());
+                System.out.println("SOURCE: " + dtoPrice.getPriceSource());
                 return dtoPrice;
             }
 

@@ -35,7 +35,7 @@ public class CardTraderController {
             @RequestParam boolean isFoil
     ){
 
-        ScryfallCardDTO card =  cardTraderService.buildScryfallCardDTO(cardId, scryfallId, lang, condition, isFoil);
+        ScryfallCardDTO card = cardTraderService.buildScryfallCardDTO(cardId, scryfallId, lang, condition, isFoil);
         CardtraderPriceDTO priceDTO = cardTraderService.getCardtraderPrices(card);
 
         if (priceDTO == null) {

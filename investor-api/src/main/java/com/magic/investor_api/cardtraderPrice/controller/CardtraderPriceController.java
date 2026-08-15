@@ -39,6 +39,7 @@ public class CardtraderPriceController {
         dto.setCondition(condition);
         dto.setFoil(isFoil);
 
+        System.out.println("Carta recibida: " + dto);
         // Actualiza precios de cardtrader API
         cardtraderPriceService.updateCardtraderPrices(dto);
         // Obtiene precios de cardtrader_price
