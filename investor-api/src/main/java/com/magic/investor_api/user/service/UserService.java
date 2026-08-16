@@ -104,13 +104,6 @@ public class UserService {
 
     // Comprobar si el usuario tiene la carta en user_watchlist
     public boolean getWatchlistCardId(UserWatchlistDTO dto){
-        System.out.println(
-                "WATCHLIST CONTAINS -> userId=" + dto.getUserId() +
-                        ", cardId=" + dto.getCardId() +
-                        ", condition=" + dto.getCondition() +
-                        ", foil=" + dto.isFoil() +
-                        ", lang=" + dto.getLang()
-        );
        return userDAO.selectWatchlistCardId(dto);
     }
 
@@ -127,14 +120,12 @@ public class UserService {
     }
 
     // Añadir carta a tabla user_watchlist
-    public boolean addToWatchlist(Long userId, UserWatchlistDTO dto){
-        dto.setUserId(userId);
+    public boolean addToWatchlist(UserWatchlistDTO dto){
         return userDAO.insertWatchlistCard(dto);
     }
 
     // Eliminar carta de tabla user_watchlist
-    public boolean delFromWatchlist(Long userId, UserWatchlistDTO dto){
-        dto.setUserId(userId);
+    public boolean delFromWatchlist(UserWatchlistDTO dto){
         return userDAO.deleteWatchlistCard(dto);
     }
 

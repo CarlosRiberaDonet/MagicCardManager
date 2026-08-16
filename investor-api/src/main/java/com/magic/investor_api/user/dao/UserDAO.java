@@ -100,17 +100,17 @@ public class UserDAO {
     // Insertar carta en la tabla user_watchlist
     public boolean insertWatchlistCard(UserWatchlistDTO dto){
 
-        String query = "INSERT INTO user_watchlist (user_id, card_id, last_price, card_condition, is_foil, lang) " +
-                " VALUES (?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO user_watchlist (user_id, card_id, card_condition, is_foil, lang, " +
+                "last_price) VALUES (?, ?, ?, ?, ?, ?)";
 
         try(Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)){
 
             stmt.setLong(1, dto.getUserId());
             stmt.setLong(2, dto.getCardId());
-            stmt.setObject(3, dto.getLastPrice());
-            stmt.setString(4, Utils.CardCondition.valueOf(dto.getCondition()).getCardTraderValue());
-            stmt.setBoolean(5, dto.isFoil());
-            stmt.setString(6, dto.getLang());
+            stmt.setString(3, dto.getCondition());
+            stmt.setBoolean(4, dto.isFoil());
+            stmt.setString(5, dto.getLang());
+            stmt.setObject(6, dto.getLastPrice());
 
             int filasAfectadas = stmt.executeUpdate();
             if(filasAfectadas > 0){
@@ -124,56 +124,26 @@ public class UserDAO {
 
     public boolean deleteWatchlistCard(UserWatchlistDTO dto) {
 
-        String query;
-
-        if (dto.getLastPrice() == null) {
-
-            query = "DELETE FROM user_watchlist " +
-                    "WHERE user_id = ? " +
-                    "AND card_id = ? " +
-                    "AND last_price IS NULL " +
-                    "AND card_condition = ? " +
-                    "AND is_foil = ?";
+        String query = "DELETE FROM user_watchlist " +
+                "WHERE user_id = ? " +
+                "AND card_id = ? " +
+                "AND card_condition = ? " +
+                "AND is_foil = ?";
 
             try (Connection conn = dataSource.getConnection();
                  PreparedStatement stmt = conn.prepareStatement(query)) {
 
                 stmt.setLong(1, dto.getUserId());
                 stmt.setLong(2, dto.getCardId());
-                stmt.setString(3, Utils.CardCondition.valueOf(dto.getCondition())
-                        .getCardTraderValue());
+                stmt.setString(3, dto.getCondition());
                 stmt.setBoolean(4, dto.isFoil());
 
                 return stmt.executeUpdate() > 0;
             } catch (SQLException e){
                 throw new RuntimeException(e);
             }
-
-        } else {
-
-            query = "DELETE FROM user_watchlist " +
-                    "WHERE user_id = ? " +
-                    "AND card_id = ? " +
-                    "AND last_price = ? " +
-                    "AND card_condition = ? " +
-                    "AND is_foil = ?";
-
-            try (Connection conn = dataSource.getConnection();
-                 PreparedStatement stmt = conn.prepareStatement(query)) {
-
-                stmt.setLong(1, dto.getUserId());
-                stmt.setLong(2, dto.getCardId());
-                stmt.setBigDecimal(3, dto.getLastPrice());
-                stmt.setString(4, Utils.CardCondition.valueOf(dto.getCondition())
-                        .getCardTraderValue());
-                stmt.setBoolean(5, dto.isFoil());
-
-                return stmt.executeUpdate() > 0;
-            }catch (SQLException ex){
-                throw new RuntimeException(ex);
-            }
-        }
     }
+
 
     // Obtener cantidad de una carta en user_collection
     public int selectCollectionCardQuantity(UserCollectionDTO dto){
@@ -278,7 +248,7 @@ public class UserDAO {
     public List<UserWatchlistDTO> selectMyWatchlist(Long userId){
 
         List<UserWatchlistDTO> userWatchlistDTOList = new ArrayList<>();
-        String query = "SELECT wl.user_id, wl.card_id, wl.last_price, wl.card_condition, wl.is_foil, wl.added_at, " +
+        String query = "SELECT wl.user_id, wl.card_id, wl.last_price, wl.card_condition, wl.is_foil, wl.lang, wl.added_at, " +
                 "sc.name, sc.printed_name, sc.lang, sc.image_url, sc.rarity, sc.set_name, sc.set_code, sc.collector_number, " +
                 "s.set_code, s.icon_svg_uri, " +
                 "cp.low, cp.trend " +
@@ -305,6 +275,7 @@ public class UserDAO {
                 dto.setLastPrice(rs.getBigDecimal("last_price"));
                 dto.setCondition(rs.getString("card_condition"));
                 dto.setFoil(rs.getBoolean("is_foil"));
+                dto.setLang(rs.getString("lang"));
                 dto.setAddedAt(rs.getDate("added_at").toLocalDate().atStartOfDay().toLocalDate());
 
                 ScryfallCardDTO card = new ScryfallCardDTO();

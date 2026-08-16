@@ -58,6 +58,7 @@ public class UserController {
         String token = httpRequest.getHeader("Authorization").substring(7);
         Long userId = jwtService.extractUserId(token);
         UserWatchlistDTO dto = new UserWatchlistDTO(userId, cardId, condition, isFoil, lang);
+
         boolean result = userService.getWatchlistCardId(dto);
         if(result) return ResponseEntity.ok(true);
         return ResponseEntity.ok(false);
@@ -89,21 +90,33 @@ public class UserController {
     // Añadir carta en user_watchlist
     @PostMapping("/watchlist/add")
     public ResponseEntity<String> addToWatchlist(HttpServletRequest httpRequest,
-                                                 @RequestBody UserWatchlistDTO request){
+                                                 @RequestParam Long cardId,
+                                                 @RequestParam String condition,
+                                                 @RequestParam boolean isFoil,
+                                                 @RequestParam String lang,
+                                                 @RequestParam BigDecimal lastPrice){
         String token = httpRequest.getHeader("Authorization").substring(7);
         Long userId = jwtService.extractUserId(token);
-        boolean result = userService.addToWatchlist(userId, request);
+        UserWatchlistDTO dto = new UserWatchlistDTO(userId, cardId, condition, isFoil, lang, lastPrice);
+        System.out.println("Añadir: " + dto);
+        boolean result = userService.addToWatchlist(dto);
 
         if(result) return ResponseEntity.ok("Carta añadida correctamente");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al añadir carta");
     }
+
     // Eliminar carta en user_watchlist
     @DeleteMapping("/watchlist/del")
     public ResponseEntity<String> delFromWatchlist(HttpServletRequest httpRequest,
-                                                   @RequestBody UserWatchlistDTO request){
+                                                   @RequestParam Long cardId,
+                                                   @RequestParam String condition,
+                                                   @RequestParam boolean isFoil,
+                                                   @RequestParam String lang){
         String token = httpRequest.getHeader("Authorization").substring(7);
         Long userId = jwtService.extractUserId(token);
-        boolean result = userService.delFromWatchlist(userId, request);
+        UserWatchlistDTO dto = new UserWatchlistDTO(userId, cardId, condition, isFoil, lang);
+        System.out.println("Eliminar: " + dto);
+        boolean result = userService.delFromWatchlist(dto);
         if(result) return ResponseEntity.ok("Carta eliminada correctamente");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al eliminar carta");
     }

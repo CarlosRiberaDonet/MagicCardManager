@@ -20,7 +20,7 @@ public class UserWatchlistDTO {
     public UserWatchlistDTO() {
     }
 
-    public UserWatchlistDTO(Long userId, Long cardId, BigDecimal lastPrice, String condition, boolean isFoil, String lang ) {
+    public UserWatchlistDTO(Long userId, Long cardId, String condition, boolean isFoil, String lang, BigDecimal lastPrice) {
         this.userId = userId;
         this.cardId = cardId;
         this.lastPrice = lastPrice;
